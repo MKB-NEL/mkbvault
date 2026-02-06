@@ -3,102 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>MKBVAULT Mobile</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>MKBVAULT Mobile (2026)</title>
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Custom Styles -->
     <style>
-        /* Framer-inspired Mobile Variables */
         :root {
-            --background: #ffffff;
-            --surface: #fafafa;
-            --surface-elevated: #ffffff;
-            --elevation-1: 0 1px 2px rgba(0, 0, 0, 0.04);
-            --elevation-2: 0 2px 8px rgba(0, 0, 0, 0.08);
-            --elevation-3: 0 4px 16px rgba(0, 0, 0, 0.12);
             --primary: #0066ff;
             --primary-hover: #0052d9;
-            --text-primary: #000000;
-            --text-secondary: #666666;
-            --text-tertiary: #999999;
-            --border: #e5e5e5;
-            --border-hover: #d0d0d0;
             --success: #00c853;
             --warning: #ff9500;
             --danger: #ff3b30;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            --safe-top: env(safe-area-inset-top, 0px);
-            --safe-bottom: env(safe-area-inset-bottom, 0px);
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
-            line-height: 1.5;
-            font-weight: 400;
-            overflow-x: hidden;
-            padding-top: var(--safe-top);
-            padding-bottom: var(--safe-bottom);
-            position: fixed;
-            width: 100%;
-            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            background: #f8fafc;
+            height: 100vh;
+            overflow: hidden;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
-        /* Auto-lock Overlay */
+        /* Lock Overlay */
         .lock-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--background);
-            z-index: 1000;
+            background: white;
+            z-index: 10000;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 1.5rem;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1);
+            transition: opacity 0.3s ease;
         }
 
-        .lock-overlay.active {
+        .lock-overlay.is-active {
             opacity: 1;
             pointer-events: all;
         }
 
-        .lock-container {
+        .lock-modal {
             width: 100%;
-            max-width: 360px;
-            padding: 32px;
-            background: var(--surface-elevated);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--elevation-3);
-            text-align: center;
+            max-width: 340px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--danger);
+            overflow: hidden;
         }
 
-        .lock-icon {
-            font-size: 40px;
-            color: var(--danger);
-            margin-bottom: 20px;
-            opacity: 0.9;
+        .lock-header {
+            background: linear-gradient(90deg, var(--danger), #ff9500);
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
         }
 
         /* Header */
@@ -107,93 +73,63 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 56px;
-            background: var(--surface-elevated);
-            border-bottom: 1px solid var(--border);
-            padding: 0 16px;
+            height: 60px;
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 0 1rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            z-index: 100;
-            padding-top: var(--safe-top);
+            z-index: 1000;
+            padding-top: env(safe-area-inset-top);
         }
 
         .logo {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .logo-gradient {
-            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            font-size: 1.25rem;
+            font-weight: 900;
+            color: var(--primary);
         }
 
         .header-actions {
             display: flex;
-            align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
-        .header-button {
+        .header-btn {
             width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
-            font-size: 16px;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .header-button:hover {
-            background: var(--background);
-            color: var(--text-primary);
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 6px;
-            height: 6px;
-            background: var(--danger);
-            border-radius: 50%;
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            color: #64748b;
         }
 
         /* Connection Status */
         .connection-status {
             position: fixed;
             top: 70px;
-            right: 16px;
+            right: 1rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            padding: 0.5rem 0.75rem;
             display: flex;
             align-items: center;
-            gap: 6px;
-            padding: 6px 10px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 11px;
-            color: var(--text-secondary);
-            z-index: 99;
-            box-shadow: var(--elevation-1);
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #64748b;
+            z-index: 999;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .connection-dot {
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: var(--danger);
-            transition: var(--transition);
+            background: #94a3b8;
         }
 
         .connection-dot.connected {
@@ -204,54 +140,47 @@
         /* Main Content */
         .main-content {
             position: fixed;
-            top: 56px;
+            top: 60px;
             left: 0;
             right: 0;
             bottom: 72px;
             overflow-y: auto;
-            padding: 20px 16px;
+            padding: 1rem;
             -webkit-overflow-scrolling: touch;
+            padding-top: env(safe-area-inset-top);
         }
 
         /* Search Bar */
         .search-bar {
             width: 100%;
-            padding: 12px 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            color: var(--text-primary);
-            margin-bottom: 24px;
-            transition: var(--transition);
+            padding: 1rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
         }
 
         .search-bar:focus {
             outline: none;
             border-color: var(--primary);
-            background: var(--background);
-        }
-
-        .search-bar::placeholder {
-            color: var(--text-tertiary);
         }
 
         /* Quick Stats */
         .quick-stats {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 24px;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .stat-card {
-            padding: 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            cursor: pointer;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
         }
 
         .stat-card:active {
@@ -259,94 +188,48 @@
         }
 
         .stat-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
         }
 
         .stat-value {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-            letter-spacing: -0.02em;
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #1f2937;
+            line-height: 1;
+            margin-bottom: 0.25rem;
         }
 
         .stat-trend {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: var(--text-tertiary);
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            color: #64748b;
         }
 
         .trend-up { color: var(--success); }
         .trend-down { color: var(--danger); }
 
-        /* Loading States */
-        .loading {
-            display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .loading-text {
-            color: var(--text-tertiary);
-            font-style: italic;
-            font-size: 13px;
-        }
-
-        /* Section Headers */
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 32px 0 16px;
-        }
-
-        .section-title {
-            font-size: 18px;
-            font-weight: 700;
-        }
-
-        .section-action {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--primary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .section-action:hover {
-            color: var(--primary-hover);
-        }
-
         /* Quick Actions */
         .quick-actions {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 12px;
-            margin-bottom: 32px;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
         }
 
         .action-card {
-            padding: 16px 8px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem 0.5rem;
             text-align: center;
-            cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
         }
 
         .action-card:active {
@@ -354,35 +237,34 @@
         }
 
         .action-icon {
-            font-size: 20px;
+            font-size: 1.25rem;
             color: var(--primary);
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
         }
 
         .action-label {
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #475569;
         }
 
         /* Recent Items */
         .recent-list {
             display: flex;
             flex-direction: column;
-            gap: 8px;
-            margin-bottom: 32px;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
         }
 
         .recent-item {
-            padding: 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1rem;
             display: flex;
             align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: var(--transition);
+            gap: 1rem;
+            transition: all 0.3s ease;
         }
 
         .recent-item:active {
@@ -395,11 +277,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-size: 16px;
-            color: var(--text-secondary);
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            color: #64748b;
             flex-shrink: 0;
         }
 
@@ -409,73 +291,75 @@
         }
 
         .item-title {
-            font-weight: 600;
-            margin-bottom: 4px;
-            font-size: 15px;
+            font-weight: 700;
+            font-size: 0.875rem;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .item-subtitle {
-            font-size: 13px;
-            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            color: #64748b;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
         }
 
         .item-time {
-            font-size: 11px;
-            color: var(--text-tertiary);
-            font-weight: 500;
+            font-size: 0.75rem;
+            color: #94a3b8;
+            font-weight: 600;
             white-space: nowrap;
             flex-shrink: 0;
         }
 
-        /* Empty State */
-        .empty-state {
-            padding: 32px 16px;
-            text-align: center;
-            color: var(--text-tertiary);
-        }
-
-        .empty-icon {
-            font-size: 32px;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-
-        /* Security Status */
+        /* Security Card */
         .security-card {
-            padding: 20px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            margin-bottom: 24px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
         }
 
         .security-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
 
         .security-icon {
-            font-size: 20px;
+            font-size: 1.25rem;
             color: var(--success);
         }
 
         .security-title {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #1f2937;
         }
 
         .security-desc {
-            font-size: 14px;
-            color: var(--text-secondary);
+            font-size: 0.875rem;
+            color: #64748b;
             line-height: 1.5;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 3rem 1rem;
+            text-align: center;
+            color: #64748b;
+        }
+
+        .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
         /* Bottom Navigation */
@@ -485,34 +369,32 @@
             left: 0;
             right: 0;
             height: 72px;
-            background: var(--surface-elevated);
-            border-top: 1px solid var(--border);
+            background: white;
+            border-top: 2px solid #e5e7eb;
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
-            z-index: 100;
-            padding-bottom: var(--safe-bottom);
+            padding: 0.75rem 0;
+            z-index: 1000;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            padding: 8px 12px;
-            color: var(--text-tertiary);
-            cursor: pointer;
-            transition: var(--transition);
-            position: relative;
+            gap: 0.25rem;
+            padding: 0.5rem;
+            color: #94a3b8;
             flex: 1;
             max-width: 80px;
+            position: relative;
         }
 
-        .nav-item.active {
+        .nav-item.is-active {
             color: var(--primary);
         }
 
-        .nav-item.active::before {
+        .nav-item.is-active::before {
             content: '';
             position: absolute;
             top: 0;
@@ -525,12 +407,12 @@
         }
 
         .nav-icon {
-            font-size: 20px;
+            font-size: 1.25rem;
         }
 
         .nav-label {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 0.625rem;
+            font-weight: 700;
             letter-spacing: 0.05em;
         }
 
@@ -538,20 +420,18 @@
         .add-button {
             position: fixed;
             bottom: 88px;
-            right: 16px;
+            right: 1rem;
             width: 56px;
             height: 56px;
             background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
             color: white;
-            border-radius: var(--radius-md);
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            box-shadow: var(--elevation-3);
-            transition: var(--transition);
-            z-index: 99;
+            font-size: 1.25rem;
+            box-shadow: 0 10px 25px rgba(0, 102, 255, 0.3);
+            z-index: 999;
         }
 
         .add-button:active {
@@ -561,63 +441,52 @@
         /* Lock Timer */
         .lock-timer {
             position: fixed;
-            top: calc(56px + var(--safe-top) + 12px);
-            right: 16px;
-            background: var(--surface-elevated);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 8px 12px;
+            top: calc(60px + 0.5rem);
+            left: 1rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            padding: 0.5rem 0.75rem;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            color: var(--text-secondary);
-            box-shadow: var(--elevation-1);
-            z-index: 99;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: #64748b;
+            z-index: 999;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .timer-value {
-            font-weight: 700;
-            color: var(--text-primary);
+            font-weight: 900;
+            color: #1f2937;
             min-width: 16px;
             text-align: center;
         }
 
-        /* Inputs */
-        .input-field {
-            width: 100%;
-            padding: 16px;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            color: var(--text-primary);
-            margin: 16px 0;
-            transition: var(--transition);
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e7eb;
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            vertical-align: middle;
         }
 
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary);
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
 
-        .button {
-            width: 100%;
-            padding: 16px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
+        /* Hide scrollbar */
+        .main-content::-webkit-scrollbar {
+            display: none;
         }
 
-        .button:active {
-            transform: scale(0.98);
+        .main-content {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
 
         /* Device Warning */
@@ -627,57 +496,39 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--background);
-            z-index: 1001;
+            background: white;
+            z-index: 10001;
             display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 24px;
+            padding: 1.5rem;
             text-align: center;
         }
 
-        /* Animations */
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-slide-up {
-            animation: slideUp 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
-        }
-
-        /* Hide scrollbar but keep functionality */
-        .main-content::-webkit-scrollbar {
-            display: none;
-        }
-
-        .main-content {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        .device-warning.is-active {
+            display: flex;
         }
     </style>
 </head>
 <body>
     <!-- Device Warning -->
     <div class="device-warning" id="deviceWarning">
-        <div style="margin-bottom: 32px;">
-            <i class="fas fa-desktop" style="font-size: 48px; color: var(--primary); opacity: 0.8;"></i>
+        <div class="mb-4">
+            <i class="fas fa-desktop fa-3x has-text-primary mb-3"></i>
+            <h2 class="title is-4 mb-2">Desktop Console Detected</h2>
+            <p class="mb-4">
+                You're accessing the mobile interface from a desktop device. 
+                For the best experience, you'll be redirected to the desktop console.
+            </p>
         </div>
-        <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 12px;">Desktop Console Detected</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 24px;">
-            You're accessing the mobile interface from a desktop device. For the best experience, you'll be redirected to the desktop console.
-        </p>
-        <button class="button" onclick="redirectToDesktop()">
-            <i class="fas fa-external-link-alt"></i>
-            Continue to Desktop
+        <button class="button is-primary is-fullwidth mb-2" onclick="redirectToDesktop()">
+            <span class="icon">
+                <i class="fas fa-external-link-alt"></i>
+            </span>
+            <span>Continue to Desktop</span>
         </button>
+        <button class="button is-fullwidth" onclick="closeDeviceWarning()">Stay Here</button>
     </div>
 
     <!-- Connection Status -->
@@ -688,23 +539,34 @@
 
     <!-- Auto-lock Overlay -->
     <div class="lock-overlay" id="lockOverlay">
-        <div class="lock-container">
-            <div class="lock-icon">
-                <i class="fas fa-lock"></i>
+        <div class="lock-modal">
+            <div class="lock-header">
+                <i class="fas fa-lock fa-2x mb-2"></i>
+                <h2 class="title is-4 has-text-white">Vault Locked</h2>
+                <p class="has-text-white">Auto-lock activated</p>
             </div>
-            <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px;">Vault Locked</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 8px;">Auto-lock activated</p>
-            <p style="color: var(--text-tertiary); font-size: 14px; margin-bottom: 16px;">Enter master password</p>
             
-            <input type="password" class="input-field" id="masterPassword" placeholder="••••••••••••">
-            
-            <button class="button" onclick="unlockVault()">
-                <i class="fas fa-unlock"></i>
-                Unlock Vault
-            </button>
-            
-            <div style="margin-top: 20px; font-size: 12px; color: var(--text-tertiary); text-align: center;">
-                <i class="fas fa-info-circle"></i> Supabase: jjvyhwnkyenlrpzdiiun
+            <div class="p-4">
+                <div class="field">
+                    <div class="control">
+                        <input class="input" type="password" id="masterPassword" placeholder="Enter master password">
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary is-fullwidth" onclick="unlockVault()">
+                            <span class="icon">
+                                <i class="fas fa-unlock"></i>
+                            </span>
+                            <span>Unlock Vault</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <p class="has-text-grey is-size-7 mt-3">
+                    <i class="fas fa-info-circle"></i> Supabase: jjvyhwnkyenlrpzdiiun
+                </p>
             </div>
         </div>
     </div>
@@ -719,15 +581,13 @@
 
     <!-- Header -->
     <div class="header">
-        <div class="logo">
-            <span class="logo-gradient">MKBVAULT</span>
-        </div>
+        <div class="logo">MKBVAULT</div>
         
         <div class="header-actions">
-            <div class="header-button" onclick="refreshData()" title="Refresh">
+            <div class="header-btn" onclick="refreshData()" title="Refresh">
                 <i class="fas fa-sync-alt"></i>
             </div>
-            <div class="header-button" onclick="lockVault()">
+            <div class="header-btn" onclick="lockVault()" title="Lock Vault">
                 <i class="fas fa-lock"></i>
             </div>
         </div>
@@ -741,10 +601,10 @@
             <div class="stat-card" onclick="viewItems('total')">
                 <div class="stat-title">Total Items</div>
                 <div class="stat-value" id="statTotal">
-                    <span class="loading" style="vertical-align: middle;"></span>
+                    <span class="loading"></span>
                 </div>
                 <div class="stat-trend" id="statTotalTrend">
-                    <span class="loading-text">Loading...</span>
+                    <span>Loading...</span>
                 </div>
             </div>
             
@@ -758,11 +618,7 @@
             </div>
         </div>
 
-        <div class="section-header">
-            <div class="section-title">Quick Access</div>
-            <div class="section-action" onclick="viewAll('quick')">View All</div>
-        </div>
-        
+        <h3 class="title is-5 mb-3">Quick Access</h3>
         <div class="quick-actions">
             <div class="action-card" onclick="openSection('logins')">
                 <div class="action-icon">
@@ -793,11 +649,7 @@
             </div>
         </div>
 
-        <div class="section-header">
-            <div class="section-title">Recent Activity</div>
-            <div class="section-action" onclick="refreshRecent()">Refresh</div>
-        </div>
-        
+        <h3 class="title is-5 mb-3 mt-4">Recent Activity</h3>
         <div class="recent-list" id="recentList">
             <div class="empty-state">
                 <div class="empty-icon">
@@ -827,28 +679,28 @@
 
     <!-- Bottom Navigation -->
     <div class="bottom-nav">
-        <div class="nav-item active" onclick="switchTab('home')">
+        <div class="nav-item is-active" data-tab="home">
             <div class="nav-icon">
                 <i class="fas fa-home"></i>
             </div>
             <div class="nav-label">Home</div>
         </div>
         
-        <div class="nav-item" onclick="switchTab('vault')">
+        <div class="nav-item" data-tab="vault">
             <div class="nav-icon">
                 <i class="fas fa-vault"></i>
             </div>
             <div class="nav-label">Vault</div>
         </div>
         
-        <div class="nav-item" onclick="switchTab('search')">
+        <div class="nav-item" data-tab="search">
             <div class="nav-icon">
                 <i class="fas fa-search"></i>
             </div>
             <div class="nav-label">Search</div>
         </div>
         
-        <div class="nav-item" onclick="switchTab('more')">
+        <div class="nav-item" data-tab="more">
             <div class="nav-icon">
                 <i class="fas fa-ellipsis-h"></i>
             </div>
@@ -856,13 +708,22 @@
         </div>
     </div>
 
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration
+        // Supabase Configuration for 2026
         const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_baqcMEGuteudYzRBHaxoPA_qDLLbl7c';
+        const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
         
         // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase client initialized for Mobile 2026');
+        } catch (error) {
+            console.error('Failed to initialize Supabase:', error);
+            updateConnectionStatus('Supabase init failed', 'error');
+        }
         
         // Application state
         let lockTimer = 60;
@@ -877,6 +738,10 @@
         async function checkConnection() {
             try {
                 updateConnectionStatus('Connecting...', 'warning');
+                
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
                 
                 // Test connection
                 const { data, error } = await supabase
@@ -893,7 +758,7 @@
                 if (error) throw error;
                 
                 updateConnectionStatus('Connected', 'success');
-                updateSecurityStatus('Connected to Supabase. All systems secure.');
+                updateSecurityStatus('Connected to Supabase 2026. All systems secure.');
                 return true;
             } catch (error) {
                 console.error('Connection error:', error);
@@ -907,15 +772,17 @@
             const statusEl = document.getElementById('connectionText');
             const dotEl = document.getElementById('connectionDot');
             
-            statusEl.textContent = message;
-            dotEl.className = 'connection-dot';
+            if (statusEl) statusEl.textContent = message;
             
-            if (type === 'success') {
-                dotEl.classList.add('connected');
-            } else if (type === 'warning') {
-                dotEl.style.background = 'var(--warning)';
-            } else if (type === 'error') {
-                dotEl.style.background = 'var(--danger)';
+            if (dotEl) {
+                dotEl.className = 'connection-dot';
+                if (type === 'success') {
+                    dotEl.classList.add('connected');
+                } else if (type === 'warning') {
+                    dotEl.style.background = 'var(--warning)';
+                } else if (type === 'error') {
+                    dotEl.style.background = 'var(--danger)';
+                }
             }
         }
         
@@ -990,10 +857,12 @@
                         <div class="empty-icon">
                             <i class="fas fa-inbox"></i>
                         </div>
-                        <p>No items in vault</p>
-                        <button class="button" onclick="addNewItem()" style="margin-top: 12px; padding: 8px 16px; font-size: 14px;">
-                            <i class="fas fa-plus"></i>
-                            Add First Item
+                        <p class="mb-3">No items in vault</p>
+                        <button class="button is-primary is-small" onclick="addNewItem()">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span>Add First Item</span>
                         </button>
                     </div>
                 `;
@@ -1029,10 +898,12 @@
                     <div class="empty-icon">
                         <i class="fas fa-inbox"></i>
                     </div>
-                    <p>Unable to load items</p>
-                    <button class="button" onclick="loadData()" style="margin-top: 12px; padding: 8px 16px; font-size: 14px;">
-                        <i class="fas fa-sync-alt"></i>
-                        Retry
+                    <p class="mb-3">Unable to load items</p>
+                    <button class="button is-primary is-small" onclick="loadData()">
+                        <span class="icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </span>
+                        <span>Retry</span>
                     </button>
                 </div>
             `;
@@ -1045,10 +916,12 @@
                     <div class="empty-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
-                    <p>Error loading data</p>
-                    <button class="button" onclick="initializeApp()" style="margin-top: 12px; padding: 8px 16px; font-size: 14px;">
-                        <i class="fas fa-redo"></i>
-                        Try Again
+                    <p class="mb-3">Error loading data</p>
+                    <button class="button is-primary is-small" onclick="initializeApp()">
+                        <span class="icon">
+                            <i class="fas fa-redo"></i>
+                        </span>
+                        <span>Try Again</span>
                     </button>
                 </div>
             `;
@@ -1069,23 +942,38 @@
         function updateUI() {
             // Update total items
             const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statTotalTrend').innerHTML = `
-                <i class="fas fa-database"></i>
-                <span>From Supabase</span>
-            `;
+            const totalEl = document.getElementById('statTotal');
+            if (totalEl) {
+                totalEl.innerHTML = total;
+                totalEl.classList.remove('loading');
+            }
+            
+            const totalTrend = document.getElementById('statTotalTrend');
+            if (totalTrend) {
+                totalTrend.innerHTML = `
+                    <i class="fas fa-database"></i>
+                    <span>From Supabase</span>
+                `;
+            }
             
             // Update labels with counts
-            document.getElementById('loginsLabel').textContent = `Logins\n(${currentData.counts.login || 0})`;
-            document.getElementById('imagesLabel').textContent = `Images\n(${currentData.counts.image || 0})`;
-            document.getElementById('projectsLabel').textContent = `Projects\n(${currentData.counts.project || 0})`;
-            document.getElementById('textsLabel').textContent = `Docs\n(${currentData.counts.text || 0})`;
+            const loginsLabel = document.getElementById('loginsLabel');
+            if (loginsLabel) loginsLabel.textContent = `Logins\n(${currentData.counts.login || 0})`;
+            
+            const imagesLabel = document.getElementById('imagesLabel');
+            if (imagesLabel) imagesLabel.textContent = `Images\n(${currentData.counts.image || 0})`;
+            
+            const projectsLabel = document.getElementById('projectsLabel');
+            if (projectsLabel) projectsLabel.textContent = `Projects\n(${currentData.counts.project || 0})`;
+            
+            const textsLabel = document.getElementById('textsLabel');
+            if (textsLabel) textsLabel.textContent = `Docs\n(${currentData.counts.text || 0})`;
             
             // Update security status
             if (total > 0) {
-                updateSecurityStatus(`${total} items encrypted. Connected to Supabase. Last sync: Just now.`);
+                updateSecurityStatus(`${total} items encrypted. Connected to Supabase 2026. Last sync: Just now.`);
             } else {
-                updateSecurityStatus('Connected to Supabase. Ready to add encrypted items.');
+                updateSecurityStatus('Connected to Supabase 2026. Ready to add encrypted items.');
             }
         }
         
@@ -1093,16 +981,17 @@
         function startLockTimer() {
             clearInterval(lockInterval);
             lockTimer = 60;
-            document.getElementById('lockTimer').textContent = lockTimer;
+            const timerEl = document.getElementById('lockTimer');
+            if (timerEl) timerEl.textContent = lockTimer;
             
             lockInterval = setInterval(() => {
                 lockTimer--;
-                document.getElementById('lockTimer').textContent = lockTimer;
+                if (timerEl) timerEl.textContent = lockTimer;
                 
-                if (lockTimer <= 10) {
-                    document.getElementById('lockTimer').style.color = 'var(--danger)';
-                } else if (lockTimer <= 30) {
-                    document.getElementById('lockTimer').style.color = 'var(--warning)';
+                if (lockTimer <= 10 && timerEl) {
+                    timerEl.style.color = 'var(--danger)';
+                } else if (lockTimer <= 30 && timerEl) {
+                    timerEl.style.color = 'var(--warning)';
                 }
                 
                 if (lockTimer <= 0) {
@@ -1114,24 +1003,29 @@
         function resetLockTimer() {
             if (!isLocked) {
                 startLockTimer();
-                document.getElementById('lockTimer').style.color = 'var(--text-primary)';
+                const timerEl = document.getElementById('lockTimer');
+                if (timerEl) timerEl.style.color = '#1f2937';
             }
         }
         
         function lockVault() {
             isLocked = true;
             clearInterval(lockInterval);
-            document.getElementById('lockOverlay').classList.add('active');
-            document.getElementById('masterPassword').focus();
+            const lockOverlay = document.getElementById('lockOverlay');
+            if (lockOverlay) lockOverlay.classList.add('is-active');
+            const passwordInput = document.getElementById('masterPassword');
+            if (passwordInput) passwordInput.focus();
         }
         
         function unlockVault() {
-            const password = document.getElementById('masterPassword').value;
+            const passwordInput = document.getElementById('masterPassword');
+            const password = passwordInput ? passwordInput.value : '';
             
             if (password.trim()) {
                 isLocked = false;
-                document.getElementById('lockOverlay').classList.remove('active');
-                document.getElementById('masterPassword').value = '';
+                const lockOverlay = document.getElementById('lockOverlay');
+                if (lockOverlay) lockOverlay.classList.remove('is-active');
+                if (passwordInput) passwordInput.value = '';
                 startLockTimer();
             } else {
                 alert('Please enter your master password');
@@ -1141,9 +1035,9 @@
         // UI Actions
         function switchTab(tab) {
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
+                item.classList.remove('is-active');
             });
-            event.currentTarget.classList.add('active');
+            event.currentTarget.classList.add('is-active');
             
             if (tab === 'home') {
                 // Already on home
@@ -1159,14 +1053,9 @@
             resetLockTimer();
         }
         
-        function refreshRecent() {
-            loadRecentItems();
-            resetLockTimer();
-        }
-        
         function openSection(section) {
             const count = currentData.counts[section] || 0;
-            alert(`Opening ${section} section\n\nItems: ${count}\n\nData loaded from Supabase.`);
+            alert(`Opening ${section} section\n\nItems: ${count}\n\nData loaded from Supabase 2026.`);
             resetLockTimer();
         }
         
@@ -1182,12 +1071,7 @@
         
         function viewItems(type) {
             const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
-            alert(`Viewing ${type} items\n\nTotal in vault: ${total}\n\nLoaded from Supabase.`);
-            resetLockTimer();
-        }
-        
-        function viewAll(type) {
-            alert(`Viewing all ${type} items\n\nFetching from Supabase database...`);
+            alert(`Viewing ${type} items\n\nTotal in vault: ${total}\n\nLoaded from Supabase 2026.`);
             resetLockTimer();
         }
         
@@ -1198,10 +1082,14 @@
             const screenWidth = window.screen.width;
             
             if (!isMobile || screenWidth >= 1024) {
-                document.getElementById('deviceWarning').style.display = 'flex';
+                document.getElementById('deviceWarning').classList.add('is-active');
                 return true;
             }
             return false;
+        }
+        
+        function closeDeviceWarning() {
+            document.getElementById('deviceWarning').classList.remove('is-active');
         }
         
         function redirectToDesktop() {
@@ -1213,24 +1101,27 @@
             if (!checkDevice()) {
                 startLockTimer();
                 
-                const isConnected = await checkConnection();
-                if (isConnected) {
-                    await loadData();
-                }
-                
-                // Add animations
-                setTimeout(() => {
-                    document.querySelectorAll('.stat-card, .action-card').forEach((card, index) => {
-                        card.style.animationDelay = `${index * 0.05}s`;
-                        card.classList.add('animate-slide-up');
+                // Setup navigation
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const tab = this.getAttribute('data-tab');
+                        switchTab(tab);
                     });
-                }, 100);
+                });
+                
+                if (supabase) {
+                    const isConnected = await checkConnection();
+                    if (isConnected) {
+                        await loadData();
+                    }
+                }
             }
         }
         
         // Event Listeners
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.getElementById('lockOverlay').classList.contains('active')) {
+            const lockOverlay = document.getElementById('lockOverlay');
+            if (e.key === 'Enter' && lockOverlay && lockOverlay.classList.contains('is-active')) {
                 unlockVault();
             }
         });
