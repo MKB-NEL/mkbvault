@@ -3,178 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MKBVAULT — Encrypted Vault</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>MKBVAULT — Encrypted Vault (2026)</title>
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Custom Styles -->
     <style>
-        /* Framer-inspired CSS Reset & Base */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
         :root {
-            --background: #ffffff;
-            --surface: #fafafa;
-            --elevation-1: 0 1px 1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.04);
-            --elevation-2: 0 2px 8px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.08);
-            --elevation-3: 0 8px 24px rgba(0, 0, 0, 0.1), 0 16px 48px rgba(0, 0, 0, 0.12);
             --primary: #0066ff;
             --primary-hover: #0052d9;
-            --text-primary: #000000;
-            --text-secondary: #666666;
-            --text-tertiary: #999999;
-            --border: #e5e5e5;
-            --border-hover: #d0d0d0;
             --success: #00c853;
             --warning: #ff9500;
             --danger: #ff3b30;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --radius-lg: 20px;
-            --transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            --transition-slow: all 0.4s cubic-bezier(0.2, 0, 0, 1);
-            --container: 1200px;
         }
 
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--background);
-            color: var(--text-primary);
-            line-height: 1.6;
-            font-weight: 400;
-            overflow-x: hidden;
-        }
-
-        /* Layout */
-        .container {
-            max-width: var(--container);
-            margin: 0 auto;
-            padding: 0 24px;
-        }
-
-        .section {
-            padding: 120px 0;
-            position: relative;
-        }
-
-        .section-sm {
-            padding: 80px 0;
-        }
-
-        /* Typography */
-        .display {
-            font-size: 72px;
-            font-weight: 800;
-            line-height: 1.1;
-            letter-spacing: -0.03em;
-        }
-
-        .display-sm {
-            font-size: 56px;
-            font-weight: 800;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-        }
-
-        .h1 {
-            font-size: 48px;
-            font-weight: 700;
-            line-height: 1.2;
-            letter-spacing: -0.02em;
-        }
-
-        .h2 {
-            font-size: 36px;
-            font-weight: 700;
-            line-height: 1.3;
-            letter-spacing: -0.01em;
-        }
-
-        .h3 {
-            font-size: 24px;
-            font-weight: 600;
-            line-height: 1.4;
-            letter-spacing: -0.01em;
-        }
-
-        .body-lg {
-            font-size: 20px;
-            font-weight: 400;
-            line-height: 1.6;
-            color: var(--text-secondary);
-        }
-
-        .body {
-            font-size: 16px;
-            font-weight: 400;
-            line-height: 1.6;
-            color: var(--text-secondary);
-        }
-
-        .body-sm {
-            font-size: 14px;
-            font-weight: 400;
-            line-height: 1.6;
-            color: var(--text-tertiary);
-        }
-
-        .label {
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-tertiary);
-        }
-
-        /* Hero Section */
-        .hero {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border), transparent);
-        }
-
-        .hero-content {
-            max-width: 720px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 100px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            margin-bottom: 32px;
-        }
-
-        .hero-badge i {
-            color: var(--primary);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
 
         .gradient-text {
@@ -184,290 +31,168 @@
             background-clip: text;
         }
 
-        /* Features Grid */
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 32px;
-            margin: 64px 0;
+        .logo-container {
+            margin-bottom: 3rem;
+        }
+
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: -0.05em;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 2rem;
         }
 
         .feature-card {
-            padding: 32px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
+            height: 100%;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            background: white;
         }
 
         .feature-card:hover {
-            transform: translateY(-4px);
-            border-color: var(--border-hover);
-            box-shadow: var(--elevation-2);
+            border-color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.1);
         }
 
         .feature-icon {
-            width: 56px;
-            height: 56px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            margin-bottom: 24px;
-            font-size: 24px;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
             color: var(--primary);
         }
 
-        /* Buttons */
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            padding: 16px 32px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            font-weight: 600;
-            line-height: 1;
-            border-radius: var(--radius-sm);
-            border: 1px solid transparent;
-            cursor: pointer;
-            transition: var(--transition);
-            text-decoration: none;
+        .access-section {
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 3rem;
+            margin: 3rem 0;
             position: relative;
             overflow: hidden;
-        }
-
-        .button::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-
-        .button:hover::after {
-            width: 300px;
-            height: 300px;
-        }
-
-        .button-primary {
-            background: var(--primary);
-            color: white;
-        }
-
-        .button-primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--elevation-2);
-        }
-
-        .button-secondary {
-            background: transparent;
-            color: var(--text-primary);
-            border-color: var(--border);
-        }
-
-        .button-secondary:hover {
-            background: var(--surface);
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-        }
-
-        /* Access Section */
-        .access-section {
-            padding: 64px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            text-align: center;
-            margin: 80px 0;
-            position: relative;
         }
 
         .access-section::before {
             content: '';
             position: absolute;
             top: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 120px;
+            left: 0;
+            right: 0;
             height: 4px;
             background: linear-gradient(90deg, var(--primary), #8b5cf6);
-            border-radius: 0 0 2px 2px;
         }
 
         .contact-chip {
             display: inline-flex;
             align-items: center;
-            gap: 12px;
-            padding: 16px 24px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            margin: 32px 0;
-            font-size: 18px;
-            font-weight: 500;
-            color: var(--text-primary);
-            transition: var(--transition);
+            gap: 1rem;
+            padding: 1.25rem 2rem;
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin: 1.5rem 0;
+            transition: all 0.3s ease;
         }
 
         .contact-chip:hover {
             border-color: var(--primary);
             transform: translateY(-2px);
-            box-shadow: var(--elevation-1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
-        /* Warning Card */
         .warning-card {
-            padding: 24px;
-            background: linear-gradient(135deg, #fff3e0 0%, #ffebee 100%);
-            border: 1px solid #ffccbc;
-            border-radius: var(--radius-md);
-            margin-top: 48px;
-        }
-
-        .warning-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 12px;
+            background: linear-gradient(135deg, #fef3c7 0%, #fee2e2 100%);
+            border: 2px solid #fca5a5;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
         }
 
         .warning-icon {
-            width: 24px;
-            height: 24px;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            width: 32px;
+            height: 32px;
             background: var(--danger);
             color: white;
             border-radius: 50%;
-            font-size: 12px;
-            font-weight: 700;
+            font-weight: bold;
+            margin-right: 1rem;
         }
 
-        /* Footer */
-        .footer {
-            padding: 64px 0;
-            border-top: 1px solid var(--border);
-            color: var(--text-tertiary);
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 48px;
-            margin-bottom: 48px;
-        }
-
-        /* Connection Status */
         .connection-status {
             position: fixed;
-            bottom: 100px;
-            right: 32px;
+            bottom: 2rem;
+            right: 2rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 12px;
-            color: var(--text-secondary);
-            z-index: 99;
-            box-shadow: var(--elevation-1);
-            transition: var(--transition);
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 100;
         }
 
         .connection-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
-            background: var(--danger);
-            transition: var(--transition);
+            background: #94a3b8;
         }
 
         .connection-dot.connected {
             background: var(--success);
-            box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
+            box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.2);
         }
 
-        /* Loading State */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 2px solid var(--border);
-            border-top-color: var(--primary);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.6s cubic-bezier(0.2, 0, 0, 1) forwards;
-        }
-
-        .delay-1 { animation-delay: 0.1s; opacity: 0; }
-        .delay-2 { animation-delay: 0.2s; opacity: 0; }
-        .delay-3 { animation-delay: 0.3s; opacity: 0; }
-
-        /* Device-specific */
         .device-switch {
             position: fixed;
-            bottom: 32px;
-            right: 32px;
+            bottom: 2rem;
+            left: 2rem;
             z-index: 100;
         }
 
         .device-pill {
             display: flex;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
             overflow: hidden;
-            box-shadow: var(--elevation-1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         .device-option {
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            color: #64748b;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
         .device-option:hover {
-            background: var(--background);
+            background: #f8fafc;
         }
 
         .device-option.active {
@@ -475,50 +200,20 @@
             color: white;
         }
 
-        /* Responsive */
         @media (max-width: 768px) {
-            .display {
-                font-size: 48px;
-            }
-            
-            .display-sm {
-                font-size: 36px;
-            }
-            
-            .h1 {
-                font-size: 32px;
-            }
-            
-            .h2 {
-                font-size: 28px;
-            }
-            
-            .section {
-                padding: 80px 0;
+            .logo {
+                font-size: 2.5rem;
             }
             
             .access-section {
-                padding: 32px;
+                padding: 2rem;
             }
             
+            .connection-status,
             .device-switch {
-                bottom: 24px;
-                right: 24px;
-            }
-            
-            .connection-status {
-                bottom: 80px;
-                right: 24px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .footer-grid {
-                grid-template-columns: 1fr;
+                position: static;
+                margin: 1rem auto;
+                width: fit-content;
             }
         }
     </style>
@@ -527,171 +222,211 @@
     <!-- Connection Status -->
     <div class="connection-status" id="connectionStatus">
         <div class="connection-dot" id="connectionDot"></div>
-        <span id="connectionText">Connecting to Supabase...</span>
+        <span class="has-text-weight-medium" id="connectionText">Connecting to Supabase...</span>
     </div>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="section">
         <div class="container">
-            <div class="hero-content animate-fade-in">
-                <div class="hero-badge animate-fade-in delay-1" id="statusBadge">
-                    <i class="fas fa-spinner loading"></i>
-                    <span>Connecting to vault...</span>
+            <div class="logo-container has-text-centered">
+                <div class="hero-badge">
+                    <i class="fas fa-shield-check"></i>
+                    <span>End-to-End Encrypted</span>
                 </div>
-                
-                <h1 class="display animate-fade-in delay-2">
-                    Secure Your Digital Life
-                    <span class="gradient-text">with MKBVAULT</span>
-                </h1>
-                
-                <p class="body-lg animate-fade-in delay-3" style="margin-top: 24px; max-width: 560px;">
-                    A private, military-grade encrypted vault for passwords, documents, and sensitive information. 
-                    All encryption happens locally on your device—your data remains inaccessible to everyone but you.
+                <h1 class="logo gradient-text">MKBVAULT</h1>
+                <p class="subtitle is-5 has-text-grey mt-3">
+                    Military-grade encrypted vault for 2026
                 </p>
-                
-                <div class="features-grid">
-                    <div class="feature-card animate-fade-in delay-1">
-                        <div class="feature-icon">
-                            <i class="fas fa-lock"></i>
-                        </div>
-                        <h3 class="h3" style="margin-bottom: 12px;">AES-256 Encryption</h3>
-                        <p class="body" style="color: var(--text-secondary);">
-                            All data encrypted with AES-256-GCM locally before syncing to Supabase.
-                        </p>
-                    </div>
-                    
-                    <div class="feature-card animate-fade-in delay-2">
-                        <div class="feature-icon">
-                            <i class="fas fa-cloud"></i>
-                        </div>
-                        <h3 class="h3" style="margin-bottom: 12px;">Supabase Sync</h3>
-                        <p class="body" style="color: var(--text-secondary);">
-                            Securely synchronized with your Supabase project: jjvyhwnkyenlrpzdiiun
-                        </p>
-                    </div>
-                    
-                    <div class="feature-card animate-fade-in delay-3">
-                        <div class="feature-icon">
-                            <i class="fas fa-user-secret"></i>
-                        </div>
-                        <h3 class="h3" style="margin-bottom: 12px;">Zero Knowledge</h3>
-                        <p class="body" style="color: var(--text-secondary);">
-                            Your master password never leaves your device. We cannot recover your data.
-                        </p>
-                    </div>
-                </div>
-                
-                <div class="access-section animate-fade-in">
-                    <h2 class="h2" style="margin-bottom: 16px;">Access Your Vault</h2>
-                    <p class="body" style="margin-bottom: 24px; color: var(--text-secondary);" id="vaultStatus">
-                        Loading vault information...
-                    </p>
-                    
-                    <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
-                        <button class="button button-primary" id="accessVault">
-                            <i class="fas fa-key"></i>
-                            <span id="accessText">Access Vault</span>
-                        </button>
-                        
-                        <button class="button button-secondary" onclick="showDatabaseInfo()">
-                            <i class="fas fa-database"></i>
-                            Database Info
-                        </button>
-                    </div>
-                    
-                    <p class="body-sm" style="margin-top: 16px; color: var(--text-tertiary;" id="lastSyncInfo">
-                        Last sync: Checking...
-                    </p>
-                </div>
-                
-                <div class="warning-card animate-fade-in" style="animation-delay: 0.4s;">
-                    <div class="warning-header">
-                        <div class="warning-icon">!</div>
-                        <h3 class="h3">Critical Security Notice</h3>
-                    </div>
-                    <p class="body-sm" style="color: #d32f2f;">
-                        Your master password is never stored or transmitted. There is absolutely no password recovery mechanism. 
-                        Loss of your password results in permanent, irreversible data loss.
-                    </p>
-                </div>
             </div>
-        </div>
-        
-        <!-- Device Switch -->
-        <div class="device-switch" id="deviceSwitch">
-            <div class="device-pill">
-                <div class="device-option active" data-device="auto">
-                    <i class="fas fa-magic"></i>
-                    <span>Auto</span>
-                </div>
-                <div class="device-option" data-device="desktop">
-                    <i class="fas fa-desktop"></i>
-                    <span>Desktop</span>
-                </div>
-                <div class="device-option" data-device="mobile">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span>Mobile</span>
+
+            <div class="columns is-centered">
+                <div class="column is-10">
+                    <div class="has-text-centered mb-6">
+                        <h2 class="title is-2 mb-4">Secure Your Digital Life</h2>
+                        <p class="subtitle is-5 has-text-grey">
+                            A private, zero-knowledge vault where all encryption happens locally on your device.
+                            Your data remains inaccessible to everyone but you.
+                        </p>
+                    </div>
+
+                    <!-- Features Grid -->
+                    <div class="columns is-multiline mb-6">
+                        <div class="column is-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-lock"></i>
+                                </div>
+                                <h3 class="title is-4 mb-3">AES-256 Encryption</h3>
+                                <p class="has-text-grey">
+                                    All data encrypted with AES-256-GCM locally before syncing to Supabase.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-cloud"></i>
+                                </div>
+                                <h3 class="title is-4 mb-3">Supabase Sync</h3>
+                                <p class="has-text-grey">
+                                    Securely synchronized with your Supabase project. Real-time updates for 2026.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="column is-4">
+                            <div class="feature-card">
+                                <div class="feature-icon">
+                                    <i class="fas fa-user-secret"></i>
+                                </div>
+                                <h3 class="title is-4 mb-3">Zero Knowledge</h3>
+                                <p class="has-text-grey">
+                                    Your master password never leaves your device. We cannot recover your data.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Access Section -->
+                    <div class="access-section">
+                        <div class="has-text-centered">
+                            <h2 class="title is-3 mb-4">Access Your Vault</h2>
+                            <p class="subtitle is-5 has-text-grey mb-4" id="vaultStatus">
+                                Loading vault information from Supabase...
+                            </p>
+                            
+                            <div class="contact-chip">
+                                <i class="fas fa-envelope"></i>
+                                <span>mkbertrand123@gmail.com</span>
+                            </div>
+                            
+                            <div class="buttons is-centered mt-5">
+                                <button class="button is-primary is-large" id="accessVault">
+                                    <span class="icon">
+                                        <i class="fas fa-key"></i>
+                                    </span>
+                                    <span id="accessText">Access Vault</span>
+                                </button>
+                                
+                                <button class="button is-info is-large" id="showDatabaseInfo">
+                                    <span class="icon">
+                                        <i class="fas fa-database"></i>
+                                    </span>
+                                    <span>Database Info</span>
+                                </button>
+                            </div>
+                            
+                            <p class="has-text-grey mt-4" id="lastSyncInfo">
+                                <i class="fas fa-sync"></i> Last sync: Checking...
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Warning Card -->
+                    <div class="warning-card">
+                        <div class="is-flex is-align-items-center mb-3">
+                            <div class="warning-icon">!</div>
+                            <h3 class="title is-4">Critical Security Notice (2026)</h3>
+                        </div>
+                        <p class="has-text-grey-dark">
+                            <strong>Your master password is never stored or transmitted.</strong> There is absolutely no password recovery mechanism. 
+                            Loss of your password results in permanent, irreversible data loss. This is a zero-knowledge system.
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-    
+
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <h3 class="h3" style="margin-bottom: 16px; color: var(--text-primary);">MKBVAULT</h3>
-                    <p class="body-sm" style="margin-bottom: 16px;">
-                        Encrypted vault synchronized with Supabase
+            <div class="columns">
+                <div class="column">
+                    <h3 class="title is-5 mb-3">MKBVAULT</h3>
+                    <p class="has-text-grey">
+                        Enterprise-grade encryption synchronized with Supabase. Built for 2026.
                     </p>
-                    <div style="display: flex; gap: 12px;">
-                        <i class="fas fa-shield-alt" style="color: var(--primary);"></i>
-                        <i class="fas fa-server" style="color: var(--text-tertiary);"></i>
-                        <i class="fas fa-database" style="color: var(--text-tertiary);"></i>
+                    <div class="mt-3">
+                        <span class="icon-text">
+                            <span class="icon has-text-primary">
+                                <i class="fas fa-shield-alt"></i>
+                            </span>
+                            <span>AES-256 Encryption</span>
+                        </span>
                     </div>
                 </div>
                 
-                <div>
-                    <h4 class="label" style="margin-bottom: 16px;">Technology</h4>
-                    <ul style="list-style: none;">
-                        <li style="margin-bottom: 8px;" class="body-sm">Supabase PostgreSQL</li>
-                        <li style="margin-bottom: 8px;" class="body-sm">AES-256-GCM Encryption</li>
-                        <li style="margin-bottom: 8px;" class="body-sm">PBKDF2 Key Derivation</li>
+                <div class="column">
+                    <h4 class="title is-6 mb-3">Technology</h4>
+                    <ul>
+                        <li class="mb-2">Supabase PostgreSQL</li>
+                        <li class="mb-2">AES-256-GCM Encryption</li>
+                        <li class="mb-2">PBKDF2 Key Derivation</li>
                     </ul>
                 </div>
                 
-                <div>
-                    <h4 class="label" style="margin-bottom: 16px;">Connection</h4>
-                    <ul style="list-style: none;">
-                        <li style="margin-bottom: 8px;" class="body-sm" id="projectId">Project: jjvyhwnkyenlrpzdiiun</li>
-                        <li style="margin-bottom: 8px;" class="body-sm" id="connectionType">Status: Connecting...</li>
-                        <li style="margin-bottom: 8px;" class="body-sm" id="encryptionStatus">Encryption: Local</li>
+                <div class="column">
+                    <h4 class="title is-6 mb-3">Connection</h4>
+                    <ul>
+                        <li class="mb-2" id="projectId">Project: jjvyhwnkyenlrpzdiiun</li>
+                        <li class="mb-2" id="connectionType">Status: Connecting...</li>
+                        <li class="mb-2" id="encryptionStatus">Encryption: Local</li>
                     </ul>
                 </div>
                 
-                <div>
-                    <h4 class="label" style="margin-bottom: 16px;">Contact</h4>
-                    <p class="body-sm" style="margin-bottom: 8px;">For vault access:</p>
-                    <p class="body-sm" style="color: var(--primary); font-weight: 500;">mkbertrand123@gmail.com</p>
+                <div class="column">
+                    <h4 class="title is-6 mb-3">Contact</h4>
+                    <p class="mb-2">For vault access:</p>
+                    <p class="has-text-primary has-text-weight-semibold">mkbertrand123@gmail.com</p>
                 </div>
             </div>
             
-            <div style="border-top: 1px solid var(--border); padding-top: 24px;">
-                <p class="body-sm" style="color: var(--text-tertiary);">
-                    © 2024 MKBVAULT Secure Systems. All rights reserved. Version 2.1.4
+            <hr class="my-5">
+            
+            <div class="has-text-centered">
+                <p class="has-text-grey">
+                    © 2026 MKBVAULT Secure Systems. All rights reserved. Version 3.0.0
                 </p>
             </div>
         </div>
     </footer>
 
+    <!-- Device Switch -->
+    <div class="device-switch" id="deviceSwitch">
+        <div class="device-pill">
+            <div class="device-option active" data-device="auto">
+                <i class="fas fa-magic"></i>
+                <span>Auto</span>
+            </div>
+            <div class="device-option" data-device="desktop">
+                <i class="fas fa-desktop"></i>
+                <span>Desktop</span>
+            </div>
+            <div class="device-option" data-device="mobile">
+                <i class="fas fa-mobile-alt"></i>
+                <span>Mobile</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration
+        // Supabase Configuration for 2026
         const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_baqcMEGuteudYzRBHaxoPA_qDLLbl7c';
+        const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
         
         // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase client initialized for 2026');
+        } catch (error) {
+            console.error('Failed to initialize Supabase:', error);
+            updateConnectionStatus('Supabase initialization failed', 'error');
+        }
         
         // Connection state
         let isConnected = false;
@@ -700,7 +435,11 @@
         // Initialize connection
         async function initializeConnection() {
             try {
-                updateConnectionStatus('Connecting to Supabase...', 'warning');
+                updateConnectionStatus('Connecting to Supabase 2026...', 'warning');
+                
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
                 
                 // Test connection by fetching vault meta
                 const { data: meta, error } = await supabase
@@ -727,17 +466,13 @@
                     // Update last sync info
                     if (vaultData.updated_at) {
                         const lastSync = new Date(vaultData.updated_at).toLocaleString();
-                        document.getElementById('lastSyncInfo').textContent = `Last sync: ${lastSync}`;
+                        document.getElementById('lastSyncInfo').innerHTML = `<i class="fas fa-sync"></i> Last sync: ${lastSync}`;
                     }
                 } else {
                     updateConnectionStatus('Connected (No vault yet)', 'success');
                     document.getElementById('vaultStatus').textContent = 'No vault found. Ready to create a new one.';
                     document.getElementById('accessText').textContent = 'Create New Vault';
                 }
-                
-                // Update status badge
-                const badge = document.getElementById('statusBadge');
-                badge.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i><span>Connected to Supabase</span>';
                 
                 // Update footer info
                 document.getElementById('connectionType').textContent = 'Status: Connected';
@@ -746,7 +481,6 @@
                 console.error('Connection error:', error);
                 updateConnectionStatus('Connection failed', 'error');
                 document.getElementById('vaultStatus').textContent = 'Unable to connect to Supabase. Please check your connection.';
-                document.getElementById('statusBadge').innerHTML = '<i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i><span>Connection Failed</span>';
                 document.getElementById('connectionType').textContent = 'Status: Failed';
             }
         }
@@ -755,23 +489,21 @@
             const statusEl = document.getElementById('connectionText');
             const dotEl = document.getElementById('connectionDot');
             
-            statusEl.textContent = message;
+            if (statusEl) statusEl.textContent = message;
             
-            dotEl.className = 'connection-dot';
-            if (type === 'success') {
-                dotEl.classList.add('connected');
-            } else if (type === 'warning') {
-                dotEl.style.background = 'var(--warning)';
-            } else if (type === 'error') {
-                dotEl.style.background = 'var(--danger)';
+            if (dotEl) {
+                dotEl.className = 'connection-dot';
+                if (type === 'success') {
+                    dotEl.classList.add('connected');
+                } else if (type === 'warning') {
+                    dotEl.style.background = 'var(--warning)';
+                } else if (type === 'error') {
+                    dotEl.style.background = 'var(--danger)';
+                }
             }
         }
         
         // Device detection and redirection
-        const accessBtn = document.getElementById('accessVault');
-        const deviceSwitch = document.getElementById('deviceSwitch');
-        const deviceOptions = document.querySelectorAll('.device-option');
-        
         function determineOptimalInterface() {
             const userAgent = navigator.userAgent;
             const screenWidth = window.screen.width;
@@ -808,12 +540,13 @@
         // Show database information
         function showDatabaseInfo() {
             const info = `
-Supabase Project Details:
-------------------------
+Supabase Project Details (2026):
+--------------------------------
 Project URL: ${SUPABASE_URL}
 Project ID: jjvyhwnkyenlrpzdiiun
 Status: ${isConnected ? 'Connected' : 'Disconnected'}
 Vault: ${vaultData ? 'Exists' : 'Not created yet'}
+Publishable Key: ${SUPABASE_KEY.substring(0, 20)}...
 
 Required Tables:
 - vault_meta (for master password)
@@ -827,80 +560,67 @@ Your data will be encrypted locally before being stored in these tables.
         }
         
         // Event Listeners
-        accessBtn.addEventListener('click', () => {
-            // First check if we need to create a vault or unlock existing
-            if (!vaultData) {
-                const create = confirm('No existing vault found.\n\nWould you like to create a new vault?\n\nThis will initialize the Supabase tables with encrypted data.');
-                if (create) {
-                    // Redirect to setup process
-                    redirectToInterface('auto');
-                }
-            } else {
-                redirectToInterface('auto');
-            }
-        });
-        
-        deviceOptions.forEach(option => {
-            option.addEventListener('click', function() {
-                deviceOptions.forEach(opt => opt.classList.remove('active'));
-                this.classList.add('active');
-                
-                const device = this.dataset.device;
-                if (device !== 'auto') {
-                    redirectToInterface(device);
-                }
-            });
-        });
-        
-        // Update button text based on device
         document.addEventListener('DOMContentLoaded', function() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            const screenWidth = window.screen.width;
-            
-            if (isMobile && screenWidth < 768) {
-                if (accessBtn) {
-                    accessBtn.innerHTML = '<i class="fas fa-mobile-alt"></i> Access Mobile Vault';
-                }
-            } else {
-                if (accessBtn) {
-                    accessBtn.innerHTML = '<i class="fas fa-desktop"></i> Access Desktop Console';
-                }
+            // Initialize Supabase connection
+            if (supabase) {
+                initializeConnection();
             }
             
-            // Initialize Supabase connection
-            initializeConnection();
-            
-            // Animate elements on scroll
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-            
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-fade-in');
+            // Access Vault button
+            const accessBtn = document.getElementById('accessVault');
+            if (accessBtn) {
+                accessBtn.addEventListener('click', () => {
+                    // First check if we need to create a vault or unlock existing
+                    if (!vaultData) {
+                        const create = confirm('No existing vault found.\n\nWould you like to create a new vault?\n\nThis will initialize the Supabase tables with encrypted data.');
+                        if (create) {
+                            redirectToInterface('auto');
+                        }
+                    } else {
+                        redirectToInterface('auto');
                     }
                 });
-            }, observerOptions);
-            
-            document.querySelectorAll('.feature-card, .access-section').forEach(el => {
-                observer.observe(el);
-            });
-        });
-        
-        // Smooth scrolling
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+                
+                // Update button text based on device
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                const screenWidth = window.screen.width;
+                
+                if (isMobile && screenWidth < 768) {
+                    accessBtn.innerHTML = '<span class="icon"><i class="fas fa-mobile-alt"></i></span><span>Access Mobile Vault</span>';
+                } else {
+                    accessBtn.innerHTML = '<span class="icon"><i class="fas fa-desktop"></i></span><span>Access Desktop Console</span>';
                 }
-            });
+            }
+            
+            // Database Info button
+            const dbInfoBtn = document.getElementById('showDatabaseInfo');
+            if (dbInfoBtn) {
+                dbInfoBtn.addEventListener('click', showDatabaseInfo);
+            }
+            
+            // Device switch
+            const deviceSwitch = document.getElementById('deviceSwitch');
+            const deviceOptions = document.querySelectorAll('.device-option');
+            
+            if (deviceOptions.length > 0) {
+                deviceOptions.forEach(option => {
+                    option.addEventListener('click', function() {
+                        deviceOptions.forEach(opt => opt.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        const device = this.dataset.device;
+                        if (device !== 'auto') {
+                            redirectToInterface(device);
+                        }
+                    });
+                });
+            }
+            
+            // Update footer with current year
+            const yearSpan = document.querySelector('footer p');
+            if (yearSpan) {
+                yearSpan.innerHTML = yearSpan.innerHTML.replace('2026', new Date().getFullYear());
+            }
         });
     </script>
 </body>
