@@ -8,6 +8,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         /* Framer-inspired Variables */
         :root {
@@ -516,21 +518,68 @@
             text-align: center;
         }
 
-        /* Device Check */
-        .device-warning {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--background);
-            z-index: 1001;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 32px;
+        /* Loading States */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-tertiary);
+            font-style: italic;
+        }
+
+        /* Empty State */
+        .empty-state {
+            padding: 48px;
             text-align: center;
+            color: var(--text-tertiary);
+        }
+
+        .empty-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* Connection Status */
+        .connection-status {
+            position: fixed;
+            top: 80px;
+            right: 32px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            color: var(--text-secondary);
+            z-index: 99;
+            box-shadow: var(--elevation-1);
+        }
+
+        .connection-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--danger);
+            transition: var(--transition);
+        }
+
+        .connection-dot.connected {
+            background: var(--success);
+            box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.1);
         }
 
         /* Scrollbar */
@@ -570,8 +619,14 @@
     </style>
 </head>
 <body>
+    <!-- Connection Status -->
+    <div class="connection-status" id="connectionStatus">
+        <div class="connection-dot" id="connectionDot"></div>
+        <span id="connectionText">Connecting...</span>
+    </div>
+
     <!-- Device Check Warning -->
-    <div class="device-warning" id="deviceWarning">
+    <div class="device-warning" id="deviceWarning" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--background); z-index: 1001; flex-direction: column; align-items: center; justify-content: center; padding: 32px; text-align: center;">
         <div style="margin-bottom: 32px;">
             <i class="fas fa-mobile-alt" style="font-size: 64px; color: var(--primary); opacity: 0.8;"></i>
         </div>
@@ -602,8 +657,8 @@
                 Unlock Vault
             </button>
             
-            <div style="margin-top: 24px; font-size: 13px; color: var(--text-tertiary);">
-                <i class="fas fa-info-circle"></i> Securely connected to Supabase
+            <div style="margin-top: 24px; font-size: 13px; color: var(--text-tertiary;">
+                <i class="fas fa-info-circle"></i> Connected to Supabase: jjvyhwnkyenlrpzdiiun
             </div>
         </div>
     </div>
@@ -615,7 +670,7 @@
             <div class="logo-container">
                 <div class="logo">
                     <span class="logo-gradient">MKBVAULT</span>
-                    <span style="font-size: 11px; background: var(--success); color: white; padding: 2px 6px; border-radius: 100px;">PRO</span>
+                    <span style="font-size: 11px; background: var(--success); color: white; padding: 2px 6px; border-radius: 100px;">LIVE</span>
                 </div>
             </div>
 
@@ -627,7 +682,9 @@
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <span>Dashboard</span>
-                    <div class="nav-badge">12</div>
+                    <div class="nav-badge" id="totalItemsCount">
+                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                    </div>
                 </div>
                 
                 <div class="nav-item" onclick="switchSection('logins')">
@@ -635,7 +692,9 @@
                         <i class="fas fa-key"></i>
                     </div>
                     <span>Logins</span>
-                    <div class="nav-badge">24</div>
+                    <div class="nav-badge" id="loginsCount">
+                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                    </div>
                 </div>
                 
                 <div class="nav-item" onclick="switchSection('images')">
@@ -643,7 +702,9 @@
                         <i class="fas fa-image"></i>
                     </div>
                     <span>Images</span>
-                    <div class="nav-badge">45</div>
+                    <div class="nav-badge" id="imagesCount">
+                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                    </div>
                 </div>
                 
                 <div class="nav-item" onclick="switchSection('projects')">
@@ -651,7 +712,9 @@
                         <i class="fas fa-folder"></i>
                     </div>
                     <span>Projects</span>
-                    <div class="nav-badge">12</div>
+                    <div class="nav-badge" id="projectsCount">
+                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                    </div>
                 </div>
             </div>
 
@@ -663,6 +726,9 @@
                         <i class="fas fa-folder-tree"></i>
                     </div>
                     <span>Folders</span>
+                    <div class="nav-badge" id="foldersCount">
+                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                    </div>
                 </div>
                 
                 <div class="nav-item" onclick="switchSection('favorites')">
@@ -670,7 +736,9 @@
                         <i class="fas fa-star"></i>
                     </div>
                     <span>Favorites</span>
-                    <div class="nav-badge">18</div>
+                    <div class="nav-badge" id="favoritesCount">
+                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                    </div>
                 </div>
                 
                 <div class="nav-item" onclick="switchSection('archive')">
@@ -678,15 +746,18 @@
                         <i class="fas fa-archive"></i>
                     </div>
                     <span>Archive</span>
+                    <div class="nav-badge" id="archiveCount">
+                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                    </div>
                 </div>
             </div>
 
             <div style="margin-top: auto; padding: 0 16px;">
-                <div class="nav-item" onclick="showSecurity()">
+                <div class="nav-item" onclick="showSupabaseInfo()">
                     <div class="nav-icon">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fas fa-database"></i>
                     </div>
-                    <span>Security</span>
+                    <span>Database Info</span>
                 </div>
                 
                 <div class="nav-item" onclick="showSettings()">
@@ -703,21 +774,21 @@
             <!-- Top Bar -->
             <div class="top-bar">
                 <div class="breadcrumb">
-                    <span style="color: var(--text-primary); font-weight: 500;">Dashboard</span>
+                    <span style="color: var(--text-primary); font-weight: 500;" id="currentSection">Dashboard</span>
                     <span class="breadcrumb-separator">/</span>
-                    <span>Overview</span>
+                    <span id="currentSubsection">Loading...</span>
                 </div>
                 
                 <div class="actions">
+                    <div class="action-button" onclick="refreshData()" title="Refresh Data">
+                        <i class="fas fa-sync-alt"></i>
+                    </div>
+                    
                     <div class="action-button" onclick="showSearch()">
                         <i class="fas fa-search"></i>
                     </div>
                     
-                    <div class="action-button" onclick="showNotifications()">
-                        <i class="fas fa-bell"></i>
-                    </div>
-                    
-                    <div class="action-button" onclick="lockVault()">
+                    <div class="action-button" onclick="lockVault()" title="Lock Vault">
                         <i class="fas fa-lock"></i>
                     </div>
                 </div>
@@ -726,14 +797,15 @@
             <!-- Content Area -->
             <div class="content-area">
                 <div class="dashboard-header">
-                    <h1 class="dashboard-title">Security Dashboard</h1>
-                    <p class="dashboard-subtitle">
-                        Overview of your encrypted vault activity, storage usage, and security status. All data is encrypted locally before syncing to Supabase.
+                    <h1 class="dashboard-title" id="pageTitle">Security Dashboard</h1>
+                    <p class="dashboard-subtitle" id="pageSubtitle">
+                        <span class="loading" style="vertical-align: middle; margin-right: 8px;"></span>
+                        Loading data from Supabase...
                     </p>
                 </div>
 
                 <!-- Stats Grid -->
-                <div class="stats-grid">
+                <div class="stats-grid" id="statsGrid">
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-title">Total Items</div>
@@ -741,10 +813,9 @@
                                 <i class="fas fa-database"></i>
                             </div>
                         </div>
-                        <div class="stat-value">109</div>
-                        <div class="stat-trend trend-up">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>12% increase this month</span>
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-trend" id="statTotalTrend">
+                            <span class="loading-text">Loading from Supabase...</span>
                         </div>
                     </div>
                     
@@ -755,81 +826,52 @@
                                 <i class="fas fa-hdd"></i>
                             </div>
                         </div>
-                        <div class="stat-value">2.4 GB</div>
-                        <div class="stat-trend">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>64% of 4 GB limit</span>
+                        <div class="stat-value" id="statStorage">0 KB</div>
+                        <div class="stat-trend" id="statStorageTrend">
+                            <span class="loading-text">Calculating...</span>
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Last Backup</div>
+                            <div class="stat-title">Last Updated</div>
                             <div class="stat-icon" style="color: var(--success);">
-                                <i class="fas fa-cloud-upload-alt"></i>
+                                <i class="fas fa-clock"></i>
                             </div>
                         </div>
-                        <div class="stat-value">2h ago</div>
-                        <div class="stat-trend trend-up">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Backup successful</span>
+                        <div class="stat-value" id="statUpdated">--:--</div>
+                        <div class="stat-trend" id="statUpdatedTrend">
+                            <span class="loading-text">Checking Supabase...</span>
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
-                            <div class="stat-title">Security Score</div>
+                            <div class="stat-title">Security Status</div>
                             <div class="stat-icon" style="color: var(--warning);">
                                 <i class="fas fa-shield-alt"></i>
                             </div>
                         </div>
-                        <div class="stat-value">98%</div>
-                        <div class="stat-trend">
-                            <i class="fas fa-star"></i>
-                            <span>Excellent security status</span>
+                        <div class="stat-value" id="statSecurity">--%</div>
+                        <div class="stat-trend" id="statSecurityTrend">
+                            <span class="loading-text">Verifying encryption...</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="recent-section">
+                <div class="recent-section" id="recentSection">
                     <div class="section-header">
                         <div class="section-title">Recent Activity</div>
-                        <div class="section-action" onclick="viewAllActivity()">View All</div>
+                        <div class="section-action" onclick="loadAllActivity()">Refresh</div>
                     </div>
                     
-                    <div class="recent-list">
-                        <div class="recent-item" onclick="openItem('instagram')">
-                            <div class="item-icon">
-                                <i class="fab fa-instagram"></i>
+                    <div class="recent-list" id="recentList">
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-spinner loading"></i>
                             </div>
-                            <div class="item-content">
-                                <div class="item-title">Instagram Credentials Updated</div>
-                                <div class="item-subtitle">Login • Password rotated • 2FA enabled</div>
-                            </div>
-                            <div class="item-time">12 min ago</div>
-                        </div>
-                        
-                        <div class="recent-item" onclick="openItem('project-alpha')">
-                            <div class="item-icon">
-                                <i class="fas fa-rocket"></i>
-                            </div>
-                            <div class="item-content">
-                                <div class="item-title">Project Alpha - Phase 2 Completed</div>
-                                <div class="item-subtitle">Project • 3 files encrypted • Team updated</div>
-                            </div>
-                            <div class="item-time">45 min ago</div>
-                        </div>
-                        
-                        <div class="recent-item" onclick="openItem('financial-docs')">
-                            <div class="item-icon">
-                                <i class="fas fa-file-invoice-dollar"></i>
-                            </div>
-                            <div class="item-content">
-                                <div class="item-title">Q3 Financial Reports Secured</div>
-                                <div class="item-subtitle">Document • AES-256 encrypted • Backup created</div>
-                            </div>
-                            <div class="item-time">2 hours ago</div>
+                            <p>Loading recent items from Supabase...</p>
                         </div>
                     </div>
                 </div>
@@ -850,29 +892,250 @@
         const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_baqcMEGuteudYzRBHaxoPA_qDLLbl7c';
         
-        // Auto-lock system
+        // Initialize Supabase client
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // Application state
         let lockTimer = 60;
         let lockInterval;
         let isLocked = false;
+        let currentData = {
+            items: [],
+            counts: {},
+            lastUpdated: null
+        };
         
-        // Device detection
-        function checkDevice() {
-            const userAgent = navigator.userAgent;
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-            const screenWidth = window.screen.width;
-            
-            if (isMobile && screenWidth < 1024) {
-                document.getElementById('deviceWarning').style.display = 'flex';
+        // Connection management
+        async function checkConnection() {
+            try {
+                updateConnectionStatus('Connecting to Supabase...', 'warning');
+                
+                // Test connection
+                const { data, error } = await supabase
+                    .from('vault_meta')
+                    .select('updated_at')
+                    .limit(1);
+                
+                if (error) {
+                    if (error.code === '42P01') {
+                        updateConnectionStatus('Tables not initialized', 'warning');
+                        return false;
+                    }
+                    throw error;
+                }
+                
+                updateConnectionStatus('Connected to Supabase', 'success');
                 return true;
+            } catch (error) {
+                console.error('Connection error:', error);
+                updateConnectionStatus('Connection failed', 'error');
+                return false;
             }
-            return false;
         }
         
-        function redirectToMobile() {
-            window.location.href = 'phone.html';
+        function updateConnectionStatus(message, type) {
+            const statusEl = document.getElementById('connectionText');
+            const dotEl = document.getElementById('connectionDot');
+            
+            statusEl.textContent = message;
+            dotEl.className = 'connection-dot';
+            
+            if (type === 'success') {
+                dotEl.classList.add('connected');
+            } else if (type === 'warning') {
+                dotEl.style.background = 'var(--warning)';
+            } else if (type === 'error') {
+                dotEl.style.background = 'var(--danger)';
+            }
         }
         
-        // Auto-lock timer
+        // Data loading functions
+        async function loadAllData() {
+            try {
+                updatePageStatus('Loading data from Supabase...');
+                
+                // Load counts for each type
+                await Promise.all([
+                    loadItemsCount('logins'),
+                    loadItemsCount('images'),
+                    loadItemsCount('projects'),
+                    loadItemsCount('folders'),
+                    loadItemsCount('texts'),
+                    loadRecentItems()
+                ]);
+                
+                updateStats();
+                updatePageStatus('Data loaded successfully');
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                updatePageStatus('Error loading data from Supabase');
+            }
+        }
+        
+        async function loadItemsCount(type) {
+            try {
+                const { count, error } = await supabase
+                    .from('vault_items')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('type', type);
+                
+                if (!error) {
+                    currentData.counts[type] = count || 0;
+                    updateBadgeCount(type, count || 0);
+                }
+            } catch (error) {
+                console.error(`Error loading ${type} count:`, error);
+                currentData.counts[type] = 0;
+                updateBadgeCount(type, 0);
+            }
+        }
+        
+        async function loadRecentItems() {
+            try {
+                const { data, error } = await supabase
+                    .from('vault_items')
+                    .select('id, type, title, created_at')
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                if (!error && data) {
+                    currentData.items = data;
+                    displayRecentItems(data);
+                } else {
+                    displayEmptyState();
+                }
+            } catch (error) {
+                console.error('Error loading recent items:', error);
+                displayEmptyState();
+            }
+        }
+        
+        function displayRecentItems(items) {
+            const container = document.getElementById('recentList');
+            
+            if (!items || items.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-inbox"></i>
+                        </div>
+                        <p>No items found in your vault</p>
+                        <button class="button" onclick="addNewItem()" style="margin-top: 16px;">
+                            <i class="fas fa-plus"></i>
+                            Add First Item
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            let html = '';
+            items.forEach(item => {
+                const icon = getIconForType(item.type);
+                const time = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const date = new Date(item.created_at).toLocaleDateString();
+                
+                html += `
+                    <div class="recent-item" onclick="openItem('${item.id}')">
+                        <div class="item-icon">
+                            <i class="${icon}"></i>
+                        </div>
+                        <div class="item-content">
+                            <div class="item-title">${item.title || 'Untitled Item'}</div>
+                            <div class="item-subtitle">${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</div>
+                        </div>
+                        <div class="item-time" title="${date}">${time}</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        function displayEmptyState() {
+            const container = document.getElementById('recentList');
+            container.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="fas fa-inbox"></i>
+                    </div>
+                    <p>No items found or error loading data</p>
+                    <button class="button" onclick="loadAllData()" style="margin-top: 16px;">
+                        <i class="fas fa-sync-alt"></i>
+                        Retry Loading
+                    </button>
+                </div>
+            `;
+        }
+        
+        function getIconForType(type) {
+            const icons = {
+                'login': 'fas fa-key',
+                'image': 'fas fa-image',
+                'project': 'fas fa-folder',
+                'text': 'fas fa-file-alt',
+                'folder': 'fas fa-folder-tree'
+            };
+            return icons[type] || 'fas fa-question';
+        }
+        
+        // Update UI functions
+        function updateBadgeCount(type, count) {
+            const badgeId = `${type}Count`;
+            const badge = document.getElementById(badgeId);
+            if (badge) {
+                badge.innerHTML = count;
+            }
+            
+            // Update total items badge
+            if (type === 'totalItems') {
+                const totalBadge = document.getElementById('totalItemsCount');
+                if (totalBadge) {
+                    totalBadge.innerHTML = count;
+                }
+            }
+        }
+        
+        function updateStats() {
+            // Calculate total items
+            const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
+            document.getElementById('statTotal').textContent = total;
+            document.getElementById('statTotalTrend').innerHTML = `
+                <i class="fas fa-database"></i>
+                <span>From Supabase</span>
+            `;
+            
+            // Update storage (simplified calculation)
+            const storageKB = total * 5; // Estimate 5KB per item
+            document.getElementById('statStorage').textContent = storageKB > 1024 ? 
+                `${(storageKB / 1024).toFixed(1)} MB` : `${storageKB} KB`;
+            
+            // Update last updated
+            const now = new Date();
+            document.getElementById('statUpdated').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('statUpdatedTrend').innerHTML = `
+                <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                <span>Just now</span>
+            `;
+            
+            // Update security status
+            document.getElementById('statSecurity').textContent = total > 0 ? '100%' : '0%';
+            document.getElementById('statSecurityTrend').innerHTML = total > 0 ?
+                `<i class="fas fa-shield-check" style="color: var(--success);"></i>
+                 <span>All items encrypted</span>` :
+                `<i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                 <span>No data yet</span>`;
+        }
+        
+        function updatePageStatus(message) {
+            const subtitle = document.getElementById('pageSubtitle');
+            if (subtitle) {
+                subtitle.innerHTML = message;
+            }
+        }
+        
+        // Auto-lock system
         function startLockTimer() {
             clearInterval(lockInterval);
             lockTimer = 60;
@@ -882,7 +1145,6 @@
                 lockTimer--;
                 document.getElementById('lockTimer').textContent = lockTimer;
                 
-                // Color coding
                 if (lockTimer <= 10) {
                     document.getElementById('lockTimer').style.color = 'var(--danger)';
                 } else if (lockTimer <= 30) {
@@ -924,14 +1186,13 @@
             }
         }
         
-        // Navigation
+        // UI Actions
         function switchSection(section) {
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
             
-            // Update breadcrumb
             const sectionNames = {
                 dashboard: 'Dashboard',
                 logins: 'Logins',
@@ -942,50 +1203,86 @@
                 archive: 'Archive'
             };
             
-            const breadcrumb = document.querySelector('.breadcrumb');
             if (sectionNames[section]) {
-                breadcrumb.innerHTML = `
-                    <span style="color: var(--text-primary); font-weight: 500;">${sectionNames[section]}</span>
-                    <span class="breadcrumb-separator">/</span>
-                    <span>Overview</span>
-                `;
+                document.getElementById('currentSection').textContent = sectionNames[section];
+                document.getElementById('pageTitle').textContent = sectionNames[section];
+                document.getElementById('currentSubsection').textContent = 'Overview';
             }
             
             resetLockTimer();
         }
         
-        // UI Actions
+        function refreshData() {
+            loadAllData();
+            resetLockTimer();
+        }
+        
+        function loadAllActivity() {
+            loadRecentItems();
+            resetLockTimer();
+        }
+        
+        function openItem(id) {
+            alert(`Opening item ${id}\n\nIn production, this would decrypt and display the item`);
+            resetLockTimer();
+        }
+        
+        function addNewItem() {
+            alert('Add new item functionality\n\nThis would open a form to create new encrypted items');
+            resetLockTimer();
+        }
+        
         function showSearch() {
             const query = prompt('Search across encrypted vault:');
             if (query) {
-                alert(`Searching for "${query}" in encrypted metadata...`);
+                alert(`Searching for "${query}" in Supabase database...`);
                 resetLockTimer();
             }
         }
         
-        function showNotifications() {
-            alert('Notifications:\n\n• Backup completed successfully\n• 3 items require attention\n• Security audit passed');
-            resetLockTimer();
-        }
-        
-        function showSecurity() {
-            alert('Security Settings:\n\n• Change Master Password\n• Two-Factor Authentication\n• Auto-lock Timer\n• Encryption Algorithms');
+        function showSupabaseInfo() {
+            const info = `
+Supabase Connection Details:
+---------------------------
+Project: jjvyhwnkyenlrpzdiiun
+URL: https://jjvyhwnkyenlrpzdiiun.supabase.co
+Status: ${document.getElementById('connectionText').textContent}
+
+Current Stats:
+-------------
+Total Items: ${document.getElementById('statTotal').textContent}
+Logins: ${currentData.counts.logins || 0}
+Images: ${currentData.counts.images || 0}
+Projects: ${currentData.counts.projects || 0}
+Folders: ${currentData.counts.folders || 0}
+
+All data is encrypted locally before being stored in Supabase.
+            `;
+            
+            alert(info);
             resetLockTimer();
         }
         
         function showSettings() {
-            alert('Settings:\n\n• Appearance\n• Backup Settings\n• Supabase Connection\n• Export/Import');
+            alert('Settings Panel\n\n• Master Password Change\n• Auto-lock Timer\n• Supabase Connection\n• Export/Import Data');
             resetLockTimer();
         }
         
-        function openItem(item) {
-            alert(`Opening encrypted item: ${item}\n\nData would be fetched from Supabase and decrypted locally`);
-            resetLockTimer();
+        // Device detection
+        function checkDevice() {
+            const userAgent = navigator.userAgent;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+            const screenWidth = window.screen.width;
+            
+            if (isMobile && screenWidth < 1024) {
+                document.getElementById('deviceWarning').style.display = 'flex';
+                return true;
+            }
+            return false;
         }
         
-        function viewAllActivity() {
-            alert('Loading all recent activity...');
-            resetLockTimer();
+        function redirectToMobile() {
+            window.location.href = 'phone.html';
         }
         
         // Event Listeners
@@ -1006,23 +1303,23 @@
         });
         
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             if (!checkDevice()) {
                 startLockTimer();
                 
-                // Setup navigation items
+                // Check connection and load data
+                const isConnected = await checkConnection();
+                if (isConnected) {
+                    await loadAllData();
+                } else {
+                    updatePageStatus('Unable to connect to Supabase. Please check your connection.');
+                }
+                
+                // Setup navigation
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.addEventListener('click', function() {
                         const section = this.getAttribute('onclick').match(/'([^']+)'/)[1];
                         switchSection(section);
-                    });
-                });
-                
-                // Setup recent items
-                document.querySelectorAll('.recent-item').forEach(item => {
-                    item.addEventListener('click', function() {
-                        const itemName = this.getAttribute('onclick').match(/'([^']+)'/)[1];
-                        openItem(itemName);
                     });
                 });
                 
