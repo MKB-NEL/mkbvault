@@ -3,75 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Console — MKBVAULT</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>Console — MKBVAULT (2026)</title>
+    <!-- Bulma CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Custom Styles -->
     <style>
-        /* Framer-inspired Variables */
         :root {
-            --background: #ffffff;
-            --surface: #fafafa;
-            --surface-elevated: #ffffff;
-            --elevation-1: 0 1px 1px rgba(0, 0, 0, 0.02), 0 2px 4px rgba(0, 0, 0, 0.04);
-            --elevation-2: 0 2px 8px rgba(0, 0, 0, 0.06), 0 4px 16px rgba(0, 0, 0, 0.08);
-            --elevation-3: 0 8px 24px rgba(0, 0, 0, 0.1), 0 16px 48px rgba(0, 0, 0, 0.12);
             --primary: #0066ff;
             --primary-hover: #0052d9;
-            --text-primary: #000000;
-            --text-secondary: #666666;
-            --text-tertiary: #999999;
-            --border: #e5e5e5;
-            --border-hover: #d0d0d0;
             --success: #00c853;
             --warning: #ff9500;
             --danger: #ff3b30;
-            --radius-sm: 8px;
-            --radius-md: 12px;
-            --transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
-            --sidebar-width: 280px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
 
         body {
-            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: var(--background);
-            color: var(--text-primary);
-            line-height: 1.6;
-            font-weight: 400;
-            overflow: hidden;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             height: 100vh;
+            overflow: hidden;
         }
 
-        /* Auto-lock Overlay */
+        /* Lock Overlay */
         .lock-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(20px);
-            z-index: 1000;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
             display: flex;
             align-items: center;
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s cubic-bezier(0.2, 0, 0, 1);
+            transition: opacity 0.3s ease;
         }
 
-        .lock-overlay.active {
+        .lock-overlay.is-active {
             opacity: 1;
             pointer-events: all;
         }
@@ -79,130 +50,113 @@
         .lock-modal {
             width: 100%;
             max-width: 400px;
-            padding: 48px;
-            background: var(--surface-elevated);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            box-shadow: var(--elevation-3);
-            text-align: center;
-            position: relative;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: 2px solid var(--danger);
+            overflow: hidden;
         }
 
-        .lock-modal::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
+        .lock-header {
             background: linear-gradient(90deg, var(--danger), #ff9500);
-            border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+            color: white;
+            padding: 2rem;
+            text-align: center;
         }
 
-        .lock-icon {
-            font-size: 48px;
-            color: var(--danger);
-            margin-bottom: 24px;
-            opacity: 0.9;
-        }
-
-        /* App Container */
+        /* App Layout */
         .app-container {
             display: flex;
             height: 100vh;
-            overflow: hidden;
         }
 
         /* Sidebar */
         .sidebar {
-            width: var(--sidebar-width);
-            background: var(--surface);
-            border-right: 1px solid var(--border);
+            width: 280px;
+            background: white;
+            border-right: 2px solid #e5e7eb;
             display: flex;
             flex-direction: column;
-            padding: 24px 0;
-            position: relative;
-            z-index: 100;
+            padding: 1.5rem 0;
         }
 
         .logo-container {
-            padding: 0 24px 24px;
-            border-bottom: 1px solid var(--border);
-            margin-bottom: 24px;
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
+            margin-bottom: 1.5rem;
         }
 
         .logo {
-            font-size: 20px;
-            font-weight: 700;
-            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.75rem;
         }
 
-        .logo-gradient {
-            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+        .logo-badge {
+            background: var(--success);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
         }
 
         .nav-section {
-            padding: 0 16px;
-            margin-bottom: 24px;
+            padding: 0 1rem;
+            margin-bottom: 1.5rem;
         }
 
         .nav-label {
-            font-size: 11px;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-tertiary);
-            padding: 0 24px 12px;
+            letter-spacing: 0.05em;
+            color: #64748b;
+            padding: 0 1.5rem 0.75rem;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 12px 24px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            border-radius: var(--radius-sm);
-            margin: 4px 8px;
-            transition: var(--transition);
+            gap: 1rem;
+            padding: 0.875rem 1.5rem;
+            color: #475569;
+            border-radius: 8px;
+            margin: 0.25rem 0.5rem;
             cursor: pointer;
-            position: relative;
+            transition: all 0.2s ease;
         }
 
         .nav-item:hover {
-            background: var(--background);
-            color: var(--text-primary);
+            background: #f8fafc;
+            color: var(--primary);
         }
 
-        .nav-item.active {
+        .nav-item.is-active {
             background: var(--primary);
             color: white;
-            font-weight: 500;
         }
 
         .nav-icon {
-            font-size: 16px;
-            width: 20px;
+            font-size: 1.25rem;
+            width: 24px;
             text-align: center;
         }
 
         .nav-badge {
             margin-left: auto;
-            font-size: 11px;
+            background: #e5e7eb;
+            color: #64748b;
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.75rem;
             font-weight: 600;
-            padding: 2px 8px;
-            background: var(--border);
-            color: var(--text-secondary);
-            border-radius: 100px;
         }
 
-        .nav-item.active .nav-badge {
+        .nav-item.is-active .nav-badge {
             background: rgba(255, 255, 255, 0.2);
             color: white;
         }
@@ -213,188 +167,150 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            background: var(--background);
+            background: #f8fafc;
         }
 
-        /* Top Bar */
         .top-bar {
-            height: 64px;
-            padding: 0 32px;
-            border-bottom: 1px solid var(--border);
+            background: white;
+            border-bottom: 2px solid #e5e7eb;
+            padding: 1rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            background: var(--surface-elevated);
-            position: sticky;
-            top: 0;
-            z-index: 90;
         }
 
         .breadcrumb {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            color: var(--text-secondary);
+            gap: 0.5rem;
+            color: #64748b;
         }
 
-        .breadcrumb-separator {
-            color: var(--border);
+        .breadcrumb-current {
+            color: var(--primary);
+            font-weight: 600;
         }
 
         .actions {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            gap: 0.75rem;
         }
 
-        .action-button {
+        .action-btn {
             width: 40px;
             height: 40px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            color: var(--text-secondary);
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            color: #64748b;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s ease;
         }
 
-        .action-button:hover {
-            background: var(--background);
-            border-color: var(--border-hover);
-            color: var(--text-primary);
-            transform: translateY(-1px);
-        }
-
-        .action-button.primary {
-            background: var(--primary);
+        .action-btn:hover {
             border-color: var(--primary);
-            color: white;
-        }
-
-        .action-button.primary:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
+            color: var(--primary);
+            transform: translateY(-2px);
         }
 
         /* Content Area */
         .content-area {
             flex: 1;
             overflow-y: auto;
-            padding: 32px;
-        }
-
-        /* Dashboard */
-        .dashboard-header {
-            margin-bottom: 32px;
-        }
-
-        .dashboard-title {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
-        }
-
-        .dashboard-subtitle {
-            font-size: 16px;
-            color: var(--text-secondary);
-            max-width: 600px;
+            padding: 2rem;
         }
 
         /* Stats Grid */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 32px;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         .stat-card {
-            padding: 24px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
         }
 
         .stat-card:hover {
-            border-color: var(--border-hover);
-            transform: translateY(-2px);
-            box-shadow: var(--elevation-1);
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0, 102, 255, 0.1);
         }
 
         .stat-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 16px;
+            margin-bottom: 1rem;
         }
 
         .stat-title {
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 600;
-            color: var(--text-tertiary);
+            color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
 
         .stat-icon {
-            font-size: 24px;
-            opacity: 0.8;
+            font-size: 1.5rem;
+            color: var(--primary);
         }
 
         .stat-value {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 8px;
-            letter-spacing: -0.02em;
+            font-size: 2rem;
+            font-weight: 900;
+            color: #1f2937;
+            line-height: 1;
+            margin-bottom: 0.5rem;
         }
 
         .stat-trend {
             display: flex;
             align-items: center;
-            gap: 4px;
-            font-size: 13px;
-            color: var(--text-tertiary);
+            gap: 0.5rem;
+            font-size: 0.875rem;
+            color: #64748b;
         }
 
         .trend-up { color: var(--success); }
         .trend-down { color: var(--danger); }
 
-        /* Recent Items */
+        /* Recent Section */
         .recent-section {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
             overflow: hidden;
-            margin-top: 32px;
         }
 
         .section-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
+            padding: 1.5rem;
+            border-bottom: 2px solid #e5e7eb;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .section-title {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1f2937;
         }
 
         .section-action {
-            font-size: 14px;
-            font-weight: 500;
             color: var(--primary);
+            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
+            transition: color 0.2s ease;
         }
 
         .section-action:hover {
@@ -408,28 +324,28 @@
         .recent-item {
             display: flex;
             align-items: center;
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--border);
-            transition: var(--transition);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 2px solid #f8fafc;
             cursor: pointer;
+            transition: background 0.2s ease;
         }
 
         .recent-item:hover {
-            background: var(--background);
+            background: #f8fafc;
         }
 
         .item-icon {
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            margin-right: 16px;
-            font-size: 16px;
-            color: var(--text-secondary);
+            background: #f8fafc;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            color: #64748b;
         }
 
         .item-content {
@@ -438,92 +354,51 @@
 
         .item-title {
             font-weight: 600;
-            margin-bottom: 4px;
+            color: #1f2937;
+            margin-bottom: 0.25rem;
         }
 
         .item-subtitle {
-            font-size: 13px;
-            color: var(--text-tertiary);
+            color: #64748b;
+            font-size: 0.875rem;
         }
 
         .item-time {
-            font-size: 12px;
-            color: var(--text-tertiary);
+            color: #94a3b8;
+            font-size: 0.875rem;
             font-weight: 500;
-        }
-
-        /* Inputs */
-        .input-field {
-            width: 100%;
-            padding: 16px;
-            background: var(--background);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
-            font-family: 'Poppins', sans-serif;
-            font-size: 16px;
-            color: var(--text-primary);
-            transition: var(--transition);
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0, 102, 255, 0.1);
-        }
-
-        .button {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px 24px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-sm);
-            font-family: 'Poppins', sans-serif;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .button:hover {
-            background: var(--primary-hover);
-            transform: translateY(-1px);
+            white-space: nowrap;
         }
 
         /* Lock Timer */
         .lock-timer {
             position: fixed;
-            bottom: 24px;
-            right: 24px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 12px 16px;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            padding: 0.75rem 1.25rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: var(--text-secondary);
-            box-shadow: var(--elevation-1);
-            z-index: 99;
+            gap: 0.75rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 100;
         }
 
         .timer-value {
-            font-weight: 700;
-            color: var(--text-primary);
-            min-width: 20px;
+            font-weight: 900;
+            color: #1f2937;
+            min-width: 24px;
             text-align: center;
         }
 
         /* Loading States */
         .loading {
             display: inline-block;
-            width: 16px;
-            height: 16px;
-            border: 2px solid var(--border);
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e7eb;
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -533,48 +408,42 @@
             to { transform: rotate(360deg); }
         }
 
-        .loading-text {
-            color: var(--text-tertiary);
-            font-style: italic;
-        }
-
         /* Empty State */
         .empty-state {
-            padding: 48px;
+            padding: 4rem 2rem;
             text-align: center;
-            color: var(--text-tertiary);
+            color: #64748b;
         }
 
         .empty-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
+            font-size: 3rem;
+            margin-bottom: 1rem;
             opacity: 0.5;
         }
 
         /* Connection Status */
         .connection-status {
             position: fixed;
-            top: 80px;
-            right: 32px;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 50px;
+            padding: 0.5rem 1rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 12px;
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            font-size: 12px;
-            color: var(--text-secondary);
-            z-index: 99;
-            box-shadow: var(--elevation-1);
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: #64748b;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            z-index: 100;
         }
 
         .connection-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: var(--danger);
-            transition: var(--transition);
+            background: #94a3b8;
         }
 
         .connection-dot.connected {
@@ -583,38 +452,21 @@
         }
 
         /* Scrollbar */
-        ::-webkit-scrollbar {
+        .content-area::-webkit-scrollbar {
             width: 8px;
-            height: 8px;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--surface);
+        .content-area::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
+        .content-area::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
             border-radius: 4px;
         }
 
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--border-hover);
-        }
-
-        /* Animations */
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .animate-slide-in {
-            animation: slideIn 0.3s cubic-bezier(0.2, 0, 0, 1) forwards;
+        .content-area::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
@@ -625,95 +477,121 @@
         <span id="connectionText">Connecting...</span>
     </div>
 
-    <!-- Device Check Warning -->
-    <div class="device-warning" id="deviceWarning" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: var(--background); z-index: 1001; flex-direction: column; align-items: center; justify-content: center; padding: 32px; text-align: center;">
-        <div style="margin-bottom: 32px;">
-            <i class="fas fa-mobile-alt" style="font-size: 64px; color: var(--primary); opacity: 0.8;"></i>
+    <!-- Device Warning -->
+    <div class="modal" id="deviceWarning">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Mobile Device Detected</p>
+                <button class="delete" onclick="closeDeviceWarning()"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="has-text-centered mb-4">
+                    <i class="fas fa-mobile-alt fa-3x has-text-primary mb-3"></i>
+                    <p class="mb-3">
+                        You're accessing the desktop console from a mobile device. 
+                        For the best experience, you'll be redirected to the mobile interface.
+                    </p>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button class="button is-primary" onclick="redirectToMobile()">
+                    <span class="icon">
+                        <i class="fas fa-external-link-alt"></i>
+                    </span>
+                    <span>Continue to Mobile</span>
+                </button>
+                <button class="button" onclick="closeDeviceWarning()">Stay Here</button>
+            </footer>
         </div>
-        <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 16px;">Mobile Device Detected</h2>
-        <p style="color: var(--text-secondary); margin-bottom: 24px; max-width: 400px;">
-            You're accessing the desktop console from a mobile device. For the best experience, you'll be redirected to the mobile interface.
-        </p>
-        <button class="button" onclick="redirectToMobile()">
-            <i class="fas fa-external-link-alt"></i>
-            Continue to Mobile
-        </button>
     </div>
 
     <!-- Auto-lock Overlay -->
     <div class="lock-overlay" id="lockOverlay">
         <div class="lock-modal">
-            <div class="lock-icon">
-                <i class="fas fa-lock"></i>
+            <div class="lock-header">
+                <i class="fas fa-lock fa-2x mb-3"></i>
+                <h2 class="title is-3 has-text-white">Session Locked</h2>
+                <p class="subtitle is-6 has-text-white">Auto-lock triggered due to inactivity</p>
             </div>
-            <h2 style="font-size: 24px; font-weight: 700; margin-bottom: 8px;">Session Locked</h2>
-            <p style="color: var(--text-secondary); margin-bottom: 8px;">Auto-lock triggered due to inactivity</p>
-            <p style="color: var(--text-tertiary); font-size: 14px; margin-bottom: 24px;">Enter master password to continue</p>
             
-            <input type="password" class="input-field" id="masterPassword" placeholder="••••••••••••">
-            
-            <button class="button" onclick="unlockVault()" style="width: 100%; margin-top: 16px;">
-                <i class="fas fa-unlock"></i>
-                Unlock Vault
-            </button>
-            
-            <div style="margin-top: 24px; font-size: 13px; color: var(--text-tertiary;">
-                <i class="fas fa-info-circle"></i> Connected to Supabase: jjvyhwnkyenlrpzdiiun
+            <div class="p-5">
+                <div class="field">
+                    <label class="label">Enter master password to continue</label>
+                    <div class="control">
+                        <input class="input" type="password" id="masterPassword" placeholder="••••••••••••">
+                    </div>
+                </div>
+                
+                <div class="field">
+                    <div class="control">
+                        <button class="button is-primary is-fullwidth" onclick="unlockVault()">
+                            <span class="icon">
+                                <i class="fas fa-unlock"></i>
+                            </span>
+                            <span>Unlock Vault</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <p class="has-text-grey is-size-7 mt-3">
+                    <i class="fas fa-info-circle"></i> Connected to Supabase: jjvyhwnkyenlrpzdiiun
+                </p>
             </div>
         </div>
     </div>
 
     <!-- Main App -->
-    <div class="app-container" id="appContainer">
+    <div class="app-container">
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo-container">
                 <div class="logo">
-                    <span class="logo-gradient">MKBVAULT</span>
-                    <span style="font-size: 11px; background: var(--success); color: white; padding: 2px 6px; border-radius: 100px;">LIVE</span>
+                    <span>MKBVAULT</span>
+                    <span class="logo-badge">2026</span>
                 </div>
             </div>
 
             <div class="nav-section">
                 <div class="nav-label">Navigation</div>
                 
-                <div class="nav-item active" onclick="switchSection('dashboard')">
+                <div class="nav-item is-active" data-section="dashboard">
                     <div class="nav-icon">
                         <i class="fas fa-chart-line"></i>
                     </div>
                     <span>Dashboard</span>
                     <div class="nav-badge" id="totalItemsCount">
-                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                        <span class="loading"></span>
                     </div>
                 </div>
                 
-                <div class="nav-item" onclick="switchSection('logins')">
+                <div class="nav-item" data-section="logins">
                     <div class="nav-icon">
                         <i class="fas fa-key"></i>
                     </div>
                     <span>Logins</span>
                     <div class="nav-badge" id="loginsCount">
-                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                        <span class="loading"></span>
                     </div>
                 </div>
                 
-                <div class="nav-item" onclick="switchSection('images')">
+                <div class="nav-item" data-section="images">
                     <div class="nav-icon">
                         <i class="fas fa-image"></i>
                     </div>
                     <span>Images</span>
                     <div class="nav-badge" id="imagesCount">
-                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                        <span class="loading"></span>
                     </div>
                 </div>
                 
-                <div class="nav-item" onclick="switchSection('projects')">
+                <div class="nav-item" data-section="projects">
                     <div class="nav-icon">
                         <i class="fas fa-folder"></i>
                     </div>
                     <span>Projects</span>
                     <div class="nav-badge" id="projectsCount">
-                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                        <span class="loading"></span>
                     </div>
                 </div>
             </div>
@@ -721,38 +599,38 @@
             <div class="nav-section">
                 <div class="nav-label">Organization</div>
                 
-                <div class="nav-item" onclick="switchSection('folders')">
+                <div class="nav-item" data-section="folders">
                     <div class="nav-icon">
                         <i class="fas fa-folder-tree"></i>
                     </div>
                     <span>Folders</span>
                     <div class="nav-badge" id="foldersCount">
-                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                        <span class="loading"></span>
                     </div>
                 </div>
                 
-                <div class="nav-item" onclick="switchSection('favorites')">
+                <div class="nav-item" data-section="favorites">
                     <div class="nav-icon">
                         <i class="fas fa-star"></i>
                     </div>
                     <span>Favorites</span>
                     <div class="nav-badge" id="favoritesCount">
-                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                        <span class="loading"></span>
                     </div>
                 </div>
                 
-                <div class="nav-item" onclick="switchSection('archive')">
+                <div class="nav-item" data-section="archive">
                     <div class="nav-icon">
                         <i class="fas fa-archive"></i>
                     </div>
                     <span>Archive</span>
                     <div class="nav-badge" id="archiveCount">
-                        <span class="loading" style="width: 12px; height: 12px; border-width: 1px;"></span>
+                        <span class="loading"></span>
                     </div>
                 </div>
             </div>
 
-            <div style="margin-top: auto; padding: 0 16px;">
+            <div class="mt-auto p-4">
                 <div class="nav-item" onclick="showSupabaseInfo()">
                     <div class="nav-icon">
                         <i class="fas fa-database"></i>
@@ -760,11 +638,11 @@
                     <span>Database Info</span>
                 </div>
                 
-                <div class="nav-item" onclick="showSettings()">
+                <div class="nav-item" onclick="lockVault()">
                     <div class="nav-icon">
-                        <i class="fas fa-cog"></i>
+                        <i class="fas fa-lock"></i>
                     </div>
-                    <span>Settings</span>
+                    <span>Lock Vault</span>
                 </div>
             </div>
         </div>
@@ -774,32 +652,32 @@
             <!-- Top Bar -->
             <div class="top-bar">
                 <div class="breadcrumb">
-                    <span style="color: var(--text-primary); font-weight: 500;" id="currentSection">Dashboard</span>
-                    <span class="breadcrumb-separator">/</span>
-                    <span id="currentSubsection">Loading...</span>
+                    <span class="breadcrumb-current" id="currentSection">Dashboard</span>
+                    <span>/</span>
+                    <span id="currentSubsection">Overview</span>
                 </div>
                 
                 <div class="actions">
-                    <div class="action-button" onclick="refreshData()" title="Refresh Data">
+                    <div class="action-btn" onclick="refreshData()" title="Refresh Data">
                         <i class="fas fa-sync-alt"></i>
                     </div>
                     
-                    <div class="action-button" onclick="showSearch()">
+                    <div class="action-btn" onclick="showSearch()">
                         <i class="fas fa-search"></i>
                     </div>
                     
-                    <div class="action-button" onclick="lockVault()" title="Lock Vault">
-                        <i class="fas fa-lock"></i>
+                    <div class="action-btn is-primary" onclick="addNewItem()" title="Add New Item">
+                        <i class="fas fa-plus"></i>
                     </div>
                 </div>
             </div>
 
             <!-- Content Area -->
             <div class="content-area">
-                <div class="dashboard-header">
-                    <h1 class="dashboard-title" id="pageTitle">Security Dashboard</h1>
-                    <p class="dashboard-subtitle" id="pageSubtitle">
-                        <span class="loading" style="vertical-align: middle; margin-right: 8px;"></span>
+                <div class="mb-5">
+                    <h1 class="title is-2 mb-2" id="pageTitle">Security Dashboard 2026</h1>
+                    <p class="subtitle is-5 has-text-grey" id="pageSubtitle">
+                        <span class="loading"></span>
                         Loading data from Supabase...
                     </p>
                 </div>
@@ -809,61 +687,61 @@
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-title">Total Items</div>
-                            <div class="stat-icon" style="color: var(--primary);">
+                            <div class="stat-icon">
                                 <i class="fas fa-database"></i>
                             </div>
                         </div>
                         <div class="stat-value" id="statTotal">0</div>
                         <div class="stat-trend" id="statTotalTrend">
-                            <span class="loading-text">Loading from Supabase...</span>
+                            <span>Loading from Supabase...</span>
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-title">Storage Used</div>
-                            <div class="stat-icon" style="color: #8b5cf6;">
+                            <div class="stat-icon">
                                 <i class="fas fa-hdd"></i>
                             </div>
                         </div>
                         <div class="stat-value" id="statStorage">0 KB</div>
                         <div class="stat-trend" id="statStorageTrend">
-                            <span class="loading-text">Calculating...</span>
+                            <span>Calculating...</span>
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-title">Last Updated</div>
-                            <div class="stat-icon" style="color: var(--success);">
+                            <div class="stat-icon">
                                 <i class="fas fa-clock"></i>
                             </div>
                         </div>
                         <div class="stat-value" id="statUpdated">--:--</div>
                         <div class="stat-trend" id="statUpdatedTrend">
-                            <span class="loading-text">Checking Supabase...</span>
+                            <span>Checking Supabase...</span>
                         </div>
                     </div>
                     
                     <div class="stat-card">
                         <div class="stat-header">
                             <div class="stat-title">Security Status</div>
-                            <div class="stat-icon" style="color: var(--warning);">
+                            <div class="stat-icon">
                                 <i class="fas fa-shield-alt"></i>
                             </div>
                         </div>
                         <div class="stat-value" id="statSecurity">--%</div>
                         <div class="stat-trend" id="statSecurityTrend">
-                            <span class="loading-text">Verifying encryption...</span>
+                            <span>Verifying encryption...</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- Recent Activity -->
-                <div class="recent-section" id="recentSection">
+                <div class="recent-section mt-5">
                     <div class="section-header">
                         <div class="section-title">Recent Activity</div>
-                        <div class="section-action" onclick="loadAllActivity()">Refresh</div>
+                        <div class="section-action" onclick="loadAllActivity()">View All</div>
                     </div>
                     
                     <div class="recent-list" id="recentList">
@@ -871,7 +749,13 @@
                             <div class="empty-icon">
                                 <i class="fas fa-spinner loading"></i>
                             </div>
-                            <p>Loading recent items from Supabase...</p>
+                            <p class="mb-3">Loading recent items from Supabase...</p>
+                            <button class="button is-primary" onclick="refreshData()">
+                                <span class="icon">
+                                    <i class="fas fa-sync-alt"></i>
+                                </span>
+                                <span>Refresh</span>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -887,13 +771,22 @@
         <span>seconds</span>
     </div>
 
+    <!-- Supabase Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration
+        // Supabase Configuration for 2026
         const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_baqcMEGuteudYzRBHaxoPA_qDLLbl7c';
+        const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
         
         // Initialize Supabase client
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        let supabase;
+        try {
+            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            console.log('Supabase client initialized for PC console 2026');
+        } catch (error) {
+            console.error('Failed to initialize Supabase:', error);
+            updateConnectionStatus('Supabase initialization failed', 'error');
+        }
         
         // Application state
         let lockTimer = 60;
@@ -908,7 +801,11 @@
         // Connection management
         async function checkConnection() {
             try {
-                updateConnectionStatus('Connecting to Supabase...', 'warning');
+                updateConnectionStatus('Connecting to Supabase 2026...', 'warning');
+                
+                if (!supabase) {
+                    throw new Error('Supabase client not initialized');
+                }
                 
                 // Test connection
                 const { data, error } = await supabase
@@ -937,35 +834,37 @@
             const statusEl = document.getElementById('connectionText');
             const dotEl = document.getElementById('connectionDot');
             
-            statusEl.textContent = message;
-            dotEl.className = 'connection-dot';
+            if (statusEl) statusEl.textContent = message;
             
-            if (type === 'success') {
-                dotEl.classList.add('connected');
-            } else if (type === 'warning') {
-                dotEl.style.background = 'var(--warning)';
-            } else if (type === 'error') {
-                dotEl.style.background = 'var(--danger)';
+            if (dotEl) {
+                dotEl.className = 'connection-dot';
+                if (type === 'success') {
+                    dotEl.classList.add('connected');
+                } else if (type === 'warning') {
+                    dotEl.style.background = 'var(--warning)';
+                } else if (type === 'error') {
+                    dotEl.style.background = 'var(--danger)';
+                }
             }
         }
         
         // Data loading functions
         async function loadAllData() {
             try {
-                updatePageStatus('Loading data from Supabase...');
+                updatePageStatus('Loading data from Supabase 2026...');
                 
                 // Load counts for each type
                 await Promise.all([
-                    loadItemsCount('logins'),
-                    loadItemsCount('images'),
-                    loadItemsCount('projects'),
-                    loadItemsCount('folders'),
-                    loadItemsCount('texts'),
+                    loadItemsCount('login'),
+                    loadItemsCount('image'),
+                    loadItemsCount('project'),
+                    loadItemsCount('folder'),
+                    loadItemsCount('text'),
                     loadRecentItems()
                 ]);
                 
                 updateStats();
-                updatePageStatus('Data loaded successfully');
+                updatePageStatus('Data loaded successfully from Supabase');
                 
             } catch (error) {
                 console.error('Error loading data:', error);
@@ -1020,10 +919,12 @@
                         <div class="empty-icon">
                             <i class="fas fa-inbox"></i>
                         </div>
-                        <p>No items found in your vault</p>
-                        <button class="button" onclick="addNewItem()" style="margin-top: 16px;">
-                            <i class="fas fa-plus"></i>
-                            Add First Item
+                        <p class="mb-3">No items found in your vault</p>
+                        <button class="button is-primary" onclick="addNewItem()">
+                            <span class="icon">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                            <span>Add First Item</span>
                         </button>
                     </div>
                 `;
@@ -1043,7 +944,7 @@
                         </div>
                         <div class="item-content">
                             <div class="item-title">${item.title || 'Untitled Item'}</div>
-                            <div class="item-subtitle">${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</div>
+                            <div class="item-subtitle">${item.type.charAt(0).toUpperCase() + item.type.slice(1)} • Created ${date}</div>
                         </div>
                         <div class="item-time" title="${date}">${time}</div>
                     </div>
@@ -1060,10 +961,12 @@
                     <div class="empty-icon">
                         <i class="fas fa-inbox"></i>
                     </div>
-                    <p>No items found or error loading data</p>
-                    <button class="button" onclick="loadAllData()" style="margin-top: 16px;">
-                        <i class="fas fa-sync-alt"></i>
-                        Retry Loading
+                    <p class="mb-3">No items found or error loading data</p>
+                    <button class="button is-primary" onclick="loadAllData()">
+                        <span class="icon">
+                            <i class="fas fa-sync-alt"></i>
+                        </span>
+                        <span>Retry Loading</span>
                     </button>
                 </div>
             `;
@@ -1086,14 +989,15 @@
             const badge = document.getElementById(badgeId);
             if (badge) {
                 badge.innerHTML = count;
+                badge.classList.remove('loading');
             }
             
             // Update total items badge
-            if (type === 'totalItems') {
-                const totalBadge = document.getElementById('totalItemsCount');
-                if (totalBadge) {
-                    totalBadge.innerHTML = count;
-                }
+            const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
+            const totalBadge = document.getElementById('totalItemsCount');
+            if (totalBadge) {
+                totalBadge.innerHTML = total;
+                totalBadge.classList.remove('loading');
             }
         }
         
@@ -1132,6 +1036,8 @@
             const subtitle = document.getElementById('pageSubtitle');
             if (subtitle) {
                 subtitle.innerHTML = message;
+                const loading = subtitle.querySelector('.loading');
+                if (loading) loading.remove();
             }
         }
         
@@ -1160,15 +1066,14 @@
         function resetLockTimer() {
             if (!isLocked) {
                 startLockTimer();
-                document.getElementById('lockTimer').style.color = 'var(--text-primary)';
+                document.getElementById('lockTimer').style.color = '#1f2937';
             }
         }
         
         function lockVault() {
             isLocked = true;
             clearInterval(lockInterval);
-            document.getElementById('lockOverlay').classList.add('active');
-            document.getElementById('appContainer').style.filter = 'blur(4px)';
+            document.getElementById('lockOverlay').classList.add('is-active');
             document.getElementById('masterPassword').focus();
         }
         
@@ -1177,8 +1082,7 @@
             
             if (password.trim()) {
                 isLocked = false;
-                document.getElementById('lockOverlay').classList.remove('active');
-                document.getElementById('appContainer').style.filter = 'none';
+                document.getElementById('lockOverlay').classList.remove('is-active');
                 document.getElementById('masterPassword').value = '';
                 startLockTimer();
             } else {
@@ -1189,23 +1093,23 @@
         // UI Actions
         function switchSection(section) {
             document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
+                item.classList.remove('is-active');
             });
-            event.currentTarget.classList.add('active');
+            event.currentTarget.classList.add('is-active');
             
             const sectionNames = {
-                dashboard: 'Dashboard',
-                logins: 'Logins',
-                images: 'Images',
-                projects: 'Projects',
-                folders: 'Folders',
-                favorites: 'Favorites',
-                archive: 'Archive'
+                'dashboard': 'Dashboard',
+                'logins': 'Logins',
+                'images': 'Images',
+                'projects': 'Projects',
+                'folders': 'Folders',
+                'favorites': 'Favorites',
+                'archive': 'Archive'
             };
             
             if (sectionNames[section]) {
                 document.getElementById('currentSection').textContent = sectionNames[section];
-                document.getElementById('pageTitle').textContent = sectionNames[section];
+                document.getElementById('pageTitle').textContent = sectionNames[section] + ' 2026';
                 document.getElementById('currentSubsection').textContent = 'Overview';
             }
             
@@ -1223,12 +1127,12 @@
         }
         
         function openItem(id) {
-            alert(`Opening item ${id}\n\nIn production, this would decrypt and display the item`);
+            alert(`Opening item ${id}\n\nIn production, this would decrypt and display the item from Supabase.`);
             resetLockTimer();
         }
         
         function addNewItem() {
-            alert('Add new item functionality\n\nThis would open a form to create new encrypted items');
+            alert('Add new item functionality\n\nThis would open a form to create new encrypted items and store in Supabase.');
             resetLockTimer();
         }
         
@@ -1242,29 +1146,25 @@
         
         function showSupabaseInfo() {
             const info = `
-Supabase Connection Details:
----------------------------
+Supabase Connection Details (2026):
+-----------------------------------
 Project: jjvyhwnkyenlrpzdiiun
 URL: https://jjvyhwnkyenlrpzdiiun.supabase.co
+Publishable Key: ${SUPABASE_KEY.substring(0, 20)}...
 Status: ${document.getElementById('connectionText').textContent}
 
 Current Stats:
 -------------
 Total Items: ${document.getElementById('statTotal').textContent}
-Logins: ${currentData.counts.logins || 0}
-Images: ${currentData.counts.images || 0}
-Projects: ${currentData.counts.projects || 0}
-Folders: ${currentData.counts.folders || 0}
+Logins: ${currentData.counts.login || 0}
+Images: ${currentData.counts.image || 0}
+Projects: ${currentData.counts.project || 0}
+Folders: ${currentData.counts.folder || 0}
 
 All data is encrypted locally before being stored in Supabase.
             `;
             
             alert(info);
-            resetLockTimer();
-        }
-        
-        function showSettings() {
-            alert('Settings Panel\n\n• Master Password Change\n• Auto-lock Timer\n• Supabase Connection\n• Export/Import Data');
             resetLockTimer();
         }
         
@@ -1275,10 +1175,14 @@ All data is encrypted locally before being stored in Supabase.
             const screenWidth = window.screen.width;
             
             if (isMobile && screenWidth < 1024) {
-                document.getElementById('deviceWarning').style.display = 'flex';
+                document.getElementById('deviceWarning').classList.add('is-active');
                 return true;
             }
             return false;
+        }
+        
+        function closeDeviceWarning() {
+            document.getElementById('deviceWarning').classList.remove('is-active');
         }
         
         function redirectToMobile() {
@@ -1287,7 +1191,7 @@ All data is encrypted locally before being stored in Supabase.
         
         // Event Listeners
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.getElementById('lockOverlay').classList.contains('active')) {
+            if (e.key === 'Enter' && document.getElementById('lockOverlay').classList.contains('is-active')) {
                 unlockVault();
             }
         });
@@ -1307,27 +1211,23 @@ All data is encrypted locally before being stored in Supabase.
             if (!checkDevice()) {
                 startLockTimer();
                 
-                // Check connection and load data
-                const isConnected = await checkConnection();
-                if (isConnected) {
-                    await loadAllData();
-                } else {
-                    updatePageStatus('Unable to connect to Supabase. Please check your connection.');
-                }
-                
                 // Setup navigation
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.addEventListener('click', function() {
-                        const section = this.getAttribute('onclick').match(/'([^']+)'/)[1];
+                        const section = this.getAttribute('data-section');
                         switchSection(section);
                     });
                 });
                 
-                // Add subtle animation to stat cards
-                document.querySelectorAll('.stat-card').forEach((card, index) => {
-                    card.style.animationDelay = `${index * 0.1}s`;
-                    card.classList.add('animate-slide-in');
-                });
+                // Check connection and load data
+                if (supabase) {
+                    const isConnected = await checkConnection();
+                    if (isConnected) {
+                        await loadAllData();
+                    } else {
+                        updatePageStatus('Unable to connect to Supabase. Please check your connection.');
+                    }
+                }
             }
         });
     </script>
