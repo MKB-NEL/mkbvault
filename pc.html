@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
     <!-- Custom Styles -->
     <style>
         :root {
@@ -483,7 +485,7 @@
         <div class="modal-card">
             <header class="modal-card-head">
                 <p class="modal-card-title">Mobile Device Detected</p>
-                <button class="delete" onclick="closeDeviceWarning()"></button>
+                <button class="delete" id="closeDeviceWarning"></button>
             </header>
             <section class="modal-card-body">
                 <div class="has-text-centered mb-4">
@@ -495,13 +497,13 @@
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button class="button is-primary" onclick="redirectToMobile()">
+                <button class="button is-primary" id="redirectToMobile">
                     <span class="icon">
                         <i class="fas fa-external-link-alt"></i>
                     </span>
                     <span>Continue to Mobile</span>
                 </button>
-                <button class="button" onclick="closeDeviceWarning()">Stay Here</button>
+                <button class="button" id="stayHere">Stay Here</button>
             </footer>
         </div>
     </div>
@@ -525,7 +527,7 @@
                 
                 <div class="field">
                     <div class="control">
-                        <button class="button is-primary is-fullwidth" onclick="unlockVault()">
+                        <button class="button is-primary is-fullwidth" id="unlockVaultBtn">
                             <span class="icon">
                                 <i class="fas fa-unlock"></i>
                             </span>
@@ -631,14 +633,14 @@
             </div>
 
             <div class="mt-auto p-4">
-                <div class="nav-item" onclick="showSupabaseInfo()">
+                <div class="nav-item" id="showSupabaseInfo">
                     <div class="nav-icon">
                         <i class="fas fa-database"></i>
                     </div>
                     <span>Database Info</span>
                 </div>
                 
-                <div class="nav-item" onclick="lockVault()">
+                <div class="nav-item" id="lockVaultBtn">
                     <div class="nav-icon">
                         <i class="fas fa-lock"></i>
                     </div>
@@ -658,15 +660,15 @@
                 </div>
                 
                 <div class="actions">
-                    <div class="action-btn" onclick="refreshData()" title="Refresh Data">
+                    <div class="action-btn" id="refreshDataBtn" title="Refresh Data">
                         <i class="fas fa-sync-alt"></i>
                     </div>
                     
-                    <div class="action-btn" onclick="showSearch()">
+                    <div class="action-btn" id="showSearchBtn">
                         <i class="fas fa-search"></i>
                     </div>
                     
-                    <div class="action-btn is-primary" onclick="addNewItem()" title="Add New Item">
+                    <div class="action-btn is-primary" id="addNewItemBtn" title="Add New Item">
                         <i class="fas fa-plus"></i>
                     </div>
                 </div>
@@ -741,7 +743,7 @@
                 <div class="recent-section mt-5">
                     <div class="section-header">
                         <div class="section-title">Recent Activity</div>
-                        <div class="section-action" onclick="loadAllActivity()">View All</div>
+                        <div class="section-action" id="viewAllActivity">View All</div>
                     </div>
                     
                     <div class="recent-list" id="recentList">
@@ -750,7 +752,7 @@
                                 <i class="fas fa-spinner loading"></i>
                             </div>
                             <p class="mb-3">Loading recent items from Supabase...</p>
-                            <button class="button is-primary" onclick="refreshData()">
+                            <button class="button is-primary" id="refreshDataBtn2">
                                 <span class="icon">
                                     <i class="fas fa-sync-alt"></i>
                                 </span>
@@ -774,453 +776,506 @@
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration for 2026
-        const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
-        
-        // Initialize Supabase client
-        let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('Supabase client initialized for PC console 2026');
-        } catch (error) {
-            console.error('Failed to initialize Supabase:', error);
-            updateConnectionStatus('Supabase initialization failed', 'error');
-        }
-        
-        // Application state
-        let lockTimer = 60;
-        let lockInterval;
-        let isLocked = false;
-        let currentData = {
-            items: [],
-            counts: {},
-            lastUpdated: null
-        };
-        
-        // Connection management
-        async function checkConnection() {
-            try {
-                updateConnectionStatus('Connecting to Supabase 2026...', 'warning');
-                
-                if (!supabase) {
-                    throw new Error('Supabase client not initialized');
+        // Wrap everything in an IIFE to prevent conflicts
+        (function() {
+            // Supabase Configuration for 2026
+            const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
+            
+            // Application state (scoped to this IIFE)
+            let supabaseClient = null;
+            let lockTimer = 60;
+            let lockInterval;
+            let isLocked = false;
+            let currentData = {
+                items: [],
+                counts: {},
+                lastUpdated: null
+            };
+            
+            // Initialize Supabase client
+            function initSupabase() {
+                try {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('Supabase client initialized for PC console 2026');
+                    return supabaseClient;
+                } catch (error) {
+                    console.error('Failed to initialize Supabase:', error);
+                    updateConnectionStatus('Supabase initialization failed', 'error');
+                    return null;
                 }
-                
-                // Test connection
-                const { data, error } = await supabase
-                    .from('vault_meta')
-                    .select('updated_at')
-                    .limit(1);
-                
-                if (error) {
-                    if (error.code === '42P01') {
-                        updateConnectionStatus('Tables not initialized', 'warning');
-                        return false;
+            }
+            
+            // Connection management
+            async function checkConnection() {
+                try {
+                    updateConnectionStatus('Connecting to Supabase 2026...', 'warning');
+                    
+                    if (!supabaseClient) {
+                        supabaseClient = initSupabase();
+                        if (!supabaseClient) {
+                            throw new Error('Supabase client not initialized');
+                        }
                     }
-                    throw error;
+                    
+                    // Test connection
+                    const { data, error } = await supabaseClient
+                        .from('vault_meta')
+                        .select('updated_at')
+                        .limit(1);
+                    
+                    if (error) {
+                        if (error.code === '42P01') {
+                            updateConnectionStatus('Tables not initialized', 'warning');
+                            return false;
+                        }
+                        throw error;
+                    }
+                    
+                    updateConnectionStatus('Connected to Supabase', 'success');
+                    return true;
+                } catch (error) {
+                    console.error('Connection error:', error);
+                    updateConnectionStatus('Connection failed', 'error');
+                    return false;
                 }
-                
-                updateConnectionStatus('Connected to Supabase', 'success');
-                return true;
-            } catch (error) {
-                console.error('Connection error:', error);
-                updateConnectionStatus('Connection failed', 'error');
-                return false;
             }
-        }
-        
-        function updateConnectionStatus(message, type) {
-            const statusEl = document.getElementById('connectionText');
-            const dotEl = document.getElementById('connectionDot');
             
-            if (statusEl) statusEl.textContent = message;
+            function updateConnectionStatus(message, type) {
+                const statusEl = document.getElementById('connectionText');
+                const dotEl = document.getElementById('connectionDot');
+                
+                if (statusEl) statusEl.textContent = message;
+                
+                if (dotEl) {
+                    dotEl.className = 'connection-dot';
+                    if (type === 'success') {
+                        dotEl.classList.add('connected');
+                    } else if (type === 'warning') {
+                        dotEl.style.background = 'var(--warning)';
+                    } else if (type === 'error') {
+                        dotEl.style.background = 'var(--danger)';
+                    }
+                }
+            }
             
-            if (dotEl) {
-                dotEl.className = 'connection-dot';
-                if (type === 'success') {
-                    dotEl.classList.add('connected');
-                } else if (type === 'warning') {
-                    dotEl.style.background = 'var(--warning)';
-                } else if (type === 'error') {
-                    dotEl.style.background = 'var(--danger)';
+            // Data loading functions
+            async function loadAllData() {
+                try {
+                    updatePageStatus('Loading data from Supabase 2026...');
+                    
+                    // Load counts for each type
+                    await Promise.all([
+                        loadItemsCount('login'),
+                        loadItemsCount('image'),
+                        loadItemsCount('project'),
+                        loadItemsCount('folder'),
+                        loadItemsCount('text'),
+                        loadRecentItems()
+                    ]);
+                    
+                    updateStats();
+                    updatePageStatus('Data loaded successfully from Supabase');
+                    
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    updatePageStatus('Error loading data from Supabase');
                 }
             }
-        }
-        
-        // Data loading functions
-        async function loadAllData() {
-            try {
-                updatePageStatus('Loading data from Supabase 2026...');
-                
-                // Load counts for each type
-                await Promise.all([
-                    loadItemsCount('login'),
-                    loadItemsCount('image'),
-                    loadItemsCount('project'),
-                    loadItemsCount('folder'),
-                    loadItemsCount('text'),
-                    loadRecentItems()
-                ]);
-                
-                updateStats();
-                updatePageStatus('Data loaded successfully from Supabase');
-                
-            } catch (error) {
-                console.error('Error loading data:', error);
-                updatePageStatus('Error loading data from Supabase');
-            }
-        }
-        
-        async function loadItemsCount(type) {
-            try {
-                const { count, error } = await supabase
-                    .from('vault_items')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('type', type);
-                
-                if (!error) {
-                    currentData.counts[type] = count || 0;
-                    updateBadgeCount(type, count || 0);
+            
+            async function loadItemsCount(type) {
+                try {
+                    const { count, error } = await supabaseClient
+                        .from('vault_items')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('type', type);
+                    
+                    if (!error) {
+                        currentData.counts[type] = count || 0;
+                        updateBadgeCount(type, count || 0);
+                    }
+                } catch (error) {
+                    console.error(`Error loading ${type} count:`, error);
+                    currentData.counts[type] = 0;
+                    updateBadgeCount(type, 0);
                 }
-            } catch (error) {
-                console.error(`Error loading ${type} count:`, error);
-                currentData.counts[type] = 0;
-                updateBadgeCount(type, 0);
             }
-        }
-        
-        async function loadRecentItems() {
-            try {
-                const { data, error } = await supabase
-                    .from('vault_items')
-                    .select('id, type, title, created_at')
-                    .order('created_at', { ascending: false })
-                    .limit(5);
-                
-                if (!error && data) {
-                    currentData.items = data;
-                    displayRecentItems(data);
-                } else {
+            
+            async function loadRecentItems() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('vault_items')
+                        .select('id, type, title, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(5);
+                    
+                    if (!error && data) {
+                        currentData.items = data;
+                        displayRecentItems(data);
+                    } else {
+                        displayEmptyState();
+                    }
+                } catch (error) {
+                    console.error('Error loading recent items:', error);
                     displayEmptyState();
                 }
-            } catch (error) {
-                console.error('Error loading recent items:', error);
-                displayEmptyState();
             }
-        }
-        
-        function displayRecentItems(items) {
-            const container = document.getElementById('recentList');
             
-            if (!items || items.length === 0) {
+            function displayRecentItems(items) {
+                const container = document.getElementById('recentList');
+                
+                if (!items || items.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <p class="mb-3">No items found in your vault</p>
+                            <button class="button is-primary" id="addFirstItem">
+                                <span class="icon">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span>Add First Item</span>
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                items.forEach(item => {
+                    const icon = getIconForType(item.type);
+                    const time = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const date = new Date(item.created_at).toLocaleDateString();
+                    
+                    html += `
+                        <div class="recent-item" data-item-id="${item.id}">
+                            <div class="item-icon">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${item.title || 'Untitled Item'}</div>
+                                <div class="item-subtitle">${item.type.charAt(0).toUpperCase() + item.type.slice(1)} • Created ${date}</div>
+                            </div>
+                            <div class="item-time" title="${date}">${time}</div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                
+                // Add event listeners to recent items
+                container.querySelectorAll('.recent-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const itemId = this.getAttribute('data-item-id');
+                        openItem(itemId);
+                    });
+                });
+            }
+            
+            function displayEmptyState() {
+                const container = document.getElementById('recentList');
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">
                             <i class="fas fa-inbox"></i>
                         </div>
-                        <p class="mb-3">No items found in your vault</p>
-                        <button class="button is-primary" onclick="addNewItem()">
+                        <p class="mb-3">No items found or error loading data</p>
+                        <button class="button is-primary" id="retryLoadingBtn">
                             <span class="icon">
-                                <i class="fas fa-plus"></i>
+                                <i class="fas fa-sync-alt"></i>
                             </span>
-                            <span>Add First Item</span>
+                            <span>Retry Loading</span>
                         </button>
                     </div>
                 `;
-                return;
             }
             
-            let html = '';
-            items.forEach(item => {
-                const icon = getIconForType(item.type);
-                const time = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                const date = new Date(item.created_at).toLocaleDateString();
+            function getIconForType(type) {
+                const icons = {
+                    'login': 'fas fa-key',
+                    'image': 'fas fa-image',
+                    'project': 'fas fa-folder',
+                    'text': 'fas fa-file-alt',
+                    'folder': 'fas fa-folder-tree'
+                };
+                return icons[type] || 'fas fa-question';
+            }
+            
+            // Update UI functions
+            function updateBadgeCount(type, count) {
+                const badgeId = `${type}Count`;
+                const badge = document.getElementById(badgeId);
+                if (badge) {
+                    badge.innerHTML = count;
+                    badge.classList.remove('loading');
+                }
                 
-                html += `
-                    <div class="recent-item" onclick="openItem('${item.id}')">
-                        <div class="item-icon">
-                            <i class="${icon}"></i>
-                        </div>
-                        <div class="item-content">
-                            <div class="item-title">${item.title || 'Untitled Item'}</div>
-                            <div class="item-subtitle">${item.type.charAt(0).toUpperCase() + item.type.slice(1)} • Created ${date}</div>
-                        </div>
-                        <div class="item-time" title="${date}">${time}</div>
-                    </div>
+                // Update total items badge
+                const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
+                const totalBadge = document.getElementById('totalItemsCount');
+                if (totalBadge) {
+                    totalBadge.innerHTML = total;
+                    totalBadge.classList.remove('loading');
+                }
+            }
+            
+            function updateStats() {
+                // Calculate total items
+                const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
+                document.getElementById('statTotal').textContent = total;
+                document.getElementById('statTotalTrend').innerHTML = `
+                    <i class="fas fa-database"></i>
+                    <span>From Supabase</span>
                 `;
-            });
-            
-            container.innerHTML = html;
-        }
-        
-        function displayEmptyState() {
-            const container = document.getElementById('recentList');
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-inbox"></i>
-                    </div>
-                    <p class="mb-3">No items found or error loading data</p>
-                    <button class="button is-primary" onclick="loadAllData()">
-                        <span class="icon">
-                            <i class="fas fa-sync-alt"></i>
-                        </span>
-                        <span>Retry Loading</span>
-                    </button>
-                </div>
-            `;
-        }
-        
-        function getIconForType(type) {
-            const icons = {
-                'login': 'fas fa-key',
-                'image': 'fas fa-image',
-                'project': 'fas fa-folder',
-                'text': 'fas fa-file-alt',
-                'folder': 'fas fa-folder-tree'
-            };
-            return icons[type] || 'fas fa-question';
-        }
-        
-        // Update UI functions
-        function updateBadgeCount(type, count) {
-            const badgeId = `${type}Count`;
-            const badge = document.getElementById(badgeId);
-            if (badge) {
-                badge.innerHTML = count;
-                badge.classList.remove('loading');
+                
+                // Update storage (simplified calculation)
+                const storageKB = total * 5; // Estimate 5KB per item
+                document.getElementById('statStorage').textContent = storageKB > 1024 ? 
+                    `${(storageKB / 1024).toFixed(1)} MB` : `${storageKB} KB`;
+                
+                // Update last updated
+                const now = new Date();
+                document.getElementById('statUpdated').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                document.getElementById('statUpdatedTrend').innerHTML = `
+                    <i class="fas fa-check-circle" style="color: var(--success);"></i>
+                    <span>Just now</span>
+                `;
+                
+                // Update security status
+                document.getElementById('statSecurity').textContent = total > 0 ? '100%' : '0%';
+                document.getElementById('statSecurityTrend').innerHTML = total > 0 ?
+                    `<i class="fas fa-shield-check" style="color: var(--success);"></i>
+                     <span>All items encrypted</span>` :
+                    `<i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
+                     <span>No data yet</span>`;
             }
             
-            // Update total items badge
-            const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
-            const totalBadge = document.getElementById('totalItemsCount');
-            if (totalBadge) {
-                totalBadge.innerHTML = total;
-                totalBadge.classList.remove('loading');
+            function updatePageStatus(message) {
+                const subtitle = document.getElementById('pageSubtitle');
+                if (subtitle) {
+                    subtitle.innerHTML = message;
+                    const loading = subtitle.querySelector('.loading');
+                    if (loading) loading.remove();
+                }
             }
-        }
-        
-        function updateStats() {
-            // Calculate total items
-            const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statTotalTrend').innerHTML = `
-                <i class="fas fa-database"></i>
-                <span>From Supabase</span>
-            `;
             
-            // Update storage (simplified calculation)
-            const storageKB = total * 5; // Estimate 5KB per item
-            document.getElementById('statStorage').textContent = storageKB > 1024 ? 
-                `${(storageKB / 1024).toFixed(1)} MB` : `${storageKB} KB`;
-            
-            // Update last updated
-            const now = new Date();
-            document.getElementById('statUpdated').textContent = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            document.getElementById('statUpdatedTrend').innerHTML = `
-                <i class="fas fa-check-circle" style="color: var(--success);"></i>
-                <span>Just now</span>
-            `;
-            
-            // Update security status
-            document.getElementById('statSecurity').textContent = total > 0 ? '100%' : '0%';
-            document.getElementById('statSecurityTrend').innerHTML = total > 0 ?
-                `<i class="fas fa-shield-check" style="color: var(--success);"></i>
-                 <span>All items encrypted</span>` :
-                `<i class="fas fa-exclamation-triangle" style="color: var(--warning);"></i>
-                 <span>No data yet</span>`;
-        }
-        
-        function updatePageStatus(message) {
-            const subtitle = document.getElementById('pageSubtitle');
-            if (subtitle) {
-                subtitle.innerHTML = message;
-                const loading = subtitle.querySelector('.loading');
-                if (loading) loading.remove();
-            }
-        }
-        
-        // Auto-lock system
-        function startLockTimer() {
-            clearInterval(lockInterval);
-            lockTimer = 60;
-            document.getElementById('lockTimer').textContent = lockTimer;
-            
-            lockInterval = setInterval(() => {
-                lockTimer--;
+            // Auto-lock system
+            function startLockTimer() {
+                clearInterval(lockInterval);
+                lockTimer = 60;
                 document.getElementById('lockTimer').textContent = lockTimer;
                 
-                if (lockTimer <= 10) {
-                    document.getElementById('lockTimer').style.color = 'var(--danger)';
-                } else if (lockTimer <= 30) {
-                    document.getElementById('lockTimer').style.color = 'var(--warning)';
+                lockInterval = setInterval(() => {
+                    lockTimer--;
+                    document.getElementById('lockTimer').textContent = lockTimer;
+                    
+                    if (lockTimer <= 10) {
+                        document.getElementById('lockTimer').style.color = 'var(--danger)';
+                    } else if (lockTimer <= 30) {
+                        document.getElementById('lockTimer').style.color = 'var(--warning)';
+                    }
+                    
+                    if (lockTimer <= 0) {
+                        lockVault();
+                    }
+                }, 1000);
+            }
+            
+            function resetLockTimer() {
+                if (!isLocked) {
+                    startLockTimer();
+                    document.getElementById('lockTimer').style.color = '#1f2937';
+                }
+            }
+            
+            function lockVault() {
+                isLocked = true;
+                clearInterval(lockInterval);
+                document.getElementById('lockOverlay').classList.add('is-active');
+                document.getElementById('masterPassword').focus();
+            }
+            
+            function unlockVault() {
+                const password = document.getElementById('masterPassword').value;
+                
+                if (password.trim()) {
+                    isLocked = false;
+                    document.getElementById('lockOverlay').classList.remove('is-active');
+                    document.getElementById('masterPassword').value = '';
+                    startLockTimer();
+                } else {
+                    alert('Please enter your master password');
+                }
+            }
+            
+            // UI Actions
+            function switchSection(section) {
+                document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('is-active');
+                });
+                event.currentTarget.classList.add('is-active');
+                
+                const sectionNames = {
+                    'dashboard': 'Dashboard',
+                    'logins': 'Logins',
+                    'images': 'Images',
+                    'projects': 'Projects',
+                    'folders': 'Folders',
+                    'favorites': 'Favorites',
+                    'archive': 'Archive'
+                };
+                
+                if (sectionNames[section]) {
+                    document.getElementById('currentSection').textContent = sectionNames[section];
+                    document.getElementById('pageTitle').textContent = sectionNames[section] + ' 2026';
+                    document.getElementById('currentSubsection').textContent = 'Overview';
                 }
                 
-                if (lockTimer <= 0) {
-                    lockVault();
-                }
-            }, 1000);
-        }
-        
-        function resetLockTimer() {
-            if (!isLocked) {
-                startLockTimer();
-                document.getElementById('lockTimer').style.color = '#1f2937';
-            }
-        }
-        
-        function lockVault() {
-            isLocked = true;
-            clearInterval(lockInterval);
-            document.getElementById('lockOverlay').classList.add('is-active');
-            document.getElementById('masterPassword').focus();
-        }
-        
-        function unlockVault() {
-            const password = document.getElementById('masterPassword').value;
-            
-            if (password.trim()) {
-                isLocked = false;
-                document.getElementById('lockOverlay').classList.remove('is-active');
-                document.getElementById('masterPassword').value = '';
-                startLockTimer();
-            } else {
-                alert('Please enter your master password');
-            }
-        }
-        
-        // UI Actions
-        function switchSection(section) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('is-active');
-            });
-            event.currentTarget.classList.add('is-active');
-            
-            const sectionNames = {
-                'dashboard': 'Dashboard',
-                'logins': 'Logins',
-                'images': 'Images',
-                'projects': 'Projects',
-                'folders': 'Folders',
-                'favorites': 'Favorites',
-                'archive': 'Archive'
-            };
-            
-            if (sectionNames[section]) {
-                document.getElementById('currentSection').textContent = sectionNames[section];
-                document.getElementById('pageTitle').textContent = sectionNames[section] + ' 2026';
-                document.getElementById('currentSubsection').textContent = 'Overview';
-            }
-            
-            resetLockTimer();
-        }
-        
-        function refreshData() {
-            loadAllData();
-            resetLockTimer();
-        }
-        
-        function loadAllActivity() {
-            loadRecentItems();
-            resetLockTimer();
-        }
-        
-        function openItem(id) {
-            alert(`Opening item ${id}\n\nIn production, this would decrypt and display the item from Supabase.`);
-            resetLockTimer();
-        }
-        
-        function addNewItem() {
-            alert('Add new item functionality\n\nThis would open a form to create new encrypted items and store in Supabase.');
-            resetLockTimer();
-        }
-        
-        function showSearch() {
-            const query = prompt('Search across encrypted vault:');
-            if (query) {
-                alert(`Searching for "${query}" in Supabase database...`);
                 resetLockTimer();
             }
-        }
-        
-        function showSupabaseInfo() {
-            const info = `
-Supabase Connection Details (2026):
------------------------------------
-Project: jjvyhwnkyenlrpzdiiun
-URL: https://jjvyhwnkyenlrpzdiiun.supabase.co
-Publishable Key: ${SUPABASE_KEY.substring(0, 20)}...
-Status: ${document.getElementById('connectionText').textContent}
-
-Current Stats:
--------------
-Total Items: ${document.getElementById('statTotal').textContent}
-Logins: ${currentData.counts.login || 0}
-Images: ${currentData.counts.image || 0}
-Projects: ${currentData.counts.project || 0}
-Folders: ${currentData.counts.folder || 0}
-
-All data is encrypted locally before being stored in Supabase.
-            `;
             
-            alert(info);
-            resetLockTimer();
-        }
-        
-        // Device detection
-        function checkDevice() {
-            const userAgent = navigator.userAgent;
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-            const screenWidth = window.screen.width;
+            function refreshData() {
+                loadAllData();
+                resetLockTimer();
+            }
             
-            if (isMobile && screenWidth < 1024) {
-                document.getElementById('deviceWarning').classList.add('is-active');
-                return true;
+            function loadAllActivity() {
+                loadRecentItems();
+                resetLockTimer();
             }
-            return false;
-        }
-        
-        function closeDeviceWarning() {
-            document.getElementById('deviceWarning').classList.remove('is-active');
-        }
-        
-        function redirectToMobile() {
-            window.location.href = 'phone.html';
-        }
-        
-        // Event Listeners
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && document.getElementById('lockOverlay').classList.contains('is-active')) {
-                unlockVault();
+            
+            function openItem(id) {
+                alert(`Opening item ${id}\n\nIn production, this would decrypt and display the item from Supabase.`);
+                resetLockTimer();
             }
-        });
-        
-        document.addEventListener('mousemove', resetLockTimer);
-        document.addEventListener('keypress', resetLockTimer);
-        document.addEventListener('click', resetLockTimer);
-        
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden && !isLocked) {
-                lockVault();
+            
+            function addNewItem() {
+                alert('Add new item functionality\n\nThis would open a form to create new encrypted items and store in Supabase.');
+                resetLockTimer();
             }
-        });
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', async function() {
-            if (!checkDevice()) {
-                startLockTimer();
+            
+            function showSearch() {
+                const query = prompt('Search across encrypted vault:');
+                if (query) {
+                    alert(`Searching for "${query}" in Supabase database...`);
+                    resetLockTimer();
+                }
+            }
+            
+            function showSupabaseInfo() {
+                const info = `
+    Supabase Connection Details (2026):
+    -----------------------------------
+    Project: jjvyhwnkyenlrpzdiiun
+    URL: https://jjvyhwnkyenlrpzdiiun.supabase.co
+    Publishable Key: ${SUPABASE_KEY.substring(0, 20)}...
+    Status: ${document.getElementById('connectionText').textContent}
+    
+    Current Stats:
+    -------------
+    Total Items: ${document.getElementById('statTotal').textContent}
+    Logins: ${currentData.counts.login || 0}
+    Images: ${currentData.counts.image || 0}
+    Projects: ${currentData.counts.project || 0}
+    Folders: ${currentData.counts.folder || 0}
+    
+    All data is encrypted locally before being stored in Supabase.
+                `;
                 
-                // Setup navigation
-                document.querySelectorAll('.nav-item').forEach(item => {
+                alert(info);
+                resetLockTimer();
+            }
+            
+            // Device detection
+            function checkDevice() {
+                const userAgent = navigator.userAgent;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+                const screenWidth = window.screen.width;
+                
+                if (isMobile && screenWidth < 1024) {
+                    document.getElementById('deviceWarning').classList.add('is-active');
+                    return true;
+                }
+                return false;
+            }
+            
+            function closeDeviceWarning() {
+                document.getElementById('deviceWarning').classList.remove('is-active');
+            }
+            
+            function redirectToMobile() {
+                window.location.href = 'phone.html';
+            }
+            
+            // Event Listeners setup
+            function setupEventListeners() {
+                // Navigation items
+                document.querySelectorAll('.nav-item[data-section]').forEach(item => {
                     item.addEventListener('click', function() {
                         const section = this.getAttribute('data-section');
                         switchSection(section);
                     });
                 });
                 
-                // Check connection and load data
-                if (supabase) {
+                // Action buttons
+                document.getElementById('refreshDataBtn')?.addEventListener('click', refreshData);
+                document.getElementById('refreshDataBtn2')?.addEventListener('click', refreshData);
+                document.getElementById('showSearchBtn')?.addEventListener('click', showSearch);
+                document.getElementById('addNewItemBtn')?.addEventListener('click', addNewItem);
+                document.getElementById('viewAllActivity')?.addEventListener('click', loadAllActivity);
+                document.getElementById('showSupabaseInfo')?.addEventListener('click', showSupabaseInfo);
+                document.getElementById('lockVaultBtn')?.addEventListener('click', lockVault);
+                document.getElementById('unlockVaultBtn')?.addEventListener('click', unlockVault);
+                
+                // Device warning buttons
+                document.getElementById('closeDeviceWarning')?.addEventListener('click', closeDeviceWarning);
+                document.getElementById('redirectToMobile')?.addEventListener('click', redirectToMobile);
+                document.getElementById('stayHere')?.addEventListener('click', closeDeviceWarning);
+                
+                // Retry loading button (if exists)
+                document.addEventListener('click', function(e) {
+                    if (e.target.id === 'retryLoadingBtn' || e.target.closest('#retryLoadingBtn')) {
+                        refreshData();
+                    }
+                    if (e.target.id === 'addFirstItem' || e.target.closest('#addFirstItem')) {
+                        addNewItem();
+                    }
+                });
+                
+                // Keyboard events
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter' && document.getElementById('lockOverlay')?.classList.contains('is-active')) {
+                        unlockVault();
+                    }
+                });
+                
+                // User activity detection
+                document.addEventListener('mousemove', resetLockTimer);
+                document.addEventListener('keypress', resetLockTimer);
+                document.addEventListener('click', resetLockTimer);
+                
+                // Tab visibility change
+                document.addEventListener('visibilitychange', function() {
+                    if (document.hidden && !isLocked) {
+                        lockVault();
+                    }
+                });
+            }
+            
+            // Initialize
+            document.addEventListener('DOMContentLoaded', async function() {
+                if (!checkDevice()) {
+                    startLockTimer();
+                    
+                    // Setup event listeners
+                    setupEventListeners();
+                    
+                    // Check connection and load data
+                    if (!supabaseClient) {
+                        supabaseClient = initSupabase();
+                    }
+                    
                     const isConnected = await checkConnection();
                     if (isConnected) {
                         await loadAllData();
@@ -1228,8 +1283,17 @@ All data is encrypted locally before being stored in Supabase.
                         updatePageStatus('Unable to connect to Supabase. Please check your connection.');
                     }
                 }
-            }
-        });
+            });
+            
+            // Make functions available globally if needed
+            window.MKBVAULT_PC = {
+                refreshData,
+                showSupabaseInfo,
+                lockVault,
+                unlockVault
+            };
+            
+        })(); // End of IIFE
     </script>
 </body>
 </html>
