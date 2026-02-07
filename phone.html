@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
     <!-- Custom Styles -->
     <style>
         :root {
@@ -522,13 +524,13 @@
                 For the best experience, you'll be redirected to the desktop console.
             </p>
         </div>
-        <button class="button is-primary is-fullwidth mb-2" onclick="redirectToDesktop()">
+        <button class="button is-primary is-fullwidth mb-2" id="redirectToDesktopBtn">
             <span class="icon">
                 <i class="fas fa-external-link-alt"></i>
             </span>
             <span>Continue to Desktop</span>
         </button>
-        <button class="button is-fullwidth" onclick="closeDeviceWarning()">Stay Here</button>
+        <button class="button is-fullwidth" id="stayHereBtn">Stay Here</button>
     </div>
 
     <!-- Connection Status -->
@@ -555,7 +557,7 @@
                 
                 <div class="field">
                     <div class="control">
-                        <button class="button is-primary is-fullwidth" onclick="unlockVault()">
+                        <button class="button is-primary is-fullwidth" id="unlockVaultBtn">
                             <span class="icon">
                                 <i class="fas fa-unlock"></i>
                             </span>
@@ -584,10 +586,10 @@
         <div class="logo">MKBVAULT</div>
         
         <div class="header-actions">
-            <div class="header-btn" onclick="refreshData()" title="Refresh">
+            <div class="header-btn" id="refreshDataBtn" title="Refresh">
                 <i class="fas fa-sync-alt"></i>
             </div>
-            <div class="header-btn" onclick="lockVault()" title="Lock Vault">
+            <div class="header-btn" id="lockVaultBtn" title="Lock Vault">
                 <i class="fas fa-lock"></i>
             </div>
         </div>
@@ -598,7 +600,7 @@
         <input type="text" class="search-bar" placeholder="Search encrypted vault..." id="searchInput">
         
         <div class="quick-stats">
-            <div class="stat-card" onclick="viewItems('total')">
+            <div class="stat-card" id="viewTotalItems">
                 <div class="stat-title">Total Items</div>
                 <div class="stat-value" id="statTotal">
                     <span class="loading"></span>
@@ -608,7 +610,7 @@
                 </div>
             </div>
             
-            <div class="stat-card" onclick="viewItems('encrypted')">
+            <div class="stat-card" id="viewEncryptedItems">
                 <div class="stat-title">Encrypted</div>
                 <div class="stat-value" id="statEncrypted">100%</div>
                 <div class="stat-trend">
@@ -620,28 +622,28 @@
 
         <h3 class="title is-5 mb-3">Quick Access</h3>
         <div class="quick-actions">
-            <div class="action-card" onclick="openSection('logins')">
+            <div class="action-card" id="openLogins">
                 <div class="action-icon">
                     <i class="fas fa-key"></i>
                 </div>
                 <div class="action-label" id="loginsLabel">Logins</div>
             </div>
             
-            <div class="action-card" onclick="openSection('images')">
+            <div class="action-card" id="openImages">
                 <div class="action-icon">
                     <i class="fas fa-image"></i>
                 </div>
                 <div class="action-label" id="imagesLabel">Images</div>
             </div>
             
-            <div class="action-card" onclick="openSection('projects')">
+            <div class="action-card" id="openProjects">
                 <div class="action-icon">
                     <i class="fas fa-folder"></i>
                 </div>
                 <div class="action-label" id="projectsLabel">Projects</div>
             </div>
             
-            <div class="action-card" onclick="openSection('documents')">
+            <div class="action-card" id="openDocuments">
                 <div class="action-icon">
                     <i class="fas fa-file-alt"></i>
                 </div>
@@ -673,7 +675,7 @@
     </div>
 
     <!-- Add Button -->
-    <div class="add-button" onclick="addNewItem()">
+    <div class="add-button" id="addNewItemBtn">
         <i class="fas fa-plus"></i>
     </div>
 
@@ -711,440 +713,510 @@
     <!-- Supabase Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        // Supabase Configuration for 2026
-        const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
-        
-        // Initialize Supabase client
-        let supabase;
-        try {
-            supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-            console.log('Supabase client initialized for Mobile 2026');
-        } catch (error) {
-            console.error('Failed to initialize Supabase:', error);
-            updateConnectionStatus('Supabase init failed', 'error');
-        }
-        
-        // Application state
-        let lockTimer = 60;
-        let lockInterval;
-        let isLocked = false;
-        let currentData = {
-            counts: {},
-            recentItems: []
-        };
-        
-        // Connection management
-        async function checkConnection() {
-            try {
-                updateConnectionStatus('Connecting...', 'warning');
-                
-                if (!supabase) {
-                    throw new Error('Supabase client not initialized');
+        // Wrap everything in an IIFE to prevent conflicts
+        (function() {
+            // Supabase Configuration for 2026
+            const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
+            const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
+            
+            // Application state (scoped to this IIFE)
+            let supabaseClient = null;
+            let lockTimer = 60;
+            let lockInterval;
+            let isLocked = false;
+            let currentData = {
+                counts: {},
+                recentItems: []
+            };
+            
+            // Initialize Supabase client
+            function initSupabase() {
+                try {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    console.log('Supabase client initialized for Mobile 2026');
+                    return supabaseClient;
+                } catch (error) {
+                    console.error('Failed to initialize Supabase:', error);
+                    updateConnectionStatus('Supabase init failed', 'error');
+                    return null;
                 }
-                
-                // Test connection
-                const { data, error } = await supabase
-                    .from('vault_meta')
-                    .select('updated_at')
-                    .limit(1);
-                
-                if (error && error.code === '42P01') {
-                    updateConnectionStatus('No vault tables', 'warning');
-                    updateSecurityStatus('Vault not initialized. Tables need to be created.');
+            }
+            
+            // Connection management
+            async function checkConnection() {
+                try {
+                    updateConnectionStatus('Connecting...', 'warning');
+                    
+                    if (!supabaseClient) {
+                        supabaseClient = initSupabase();
+                        if (!supabaseClient) {
+                            throw new Error('Failed to initialize Supabase client');
+                        }
+                    }
+                    
+                    // Test connection
+                    const { data, error } = await supabaseClient
+                        .from('vault_meta')
+                        .select('updated_at')
+                        .limit(1);
+                    
+                    if (error && error.code === '42P01') {
+                        updateConnectionStatus('No vault tables', 'warning');
+                        updateSecurityStatus('Vault not initialized. Tables need to be created.');
+                        return false;
+                    }
+                    
+                    if (error) throw error;
+                    
+                    updateConnectionStatus('Connected', 'success');
+                    updateSecurityStatus('Connected to Supabase 2026. All systems secure.');
+                    return true;
+                } catch (error) {
+                    console.error('Connection error:', error);
+                    updateConnectionStatus('Failed', 'error');
+                    updateSecurityStatus('Connection failed. Check your internet.');
                     return false;
                 }
-                
-                if (error) throw error;
-                
-                updateConnectionStatus('Connected', 'success');
-                updateSecurityStatus('Connected to Supabase 2026. All systems secure.');
-                return true;
-            } catch (error) {
-                console.error('Connection error:', error);
-                updateConnectionStatus('Failed', 'error');
-                updateSecurityStatus('Connection failed. Check your internet.');
-                return false;
             }
-        }
-        
-        function updateConnectionStatus(message, type) {
-            const statusEl = document.getElementById('connectionText');
-            const dotEl = document.getElementById('connectionDot');
             
-            if (statusEl) statusEl.textContent = message;
-            
-            if (dotEl) {
-                dotEl.className = 'connection-dot';
-                if (type === 'success') {
-                    dotEl.classList.add('connected');
-                } else if (type === 'warning') {
-                    dotEl.style.background = 'var(--warning)';
-                } else if (type === 'error') {
-                    dotEl.style.background = 'var(--danger)';
+            function updateConnectionStatus(message, type) {
+                const statusEl = document.getElementById('connectionText');
+                const dotEl = document.getElementById('connectionDot');
+                
+                if (statusEl) statusEl.textContent = message;
+                
+                if (dotEl) {
+                    dotEl.className = 'connection-dot';
+                    if (type === 'success') {
+                        dotEl.classList.add('connected');
+                    } else if (type === 'warning') {
+                        dotEl.style.background = 'var(--warning)';
+                    } else if (type === 'error') {
+                        dotEl.style.background = 'var(--danger)';
+                    }
                 }
             }
-        }
-        
-        function updateSecurityStatus(message) {
-            const desc = document.getElementById('securityDesc');
-            if (desc) {
-                desc.textContent = message;
-            }
-        }
-        
-        // Data loading functions
-        async function loadData() {
-            try {
-                // Load counts
-                await Promise.all([
-                    loadTypeCount('login'),
-                    loadTypeCount('image'),
-                    loadTypeCount('project'),
-                    loadTypeCount('text'),
-                    loadTypeCount('folder'),
-                    loadRecentItems()
-                ]);
-                
-                updateUI();
-                
-            } catch (error) {
-                console.error('Error loading data:', error);
-                showErrorState();
-            }
-        }
-        
-        async function loadTypeCount(type) {
-            try {
-                const { count, error } = await supabase
-                    .from('vault_items')
-                    .select('*', { count: 'exact', head: true })
-                    .eq('type', type);
-                
-                if (!error) {
-                    currentData.counts[type] = count || 0;
+            
+            function updateSecurityStatus(message) {
+                const desc = document.getElementById('securityDesc');
+                if (desc) {
+                    desc.textContent = message;
                 }
-            } catch (error) {
-                currentData.counts[type] = 0;
             }
-        }
-        
-        async function loadRecentItems() {
-            try {
-                const { data, error } = await supabase
-                    .from('vault_items')
-                    .select('id, type, title, created_at')
-                    .order('created_at', { ascending: false })
-                    .limit(3);
-                
-                if (!error && data) {
-                    currentData.recentItems = data;
-                    displayRecentItems(data);
-                } else {
+            
+            // Data loading functions
+            async function loadData() {
+                try {
+                    // Load counts
+                    await Promise.all([
+                        loadTypeCount('login'),
+                        loadTypeCount('image'),
+                        loadTypeCount('project'),
+                        loadTypeCount('text'),
+                        loadTypeCount('folder'),
+                        loadRecentItems()
+                    ]);
+                    
+                    updateUI();
+                    
+                } catch (error) {
+                    console.error('Error loading data:', error);
+                    showErrorState();
+                }
+            }
+            
+            async function loadTypeCount(type) {
+                try {
+                    const { count, error } = await supabaseClient
+                        .from('vault_items')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('type', type);
+                    
+                    if (!error) {
+                        currentData.counts[type] = count || 0;
+                    }
+                } catch (error) {
+                    currentData.counts[type] = 0;
+                }
+            }
+            
+            async function loadRecentItems() {
+                try {
+                    const { data, error } = await supabaseClient
+                        .from('vault_items')
+                        .select('id, type, title, created_at')
+                        .order('created_at', { ascending: false })
+                        .limit(3);
+                    
+                    if (!error && data) {
+                        currentData.recentItems = data;
+                        displayRecentItems(data);
+                    } else {
+                        displayEmptyState();
+                    }
+                } catch (error) {
                     displayEmptyState();
                 }
-            } catch (error) {
-                displayEmptyState();
             }
-        }
-        
-        function displayRecentItems(items) {
-            const container = document.getElementById('recentList');
             
-            if (!items || items.length === 0) {
+            function displayRecentItems(items) {
+                const container = document.getElementById('recentList');
+                
+                if (!items || items.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">
+                                <i class="fas fa-inbox"></i>
+                            </div>
+                            <p class="mb-3">No items in vault</p>
+                            <button class="button is-primary is-small" id="addFirstItemBtn">
+                                <span class="icon">
+                                    <i class="fas fa-plus"></i>
+                                </span>
+                                <span>Add First Item</span>
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '';
+                items.forEach(item => {
+                    const icon = getIconForType(item.type);
+                    const time = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    
+                    html += `
+                        <div class="recent-item" data-item-id="${item.id}">
+                            <div class="item-icon">
+                                <i class="${icon}"></i>
+                            </div>
+                            <div class="item-content">
+                                <div class="item-title">${item.title || 'Untitled'}</div>
+                                <div class="item-subtitle">${item.type}</div>
+                            </div>
+                            <div class="item-time">${time}</div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html;
+                
+                // Add event listeners to recent items
+                container.querySelectorAll('.recent-item').forEach(item => {
+                    item.addEventListener('click', function() {
+                        const itemId = this.getAttribute('data-item-id');
+                        openItem(itemId);
+                    });
+                });
+            }
+            
+            function displayEmptyState() {
+                const container = document.getElementById('recentList');
                 container.innerHTML = `
                     <div class="empty-state">
                         <div class="empty-icon">
                             <i class="fas fa-inbox"></i>
                         </div>
-                        <p class="mb-3">No items in vault</p>
-                        <button class="button is-primary is-small" onclick="addNewItem()">
+                        <p class="mb-3">Unable to load items</p>
+                        <button class="button is-primary is-small" id="retryLoadingBtn">
                             <span class="icon">
-                                <i class="fas fa-plus"></i>
+                                <i class="fas fa-sync-alt"></i>
                             </span>
-                            <span>Add First Item</span>
+                            <span>Retry</span>
                         </button>
                     </div>
                 `;
-                return;
             }
             
-            let html = '';
-            items.forEach(item => {
-                const icon = getIconForType(item.type);
-                const time = new Date(item.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            function showErrorState() {
+                const container = document.getElementById('recentList');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <p class="mb-3">Error loading data</p>
+                        <button class="button is-primary is-small" id="tryAgainBtn">
+                            <span class="icon">
+                                <i class="fas fa-redo"></i>
+                            </span>
+                            <span>Try Again</span>
+                        </button>
+                    </div>
+                `;
+            }
+            
+            function getIconForType(type) {
+                const icons = {
+                    'login': 'fas fa-key',
+                    'image': 'fas fa-image',
+                    'project': 'fas fa-folder',
+                    'text': 'fas fa-file-alt',
+                    'folder': 'fas fa-folder-tree'
+                };
+                return icons[type] || 'fas fa-question';
+            }
+            
+            // Update UI
+            function updateUI() {
+                // Update total items
+                const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
+                const totalEl = document.getElementById('statTotal');
+                if (totalEl) {
+                    totalEl.innerHTML = total;
+                    totalEl.classList.remove('loading');
+                }
                 
-                html += `
-                    <div class="recent-item" onclick="openItem('${item.id}')">
-                        <div class="item-icon">
-                            <i class="${icon}"></i>
-                        </div>
-                        <div class="item-content">
-                            <div class="item-title">${item.title || 'Untitled'}</div>
-                            <div class="item-subtitle">${item.type}</div>
-                        </div>
-                        <div class="item-time">${time}</div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-        
-        function displayEmptyState() {
-            const container = document.getElementById('recentList');
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-inbox"></i>
-                    </div>
-                    <p class="mb-3">Unable to load items</p>
-                    <button class="button is-primary is-small" onclick="loadData()">
-                        <span class="icon">
-                            <i class="fas fa-sync-alt"></i>
-                        </span>
-                        <span>Retry</span>
-                    </button>
-                </div>
-            `;
-        }
-        
-        function showErrorState() {
-            const container = document.getElementById('recentList');
-            container.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-icon">
-                        <i class="fas fa-exclamation-triangle"></i>
-                    </div>
-                    <p class="mb-3">Error loading data</p>
-                    <button class="button is-primary is-small" onclick="initializeApp()">
-                        <span class="icon">
-                            <i class="fas fa-redo"></i>
-                        </span>
-                        <span>Try Again</span>
-                    </button>
-                </div>
-            `;
-        }
-        
-        function getIconForType(type) {
-            const icons = {
-                'login': 'fas fa-key',
-                'image': 'fas fa-image',
-                'project': 'fas fa-folder',
-                'text': 'fas fa-file-alt',
-                'folder': 'fas fa-folder-tree'
-            };
-            return icons[type] || 'fas fa-question';
-        }
-        
-        // Update UI
-        function updateUI() {
-            // Update total items
-            const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
-            const totalEl = document.getElementById('statTotal');
-            if (totalEl) {
-                totalEl.innerHTML = total;
-                totalEl.classList.remove('loading');
+                const totalTrend = document.getElementById('statTotalTrend');
+                if (totalTrend) {
+                    totalTrend.innerHTML = `
+                        <i class="fas fa-database"></i>
+                        <span>From Supabase</span>
+                    `;
+                }
+                
+                // Update labels with counts
+                const loginsLabel = document.getElementById('loginsLabel');
+                if (loginsLabel) loginsLabel.textContent = `Logins\n(${currentData.counts.login || 0})`;
+                
+                const imagesLabel = document.getElementById('imagesLabel');
+                if (imagesLabel) imagesLabel.textContent = `Images\n(${currentData.counts.image || 0})`;
+                
+                const projectsLabel = document.getElementById('projectsLabel');
+                if (projectsLabel) projectsLabel.textContent = `Projects\n(${currentData.counts.project || 0})`;
+                
+                const textsLabel = document.getElementById('textsLabel');
+                if (textsLabel) textsLabel.textContent = `Docs\n(${currentData.counts.text || 0})`;
+                
+                // Update security status
+                if (total > 0) {
+                    updateSecurityStatus(`${total} items encrypted. Connected to Supabase 2026. Last sync: Just now.`);
+                } else {
+                    updateSecurityStatus('Connected to Supabase 2026. Ready to add encrypted items.');
+                }
             }
             
-            const totalTrend = document.getElementById('statTotalTrend');
-            if (totalTrend) {
-                totalTrend.innerHTML = `
-                    <i class="fas fa-database"></i>
-                    <span>From Supabase</span>
-                `;
-            }
-            
-            // Update labels with counts
-            const loginsLabel = document.getElementById('loginsLabel');
-            if (loginsLabel) loginsLabel.textContent = `Logins\n(${currentData.counts.login || 0})`;
-            
-            const imagesLabel = document.getElementById('imagesLabel');
-            if (imagesLabel) imagesLabel.textContent = `Images\n(${currentData.counts.image || 0})`;
-            
-            const projectsLabel = document.getElementById('projectsLabel');
-            if (projectsLabel) projectsLabel.textContent = `Projects\n(${currentData.counts.project || 0})`;
-            
-            const textsLabel = document.getElementById('textsLabel');
-            if (textsLabel) textsLabel.textContent = `Docs\n(${currentData.counts.text || 0})`;
-            
-            // Update security status
-            if (total > 0) {
-                updateSecurityStatus(`${total} items encrypted. Connected to Supabase 2026. Last sync: Just now.`);
-            } else {
-                updateSecurityStatus('Connected to Supabase 2026. Ready to add encrypted items.');
-            }
-        }
-        
-        // Auto-lock system
-        function startLockTimer() {
-            clearInterval(lockInterval);
-            lockTimer = 60;
-            const timerEl = document.getElementById('lockTimer');
-            if (timerEl) timerEl.textContent = lockTimer;
-            
-            lockInterval = setInterval(() => {
-                lockTimer--;
+            // Auto-lock system
+            function startLockTimer() {
+                clearInterval(lockInterval);
+                lockTimer = 60;
+                const timerEl = document.getElementById('lockTimer');
                 if (timerEl) timerEl.textContent = lockTimer;
                 
-                if (lockTimer <= 10 && timerEl) {
-                    timerEl.style.color = 'var(--danger)';
-                } else if (lockTimer <= 30 && timerEl) {
-                    timerEl.style.color = 'var(--warning)';
-                }
-                
-                if (lockTimer <= 0) {
-                    lockVault();
-                }
-            }, 1000);
-        }
-        
-        function resetLockTimer() {
-            if (!isLocked) {
-                startLockTimer();
-                const timerEl = document.getElementById('lockTimer');
-                if (timerEl) timerEl.style.color = '#1f2937';
+                lockInterval = setInterval(() => {
+                    lockTimer--;
+                    if (timerEl) timerEl.textContent = lockTimer;
+                    
+                    if (lockTimer <= 10 && timerEl) {
+                        timerEl.style.color = 'var(--danger)';
+                    } else if (lockTimer <= 30 && timerEl) {
+                        timerEl.style.color = 'var(--warning)';
+                    }
+                    
+                    if (lockTimer <= 0) {
+                        lockVault();
+                    }
+                }, 1000);
             }
-        }
-        
-        function lockVault() {
-            isLocked = true;
-            clearInterval(lockInterval);
-            const lockOverlay = document.getElementById('lockOverlay');
-            if (lockOverlay) lockOverlay.classList.add('is-active');
-            const passwordInput = document.getElementById('masterPassword');
-            if (passwordInput) passwordInput.focus();
-        }
-        
-        function unlockVault() {
-            const passwordInput = document.getElementById('masterPassword');
-            const password = passwordInput ? passwordInput.value : '';
             
-            if (password.trim()) {
-                isLocked = false;
+            function resetLockTimer() {
+                if (!isLocked) {
+                    startLockTimer();
+                    const timerEl = document.getElementById('lockTimer');
+                    if (timerEl) timerEl.style.color = '#1f2937';
+                }
+            }
+            
+            function lockVault() {
+                isLocked = true;
+                clearInterval(lockInterval);
                 const lockOverlay = document.getElementById('lockOverlay');
-                if (lockOverlay) lockOverlay.classList.remove('is-active');
-                if (passwordInput) passwordInput.value = '';
-                startLockTimer();
-            } else {
-                alert('Please enter your master password');
-            }
-        }
-        
-        // UI Actions
-        function switchTab(tab) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('is-active');
-            });
-            event.currentTarget.classList.add('is-active');
-            
-            if (tab === 'home') {
-                // Already on home
-            } else {
-                alert(`Switching to ${tab} tab...\n\nIn production, this would load the corresponding section.`);
+                if (lockOverlay) lockOverlay.classList.add('is-active');
+                const passwordInput = document.getElementById('masterPassword');
+                if (passwordInput) passwordInput.focus();
             }
             
-            resetLockTimer();
-        }
-        
-        function refreshData() {
-            loadData();
-            resetLockTimer();
-        }
-        
-        function openSection(section) {
-            const count = currentData.counts[section] || 0;
-            alert(`Opening ${section} section\n\nItems: ${count}\n\nData loaded from Supabase 2026.`);
-            resetLockTimer();
-        }
-        
-        function openItem(id) {
-            alert(`Opening item ${id}\n\nDecrypting data from Supabase...`);
-            resetLockTimer();
-        }
-        
-        function addNewItem() {
-            alert('Add new encrypted item\n\nThis would create locally encrypted data and sync to Supabase.');
-            resetLockTimer();
-        }
-        
-        function viewItems(type) {
-            const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
-            alert(`Viewing ${type} items\n\nTotal in vault: ${total}\n\nLoaded from Supabase 2026.`);
-            resetLockTimer();
-        }
-        
-        // Device detection
-        function checkDevice() {
-            const userAgent = navigator.userAgent;
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-            const screenWidth = window.screen.width;
-            
-            if (!isMobile || screenWidth >= 1024) {
-                document.getElementById('deviceWarning').classList.add('is-active');
-                return true;
-            }
-            return false;
-        }
-        
-        function closeDeviceWarning() {
-            document.getElementById('deviceWarning').classList.remove('is-active');
-        }
-        
-        function redirectToDesktop() {
-            window.location.href = 'pc.html';
-        }
-        
-        // Initialize app
-        async function initializeApp() {
-            if (!checkDevice()) {
-                startLockTimer();
+            function unlockVault() {
+                const passwordInput = document.getElementById('masterPassword');
+                const password = passwordInput ? passwordInput.value : '';
                 
-                // Setup navigation
+                if (password.trim()) {
+                    isLocked = false;
+                    const lockOverlay = document.getElementById('lockOverlay');
+                    if (lockOverlay) lockOverlay.classList.remove('is-active');
+                    if (passwordInput) passwordInput.value = '';
+                    startLockTimer();
+                } else {
+                    alert('Please enter your master password');
+                }
+            }
+            
+            // UI Actions
+            function switchTab(tab) {
                 document.querySelectorAll('.nav-item').forEach(item => {
+                    item.classList.remove('is-active');
+                });
+                event.currentTarget.classList.add('is-active');
+                
+                if (tab === 'home') {
+                    // Already on home
+                } else {
+                    alert(`Switching to ${tab} tab...\n\nIn production, this would load the corresponding section.`);
+                }
+                
+                resetLockTimer();
+            }
+            
+            function refreshData() {
+                loadData();
+                resetLockTimer();
+            }
+            
+            function openSection(section) {
+                const count = currentData.counts[section] || 0;
+                alert(`Opening ${section} section\n\nItems: ${count}\n\nData loaded from Supabase 2026.`);
+                resetLockTimer();
+            }
+            
+            function openItem(id) {
+                alert(`Opening item ${id}\n\nDecrypting data from Supabase...`);
+                resetLockTimer();
+            }
+            
+            function addNewItem() {
+                alert('Add new encrypted item\n\nThis would create locally encrypted data and sync to Supabase.');
+                resetLockTimer();
+            }
+            
+            function viewItems(type) {
+                const total = Object.values(currentData.counts).reduce((sum, count) => sum + count, 0);
+                alert(`Viewing ${type} items\n\nTotal in vault: ${total}\n\nLoaded from Supabase 2026.`);
+                resetLockTimer();
+            }
+            
+            // Device detection
+            function checkDevice() {
+                const userAgent = navigator.userAgent;
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+                const screenWidth = window.screen.width;
+                
+                if (!isMobile || screenWidth >= 1024) {
+                    document.getElementById('deviceWarning').classList.add('is-active');
+                    return true;
+                }
+                return false;
+            }
+            
+            function closeDeviceWarning() {
+                document.getElementById('deviceWarning').classList.remove('is-active');
+            }
+            
+            function redirectToDesktop() {
+                window.location.href = 'pc.html';
+            }
+            
+            // Event Listeners setup
+            function setupEventListeners() {
+                // Navigation items
+                document.querySelectorAll('.nav-item[data-tab]').forEach(item => {
                     item.addEventListener('click', function() {
                         const tab = this.getAttribute('data-tab');
                         switchTab(tab);
                     });
                 });
                 
-                if (supabase) {
+                // Action buttons
+                document.getElementById('refreshDataBtn')?.addEventListener('click', refreshData);
+                document.getElementById('lockVaultBtn')?.addEventListener('click', lockVault);
+                document.getElementById('unlockVaultBtn')?.addEventListener('click', unlockVault);
+                document.getElementById('addNewItemBtn')?.addEventListener('click', addNewItem);
+                
+                // Quick access buttons
+                document.getElementById('openLogins')?.addEventListener('click', () => openSection('login'));
+                document.getElementById('openImages')?.addEventListener('click', () => openSection('image'));
+                document.getElementById('openProjects')?.addEventListener('click', () => openSection('project'));
+                document.getElementById('openDocuments')?.addEventListener('click', () => openSection('text'));
+                
+                // View items buttons
+                document.getElementById('viewTotalItems')?.addEventListener('click', () => viewItems('total'));
+                document.getElementById('viewEncryptedItems')?.addEventListener('click', () => viewItems('encrypted'));
+                
+                // Device warning buttons
+                document.getElementById('redirectToDesktopBtn')?.addEventListener('click', redirectToDesktop);
+                document.getElementById('stayHereBtn')?.addEventListener('click', closeDeviceWarning);
+                
+                // Dynamic buttons (added later)
+                document.addEventListener('click', function(e) {
+                    if (e.target.id === 'retryLoadingBtn' || e.target.closest('#retryLoadingBtn')) {
+                        refreshData();
+                    }
+                    if (e.target.id === 'tryAgainBtn' || e.target.closest('#tryAgainBtn')) {
+                        initializeApp();
+                    }
+                    if (e.target.id === 'addFirstItemBtn' || e.target.closest('#addFirstItemBtn')) {
+                        addNewItem();
+                    }
+                });
+                
+                // Keyboard events
+                document.addEventListener('keydown', function(e) {
+                    const lockOverlay = document.getElementById('lockOverlay');
+                    if (e.key === 'Enter' && lockOverlay && lockOverlay.classList.contains('is-active')) {
+                        unlockVault();
+                    }
+                });
+                
+                // User activity detection
+                document.addEventListener('touchstart', resetLockTimer);
+                document.addEventListener('touchend', resetLockTimer);
+                document.addEventListener('scroll', resetLockTimer);
+                
+                // Tab visibility change
+                document.addEventListener('visibilitychange', function() {
+                    if (document.hidden && !isLocked) {
+                        lockVault();
+                    }
+                });
+            }
+            
+            // Initialize app
+            async function initializeApp() {
+                if (!checkDevice()) {
+                    startLockTimer();
+                    
+                    // Setup event listeners
+                    setupEventListeners();
+                    
+                    if (!supabaseClient) {
+                        supabaseClient = initSupabase();
+                    }
+                    
                     const isConnected = await checkConnection();
                     if (isConnected) {
                         await loadData();
                     }
                 }
             }
-        }
-        
-        // Event Listeners
-        document.addEventListener('keydown', function(e) {
-            const lockOverlay = document.getElementById('lockOverlay');
-            if (e.key === 'Enter' && lockOverlay && lockOverlay.classList.contains('is-active')) {
-                unlockVault();
-            }
-        });
-        
-        document.addEventListener('touchstart', resetLockTimer);
-        document.addEventListener('touchend', resetLockTimer);
-        document.addEventListener('scroll', resetLockTimer);
-        
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden && !isLocked) {
-                lockVault();
-            }
-        });
-        
-        // Initialize
-        document.addEventListener('DOMContentLoaded', initializeApp);
-        
-        // Prevent zoom on double-tap
-        document.addEventListener('touchstart', function(event) {
-            if (event.touches.length > 1) {
-                event.preventDefault();
-            }
-        }, { passive: false });
+            
+            // Initialize
+            document.addEventListener('DOMContentLoaded', initializeApp);
+            
+            // Prevent zoom on double-tap
+            document.addEventListener('touchstart', function(event) {
+                if (event.touches.length > 1) {
+                    event.preventDefault();
+                }
+            }, { passive: false });
+            
+            // Make functions available globally if needed
+            window.MKBVAULT_MOBILE = {
+                refreshData,
+                lockVault,
+                unlockVault,
+                initializeApp
+            };
+            
+        })(); // End of IIFE
     </script>
 </body>
 </html>
