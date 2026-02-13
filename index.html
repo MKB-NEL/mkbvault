@@ -3,29 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boveda · living wallpaper</title>
-    <!-- Tailwind + Inter font -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Boveda · byMKB</title>
+    <!-- Inter font only - no Tailwind CDN warning -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
+        /* Manual Tailwind-like utilities - no CDN warning */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        /* Layout utilities */
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-center { justify-content: center; }
+        .justify-between { justify-content: space-between; }
+        .flex-col { flex-direction: column; }
+        .grid { display: grid; }
+        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-8 { gap: 2rem; }
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-6 > * + * { margin-top: 1.5rem; }
+        .space-y-8 > * + * { margin-top: 2rem; }
+
+        /* Spacing */
+        .p-5 { padding: 1.25rem; }
+        .p-8 { padding: 2rem; }
+        .px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .pb-2 { padding-bottom: 0.5rem; }
+        .pb-4 { padding-bottom: 1rem; }
+        .pb-12 { padding-bottom: 3rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mb-12 { margin-bottom: 3rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+
+        /* Text */
+        .text-center { text-align: center; }
+        .text-xs { font-size: 0.75rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-base { font-size: 1rem; }
+        .text-lg { font-size: 1.125rem; }
+        .text-xl { font-size: 1.25rem; }
+        .text-2xl { font-size: 1.5rem; }
+        .text-3xl { font-size: 1.875rem; }
+        .text-4xl { font-size: 2.25rem; }
+        .text-5xl { font-size: 3rem; }
+        .font-light { font-weight: 300; }
+        .font-normal { font-weight: 400; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .tracking-wide { letter-spacing: 0.025em; }
+        .tracking-wider { letter-spacing: 0.05em; }
+
+        /* Colors */
+        .text-white { color: white; }
+        .text-black { color: black; }
+        .text-rose-400 { color: #fb7185; }
+        .text-rose-600 { color: #e11d48; }
+        .text-emerald-600 { color: #059669; }
+        .text-indigo-200 { color: #c7d2fe; }
+        .text-indigo-300 { color: #a5b4fc; }
+        .text-indigo-400 { color: #818cf8; }
+        .text-indigo-600 { color: #4f46e5; }
+        .text-slate-500 { color: #64748b; }
+
+        /* Background */
+        .bg-transparent { background: transparent; }
+
+        /* Borders */
+        .border-b { border-bottom-width: 1px; }
+        .border-indigo-200 { border-color: #c7d2fe; }
+        .border-indigo-200\/30 { border-color: rgba(199, 210, 254, 0.3); }
+        .border-slate-200 { border-color: #e2e8f0; }
+
+        /* Width */
+        .w-full { width: 100%; }
+        .max-w-\[440px\] { max-width: 440px; }
+        .max-w-\[460px\] { max-width: 460px; }
+        .min-h-screen { min-height: 100vh; }
+
+        /* Position */
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .top-0 { top: 0; }
+        .left-0 { left: 0; }
+        .z-0 { z-index: 0; }
+        .z-10 { z-index: 10; }
+
+        /* Overflow */
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; }
+
+        /* Misc */
+        .cursor-pointer { cursor: pointer; }
+        .opacity-80 { opacity: 0.8; }
+        .hidden { display: none !important; }
+
+        /* Custom styles */
         body {
             font-family: "Inter", sans-serif;
+            background: #0a0c12;
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            background: #0a0c12; /* deep base */
         }
 
-        /* ===== LIVING WALLPAPER ===== */
-        /* cinematic moving blur layers - deep, moody, constantly evolving */
+        /* Living wallpaper */
         .wallpaper {
             position: fixed;
             top: 0;
@@ -37,18 +132,15 @@
             background: #080b14;
         }
 
-        /* blur orbs with deep, saturated colors that move independently */
         .orb {
             position: absolute;
             border-radius: 50%;
             filter: blur(100px) saturate(200%);
             mix-blend-mode: screen;
             opacity: 0.6;
-            animation: orbital 35s cubic-bezier(0.45, 0.05, 0.2, 0.99) infinite alternate;
             will-change: transform, opacity, background;
         }
 
-        /* deep purple orb - moves diagonally */
         .orb-1 {
             width: 70vh;
             height: 70vh;
@@ -58,7 +150,6 @@
             animation: float1 28s ease-in-out infinite alternate;
         }
 
-        /* deep blue orb - slow, sweeping motion */
         .orb-2 {
             width: 90vh;
             height: 90vh;
@@ -68,7 +159,6 @@
             animation: float2 32s ease-in-out infinite alternate;
         }
 
-        /* deep magenta orb - subtle movement */
         .orb-3 {
             width: 60vh;
             height: 60vh;
@@ -78,7 +168,6 @@
             animation: float3 25s ease-in-out infinite alternate;
         }
 
-        /* deep indigo orb - large and moody */
         .orb-4 {
             width: 100vh;
             height: 100vh;
@@ -88,55 +177,6 @@
             animation: float4 40s ease-in-out infinite alternate;
         }
 
-        /* deep crimson orb - adds warmth */
-        .orb-5 {
-            width: 50vh;
-            height: 50vh;
-            background: radial-gradient(circle at 60% 20%, #ef4444, #7f1d1d);
-            top: 60%;
-            right: 25%;
-            animation: float5 22s ease-in-out infinite alternate;
-        }
-
-        /* deep teal orb - cool contrast */
-        .orb-6 {
-            width: 80vh;
-            height: 80vh;
-            background: radial-gradient(circle at 40% 70%, #14b8a6, #115e59);
-            top: -20%;
-            right: 30%;
-            animation: float6 38s ease-in-out infinite alternate;
-        }
-
-        /* secondary layer with different blend for depth */
-        .orb-glow {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(150px) saturate(180%);
-            mix-blend-mode: soft-light;
-            opacity: 0.4;
-            animation: orbitalSlow 45s ease-in-out infinite alternate;
-        }
-
-        .glow-1 {
-            width: 120vh;
-            height: 120vh;
-            background: #a78bfa;
-            top: -20%;
-            left: -10%;
-            animation: glowFloat1 50s ease-in-out infinite alternate;
-        }
-
-        .glow-2 {
-            width: 100vh;
-            height: 100vh;
-            background: #60a5fa;
-            bottom: -30%;
-            right: -10%;
-            animation: glowFloat2 55s ease-in-out infinite alternate;
-        }
-
-        /* complex movement patterns */
         @keyframes float1 {
             0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
             50% { transform: translate(15%, 10%) scale(1.3); opacity: 0.7; }
@@ -157,26 +197,7 @@
             50% { transform: translate(-15%, 10%) scale(1.5); opacity: 0.7; }
             100% { transform: translate(10%, -10%) scale(1.2); opacity: 0.6; }
         }
-        @keyframes float5 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-            50% { transform: translate(20%, -10%) scale(1.3); opacity: 0.6; }
-            100% { transform: translate(15%, 15%) scale(1.1); opacity: 0.5; }
-        }
-        @keyframes float6 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-            50% { transform: translate(-20%, 20%) scale(1.4); opacity: 0.7; }
-            100% { transform: translate(-25%, -5%) scale(1.1); opacity: 0.5; }
-        }
-        @keyframes glowFloat1 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-            100% { transform: translate(10%, -15%) scale(1.3); opacity: 0.5; }
-        }
-        @keyframes glowFloat2 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
-            100% { transform: translate(-15%, 10%) scale(1.4); opacity: 0.5; }
-        }
 
-        /* subtle noise overlay for texture */
         .noise {
             position: fixed;
             top: 0;
@@ -191,7 +212,6 @@
             mix-blend-mode: overlay;
         }
 
-        /* Scrollable content */
         .content {
             position: relative;
             z-index: 10;
@@ -203,7 +223,6 @@
             overflow-y: auto;
         }
 
-        /* Floating card - pure white blur, no borders */
         .ethereal-card {
             width: 100%;
             max-width: 480px;
@@ -216,14 +235,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* NO BORDERS, NO BACKGROUNDS on elements */
-        input, button, .tab, .logo-container, form, div {
-            background: transparent !important;
-            border: none !important;
-            outline: none !important;
-        }
-
-        /* Input styling - subtle bottom line */
+        /* Input styling */
         .input-wrapper {
             position: relative;
             margin-bottom: 1.5rem;
@@ -246,13 +258,16 @@
             font-size: 1.1rem;
             color: white;
             font-weight: 500;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
             transition: all 0.2s ease;
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
 
         .modern-input:focus {
-            border-bottom-color: rgba(255, 255, 255, 0.8) !important;
+            outline: none;
+            border-bottom-color: rgba(255, 255, 255, 0.8);
         }
 
         .modern-input::placeholder {
@@ -261,7 +276,6 @@
             font-size: 1rem;
         }
 
-        /* Tabs - white text */
         .tab-container {
             display: flex;
             justify-content: center;
@@ -277,6 +291,8 @@
             transition: all 0.2s;
             padding: 0.25rem 0;
             position: relative;
+            background: transparent;
+            border: none;
         }
 
         .tab.active {
@@ -295,38 +311,31 @@
             box-shadow: 0 0 10px rgba(255,255,255,0.5);
         }
 
-        /* Button - floating with glass effect */
         .elegant-btn {
             width: 100%;
             padding: 1.2rem;
-            background: rgba(255, 255, 255, 0.15) !important;
+            background: rgba(255, 255, 255, 0.15);
             color: white;
             font-size: 1.1rem;
             font-weight: 600;
-            border-radius: 3rem !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3rem;
             cursor: pointer;
             transition: all 0.3s;
             margin: 1.5rem 0 0.5rem;
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2) !important;
-            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.4) !important;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.4);
         }
 
         .elegant-btn:hover:not(:disabled) {
             transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.25) !important;
-            box-shadow: 0 25px 35px -8px rgba(0, 0, 0, 0.5) !important;
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow: 0 25px 35px -8px rgba(0, 0, 0, 0.5);
         }
 
         .elegant-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-        }
-
-        /* Logo - white with glow */
-        .logo {
-            text-align: center;
-            margin-bottom: 1rem;
         }
 
         .logo-icon {
@@ -346,12 +355,10 @@
         .logo-tagline {
             color: rgba(255, 255, 255, 0.7);
             font-size: 1rem;
-            font-weight: 400;
             margin-top: 0.25rem;
             text-shadow: 0 1px 5px rgba(0,0,0,0.2);
         }
 
-        /* Warning - minimal */
         .warning-message {
             display: flex;
             align-items: center;
@@ -363,14 +370,12 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        /* Grid for 2-column fields */
         .input-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1.2rem;
         }
 
-        /* Messages */
         .error-msg {
             color: #ffa7a7;
             font-size: 0.85rem;
@@ -386,7 +391,6 @@
             text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        /* spinner */
         .spinner {
             width: 1.3rem;
             height: 1.3rem;
@@ -398,12 +402,6 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Hide/Show */
-        .hidden {
-            display: none !important;
-        }
-
-        /* Master welcome */
         .master-welcome {
             color: white;
             font-size: 1.1rem;
@@ -413,34 +411,48 @@
             margin-bottom: 1.5rem;
             text-shadow: 0 1px 5px rgba(0,0,0,0.2);
         }
+
+        /* Debug console styling */
+        .debug-console {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.8);
+            color: #0f0;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 400px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 9999;
+            display: none;
+        }
+        .debug-console.visible {
+            display: block;
+        }
     </style>
 </head>
 <body>
-    <!-- LIVING WALLPAPER - cinematic moving blur layers -->
+    <!-- Debug console toggle (press F2 to show) -->
+    <div class="debug-console" id="debugConsole"></div>
+
+    <!-- Living wallpaper -->
     <div class="wallpaper">
-        <!-- primary moving orbs -->
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
         <div class="orb orb-3"></div>
         <div class="orb orb-4"></div>
-        <div class="orb orb-5"></div>
-        <div class="orb orb-6"></div>
-        
-        <!-- secondary glow layers for depth -->
-        <div class="orb-glow glow-1"></div>
-        <div class="orb-glow glow-2"></div>
-        
-        <!-- subtle noise texture -->
         <div class="noise"></div>
     </div>
 
-    <!-- Content area with scroll -->
+    <!-- Content -->
     <div class="content">
-        <!-- Ethereal card - pure white blur -->
         <div class="ethereal-card">
             
             <!-- Logo -->
-            <div class="logo">
+            <div class="text-center mb-8">
                 <div class="logo-icon">🔐</div>
                 <div class="logo-text">BOVEDA</div>
                 <div class="logo-tagline">your private digital safe</div>
@@ -526,8 +538,48 @@
         </div>
     </div>
 
-    <!-- Firebase + Firestore -->
+    <!-- Firebase + Firestore with enhanced error handling -->
     <script type="module">
+        // Enhanced debug logging
+        const debug = {
+            log: (...args) => {
+                console.log('[Boveda]', ...args);
+                const consoleEl = document.getElementById('debugConsole');
+                if (consoleEl) {
+                    const msg = args.map(arg => 
+                        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
+                    ).join(' ');
+                    consoleEl.innerHTML += `<div>> ${msg}</div>`;
+                    consoleEl.scrollTop = consoleEl.scrollHeight;
+                }
+            },
+            error: (...args) => {
+                console.error('[Boveda ERROR]', ...args);
+                const consoleEl = document.getElementById('debugConsole');
+                if (consoleEl) {
+                    const msg = args.map(arg => 
+                        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
+                    ).join(' ');
+                    consoleEl.innerHTML += `<div style="color: #ff6b6b">⚠️ ${msg}</div>`;
+                    consoleEl.scrollTop = consoleEl.scrollHeight;
+                }
+            },
+            clear: () => {
+                const consoleEl = document.getElementById('debugConsole');
+                if (consoleEl) consoleEl.innerHTML = '';
+            }
+        };
+
+        // Toggle debug console with F2
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'F2') {
+                e.preventDefault();
+                document.getElementById('debugConsole').classList.toggle('visible');
+            }
+        });
+
+        debug.log('Initializing Firebase...');
+
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
         import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
         import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
@@ -542,215 +594,323 @@
             appId: "1:924974842099:web:e9b04ffbea0318ce99f786",
             measurementId: "G-EFKXX58XL6"
         };
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
 
-        window.cryptoModule = {
-            deriveAndVerify: async (masterPass, email) => {
-                await new Promise(r => setTimeout(r, 700 + Math.random()*200));
-                return { success: masterPass && masterPass.length > 0, key: 'key-' + email };
-            }
-        };
+        debug.log('Firebase config loaded:', { ...firebaseConfig, apiKey: 'HIDDEN' });
 
-        // DOM elements
-        const signInForm = document.getElementById('signInForm');
-        const signUpForm = document.getElementById('signUpForm');
-        const masterForm = document.getElementById('masterForm');
-        const tabSignIn = document.getElementById('tabSignIn');
-        const tabSignUp = document.getElementById('tabSignUp');
-        const tabSwitcher = document.getElementById('tabSwitcher');
-
-        const signinEmail = document.getElementById('signinEmail');
-        const signinPassword = document.getElementById('signinPassword');
-        const signinBtn = document.getElementById('signinBtn');
-        const signinError = document.getElementById('signinError');
-
-        const signupName = document.getElementById('signupName');
-        const signupEmail = document.getElementById('signupEmail');
-        const signupPassword = document.getElementById('signupPassword');
-        const signupConfirmPassword = document.getElementById('signupConfirmPassword');
-        const signupMaster = document.getElementById('signupMaster');
-        const signupConfirmMaster = document.getElementById('signupConfirmMaster');
-        const signupBtn = document.getElementById('signupBtn');
-        const signupError = document.getElementById('signupError');
-        const signupSuccess = document.getElementById('signupSuccess');
-
-        const masterPassword = document.getElementById('masterPassword');
-        const unlockBtn = document.getElementById('unlockBtn');
-        const masterError = document.getElementById('masterError');
-        const masterWelcome = document.getElementById('masterWelcome');
-
-        function setActiveTab(active) {
-            if (active === 'in') {
-                tabSignIn.classList.add('active');
-                tabSignUp.classList.remove('active');
-            } else {
-                tabSignUp.classList.add('active');
-                tabSignIn.classList.remove('active');
-            }
-        }
-
-        function showSignIn() {
-            signInForm.classList.remove('hidden');
-            signUpForm.classList.add('hidden');
-            masterForm.classList.add('hidden');
-            tabSwitcher.classList.remove('hidden');
-            setActiveTab('in');
-            clearAll();
-        }
-
-        function showSignUp() {
-            signUpForm.classList.remove('hidden');
-            signInForm.classList.add('hidden');
-            masterForm.classList.add('hidden');
-            tabSwitcher.classList.remove('hidden');
-            setActiveTab('up');
-            clearAll();
-        }
-
-        function showMasterStep(email) {
-            signInForm.classList.add('hidden');
-            signUpForm.classList.add('hidden');
-            masterForm.classList.remove('hidden');
-            tabSwitcher.classList.add('hidden');
-            masterWelcome.innerText = `Welcome back, ${email}. Enter your Master Password to unlock.`;
-            masterPassword.value = '';
-            masterError.innerText = '';
-        }
-
-        function clearAll() {
-            document.querySelectorAll('input').forEach(i => i.value = '');
-            signinError.innerText = signupError.innerText = masterError.innerText = '';
-            if (signupSuccess) signupSuccess.innerText = '';
-        }
-
-        function setButtonLoading(btn, isLoading, originalText) {
-            if (isLoading) {
-                btn.disabled = true;
-                btn.innerHTML = `<span class="flex items-center justify-center gap-2"><span class="spinner"></span> processing</span>`;
-            } else {
-                btn.disabled = false;
-                btn.innerHTML = originalText;
-            }
-        }
-
-        tabSignIn.addEventListener('click', showSignIn);
-        tabSignUp.addEventListener('click', showSignUp);
-
-        // SIGN IN
-        signInForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            signinError.innerText = '';
-            const email = signinEmail.value.trim();
-            const pwd = signinPassword.value;
-            if (!email || !pwd) { signinError.innerText = 'All fields required'; return; }
+        try {
+            const app = initializeApp(firebaseConfig);
+            const analytics = getAnalytics(app);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
             
-            setButtonLoading(signinBtn, true, 'Continue');
-            try {
-                const userCred = await signInWithEmailAndPassword(auth, email, pwd);
-                const uid = userCred.user.uid;
+            debug.log('Firebase initialized successfully');
+            debug.log('Auth instance:', auth ? '✓' : '✗');
+            debug.log('Firestore instance:', db ? '✓' : '✗');
+
+            window.firebaseAuth = auth;
+            window.firebaseDb = db;
+
+            // Crypto module with logging
+            window.cryptoModule = {
+                deriveAndVerify: async (masterPass, email) => {
+                    debug.log('Verifying master password for:', email);
+                    await new Promise(r => setTimeout(r, 700 + Math.random()*200));
+                    debug.log('Master password verification:', masterPass ? '✓' : '✗');
+                    return { success: masterPass && masterPass.length > 0, key: 'key-' + email };
+                }
+            };
+
+            // DOM elements
+            const signInForm = document.getElementById('signInForm');
+            const signUpForm = document.getElementById('signUpForm');
+            const masterForm = document.getElementById('masterForm');
+            const tabSignIn = document.getElementById('tabSignIn');
+            const tabSignUp = document.getElementById('tabSignUp');
+            const tabSwitcher = document.getElementById('tabSwitcher');
+
+            const signinEmail = document.getElementById('signinEmail');
+            const signinPassword = document.getElementById('signinPassword');
+            const signinBtn = document.getElementById('signinBtn');
+            const signinError = document.getElementById('signinError');
+
+            const signupName = document.getElementById('signupName');
+            const signupEmail = document.getElementById('signupEmail');
+            const signupPassword = document.getElementById('signupPassword');
+            const signupConfirmPassword = document.getElementById('signupConfirmPassword');
+            const signupMaster = document.getElementById('signupMaster');
+            const signupConfirmMaster = document.getElementById('signupConfirmMaster');
+            const signupBtn = document.getElementById('signupBtn');
+            const signupError = document.getElementById('signupError');
+            const signupSuccess = document.getElementById('signupSuccess');
+
+            const masterPassword = document.getElementById('masterPassword');
+            const unlockBtn = document.getElementById('unlockBtn');
+            const masterError = document.getElementById('masterError');
+            const masterWelcome = document.getElementById('masterWelcome');
+
+            function setActiveTab(active) {
+                if (active === 'in') {
+                    tabSignIn.classList.add('active');
+                    tabSignUp.classList.remove('active');
+                } else {
+                    tabSignUp.classList.add('active');
+                    tabSignIn.classList.remove('active');
+                }
+            }
+
+            function showSignIn() {
+                debug.log('Switching to Sign In view');
+                signInForm.classList.remove('hidden');
+                signUpForm.classList.add('hidden');
+                masterForm.classList.add('hidden');
+                tabSwitcher.classList.remove('hidden');
+                setActiveTab('in');
+                clearAll();
+            }
+
+            function showSignUp() {
+                debug.log('Switching to Sign Up view');
+                signUpForm.classList.remove('hidden');
+                signInForm.classList.add('hidden');
+                masterForm.classList.add('hidden');
+                tabSwitcher.classList.remove('hidden');
+                setActiveTab('up');
+                clearAll();
+            }
+
+            function showMasterStep(email) {
+                debug.log('Showing master password step for:', email);
+                signInForm.classList.add('hidden');
+                signUpForm.classList.add('hidden');
+                masterForm.classList.remove('hidden');
+                tabSwitcher.classList.add('hidden');
+                masterWelcome.innerText = `Welcome back, ${email}. Enter your Master Password to unlock.`;
+                masterPassword.value = '';
+                masterError.innerText = '';
+            }
+
+            function clearAll() {
+                document.querySelectorAll('input').forEach(i => i.value = '');
+                signinError.innerText = signupError.innerText = masterError.innerText = '';
+                if (signupSuccess) signupSuccess.innerText = '';
+            }
+
+            function setButtonLoading(btn, isLoading, originalText) {
+                if (isLoading) {
+                    btn.disabled = true;
+                    btn.innerHTML = `<span class="flex items-center justify-center gap-2"><span class="spinner"></span> processing</span>`;
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }
+            }
+
+            tabSignIn.addEventListener('click', showSignIn);
+            tabSignUp.addEventListener('click', showSignUp);
+
+            // SIGN IN with detailed error logging
+            signInForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                signinError.innerText = '';
+                const email = signinEmail.value.trim();
+                const pwd = signinPassword.value;
                 
-                const userDoc = await getDoc(doc(db, 'users', uid));
-                if (!userDoc.exists()) throw new Error('no account');
+                debug.log('Sign In attempt for:', email);
                 
-                if (userDoc.data().status !== 'approved') {
-                    await auth.signOut();
-                    signinError.innerText = 'Account pending approval';
+                if (!email || !pwd) { 
+                    signinError.innerText = 'All fields required'; 
+                    debug.log('Sign In validation failed: missing fields');
+                    return; 
+                }
+                
+                setButtonLoading(signinBtn, true, 'Continue');
+                try {
+                    debug.log('Calling Firebase signInWithEmailAndPassword...');
+                    const userCred = await signInWithEmailAndPassword(auth, email, pwd);
+                    debug.log('Firebase auth success:', userCred.user.uid);
+                    
+                    const uid = userCred.user.uid;
+                    
+                    debug.log('Checking Firestore for user status...');
+                    const userDoc = await getDoc(doc(db, 'users', uid));
+                    
+                    if (!userDoc.exists()) {
+                        debug.error('User document not found in Firestore');
+                        throw new Error('no account');
+                    }
+                    
+                    const userData = userDoc.data();
+                    debug.log('User data:', userData);
+                    
+                    if (userData.status !== 'approved') {
+                        debug.log('User not approved, status:', userData.status);
+                        await auth.signOut();
+                        signinError.innerText = 'Account pending approval';
+                        signinPassword.value = '';
+                        return;
+                    }
+                    
+                    debug.log('User approved, proceeding to master step');
+                    showMasterStep(email);
                     signinPassword.value = '';
+                } catch (err) {
+                    debug.error('Sign In failed:', err.code, err.message);
+                    
+                    // Detailed error messages for debugging
+                    if (err.code === 'auth/user-not-found') {
+                        signinError.innerText = 'Account not found';
+                    } else if (err.code === 'auth/wrong-password') {
+                        signinError.innerText = 'Invalid password';
+                    } else if (err.code === 'auth/too-many-requests') {
+                        signinError.innerText = 'Too many attempts, try later';
+                    } else if (err.code === 'auth/invalid-credential') {
+                        signinError.innerText = 'Invalid email or password';
+                    } else {
+                        signinError.innerText = 'Authentication failed';
+                    }
+                    signinPassword.value = '';
+                } finally {
+                    setButtonLoading(signinBtn, false, 'Continue');
+                }
+            });
+
+            // SIGN UP with detailed error logging
+            signUpForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                signupError.innerText = '';
+                if (signupSuccess) signupSuccess.innerText = '';
+                
+                const name = signupName.value.trim();
+                const email = signupEmail.value.trim();
+                const pwd = signupPassword.value;
+                const cpwd = signupConfirmPassword.value;
+                const master = signupMaster.value;
+                const cmaster = signupConfirmMaster.value;
+
+                debug.log('Sign Up attempt for:', email);
+                debug.log('Name:', name);
+                debug.log('Password length:', pwd?.length);
+                debug.log('Master password length:', master?.length);
+
+                if (!name || !email || !pwd || !cpwd || !master || !cmaster) {
+                    signupError.innerText = 'All fields required';
+                    debug.log('Sign Up validation failed: missing fields');
                     return;
                 }
-                
-                showMasterStep(email);
-                signinPassword.value = '';
-            } catch (err) {
-                signinError.innerText = 'Authentication failed';
-                signinPassword.value = '';
-            } finally {
-                setButtonLoading(signinBtn, false, 'Continue');
-            }
-        });
-
-        // SIGN UP
-        signUpForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            signupError.innerText = '';
-            if (signupSuccess) signupSuccess.innerText = '';
-            
-            const name = signupName.value.trim();
-            const email = signupEmail.value.trim();
-            const pwd = signupPassword.value;
-            const cpwd = signupConfirmPassword.value;
-            const master = signupMaster.value;
-            const cmaster = signupConfirmMaster.value;
-
-            if (!name || !email || !pwd || !cpwd || !master || !cmaster) {
-                signupError.innerText = 'All fields required'; return;
-            }
-            if (pwd !== cpwd) {
-                signupError.innerText = 'Passwords do not match';
-                signupPassword.value = signupConfirmPassword.value = ''; return;
-            }
-            if (master !== cmaster) {
-                signupError.innerText = 'Master passwords do not match';
-                signupMaster.value = signupConfirmMaster.value = ''; return;
-            }
-
-            setButtonLoading(signupBtn, true, 'Request Access');
-            try {
-                const userCred = await createUserWithEmailAndPassword(auth, email, pwd);
-                const uid = userCred.user.uid;
-                
-                await setDoc(doc(db, 'users', uid), {
-                    name: name,
-                    email: email,
-                    status: 'pending',
-                    createdAt: new Date().toISOString(),
-                    masterHash: 'stub_hash'
-                });
-                
-                signupSuccess.innerText = '✓ Account created, pending admin approval';
-                signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
-                signupName.value = ''; signupEmail.value = '';
-                
-                setTimeout(() => showSignIn(), 2000);
-            } catch (err) {
-                signupError.innerText = 'Account creation failed';
-                signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
-            } finally {
-                setButtonLoading(signupBtn, false, 'Request Access');
-            }
-        });
-
-        // MASTER UNLOCK
-        masterForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            masterError.innerText = '';
-            const master = masterPassword.value;
-            if (!master) { masterError.innerText = 'Enter master password'; return; }
-
-            setButtonLoading(unlockBtn, true, 'Unlock Vault');
-            try {
-                const result = await window.cryptoModule.deriveAndVerify(master, '');
-                if (result.success) {
-                    sessionStorage.setItem('vaultKey', result.key);
-                    window.location.href = 'vault.html';
-                } else {
-                    masterError.innerText = 'Invalid master password';
-                    masterPassword.value = '';
+                if (pwd !== cpwd) {
+                    signupError.innerText = 'Passwords do not match';
+                    debug.log('Sign Up validation failed: passwords mismatch');
+                    signupPassword.value = signupConfirmPassword.value = '';
+                    return;
                 }
-            } catch {
-                masterError.innerText = 'Unlock failed';
-                masterPassword.value = '';
-            } finally {
-                setButtonLoading(unlockBtn, false, 'Unlock Vault');
-            }
-        });
+                if (master !== cmaster) {
+                    signupError.innerText = 'Master passwords do not match';
+                    debug.log('Sign Up validation failed: master passwords mismatch');
+                    signupMaster.value = signupConfirmMaster.value = '';
+                    return;
+                }
 
-        showSignIn();
-        tabSignIn.addEventListener('click', clearAll);
-        tabSignUp.addEventListener('click', clearAll);
+                setButtonLoading(signupBtn, true, 'Request Access');
+                try {
+                    debug.log('Calling Firebase createUserWithEmailAndPassword...');
+                    const userCred = await createUserWithEmailAndPassword(auth, email, pwd);
+                    debug.log('Firebase auth success:', userCred.user.uid);
+                    
+                    const uid = userCred.user.uid;
+                    
+                    debug.log('Creating Firestore user document...');
+                    const userData = {
+                        name: name,
+                        email: email,
+                        status: 'pending',
+                        createdAt: new Date().toISOString(),
+                        masterHash: 'stub_hash'
+                    };
+                    debug.log('User data to save:', userData);
+                    
+                    await setDoc(doc(db, 'users', uid), userData);
+                    debug.log('Firestore document created successfully');
+                    
+                    signupSuccess.innerText = '✓ Account created, pending admin approval';
+                    signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
+                    signupName.value = ''; signupEmail.value = '';
+                    
+                    debug.log('Sign Up complete, switching to Sign In in 2 seconds');
+                    setTimeout(() => showSignIn(), 2000);
+                } catch (err) {
+                    debug.error('Sign Up failed:', err);
+                    debug.error('Error code:', err.code);
+                    debug.error('Error message:', err.message);
+                    
+                    // Detailed error messages
+                    if (err.code === 'auth/email-already-in-use') {
+                        signupError.innerText = 'Email already registered';
+                    } else if (err.code === 'auth/weak-password') {
+                        signupError.innerText = 'Password too weak (min 6 chars)';
+                    } else if (err.code === 'auth/invalid-email') {
+                        signupError.innerText = 'Invalid email format';
+                    } else {
+                        signupError.innerText = 'Account creation failed: ' + (err.message || 'Unknown error');
+                    }
+                    
+                    signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
+                } finally {
+                    setButtonLoading(signupBtn, false, 'Request Access');
+                }
+            });
+
+            // MASTER UNLOCK
+            masterForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                masterError.innerText = '';
+                const master = masterPassword.value;
+                if (!master) { 
+                    masterError.innerText = 'Enter master password'; 
+                    return; 
+                }
+
+                debug.log('Master unlock attempt');
+                setButtonLoading(unlockBtn, true, 'Unlock Vault');
+                try {
+                    const result = await window.cryptoModule.deriveAndVerify(master, '');
+                    if (result.success) {
+                        debug.log('Master password verified, redirecting to vault.html');
+                        sessionStorage.setItem('vaultKey', result.key);
+                        window.location.href = 'vault.html';
+                    } else {
+                        debug.log('Master password verification failed');
+                        masterError.innerText = 'Invalid master password';
+                        masterPassword.value = '';
+                    }
+                } catch (err) {
+                    debug.error('Master unlock error:', err);
+                    masterError.innerText = 'Unlock failed';
+                    masterPassword.value = '';
+                } finally {
+                    setButtonLoading(unlockBtn, false, 'Unlock Vault');
+                }
+            });
+
+            showSignIn();
+            tabSignIn.addEventListener('click', clearAll);
+            tabSignUp.addEventListener('click', clearAll);
+
+        } catch (err) {
+            debug.error('Firebase initialization failed:', err);
+            document.body.innerHTML += `
+                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: white; padding: 2rem; border-radius: 1rem; z-index: 9999;">
+                    <h3>Firebase Error</h3>
+                    <p>${err.message}</p>
+                </div>
+            `;
+        }
+
+        // Favicon fix - create a simple favicon
+        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>';
+        document.getElementsByTagName('head')[0].appendChild(link);
     </script>
 </body>
 </html>
