@@ -3,643 +3,754 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MKBVAULT — Encrypted Vault (2026)</title>
-    <!-- Bulma CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@1.0.0/css/bulma.min.css">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔒</text></svg>">
-    <!-- Custom Styles -->
+    <title>Boveda · living wallpaper</title>
+    <!-- Tailwind + Inter font -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        :root {
-            --primary: #0066ff;
-            --primary-hover: #0052d9;
-            --success: #00c853;
-            --warning: #ff9500;
-            --danger: #ff3b30;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: "Inter", sans-serif;
             min-height: 100vh;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-
-        .gradient-text {
-            background: linear-gradient(135deg, var(--primary) 0%, #8b5cf6 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .logo-container {
-            margin-bottom: 3rem;
-        }
-
-        .logo {
-            font-size: 3.5rem;
-            font-weight: 900;
-            letter-spacing: -0.05em;
-        }
-
-        .hero-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: white;
-            border: 2px solid var(--primary);
-            border-radius: 50px;
-            font-weight: 600;
-            color: var(--primary);
-            margin-bottom: 2rem;
-        }
-
-        .feature-card {
-            height: 100%;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            background: white;
-        }
-
-        .feature-card:hover {
-            border-color: var(--primary);
-            transform: translateY(-5px);
-            box-shadow: 0 20px 40px rgba(0, 102, 255, 0.1);
-        }
-
-        .feature-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--primary);
-        }
-
-        .access-section {
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 16px;
-            padding: 3rem;
-            margin: 3rem 0;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden;
+            background: #0a0c12; /* deep base */
         }
 
-        .access-section::before {
-            content: '';
-            position: absolute;
+        /* ===== LIVING WALLPAPER ===== */
+        /* cinematic moving blur layers - deep, moody, constantly evolving */
+        .wallpaper {
+            position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary), #8b5cf6);
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            background: #080b14;
         }
 
-        .contact-chip {
-            display: inline-flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1.25rem 2rem;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: #1f2937;
-            margin: 1.5rem 0;
-            transition: all 0.3s ease;
+        /* blur orbs with deep, saturated colors that move independently */
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px) saturate(200%);
+            mix-blend-mode: screen;
+            opacity: 0.6;
+            animation: orbital 35s cubic-bezier(0.45, 0.05, 0.2, 0.99) infinite alternate;
+            will-change: transform, opacity, background;
         }
 
-        .contact-chip:hover {
-            border-color: var(--primary);
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        /* deep purple orb - moves diagonally */
+        .orb-1 {
+            width: 70vh;
+            height: 70vh;
+            background: radial-gradient(circle at 30% 30%, #8b5cf6, #4c1d95);
+            top: -10%;
+            left: -10%;
+            animation: float1 28s ease-in-out infinite alternate;
         }
 
-        .warning-card {
-            background: linear-gradient(135deg, #fef3c7 0%, #fee2e2 100%);
-            border: 2px solid #fca5a5;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-top: 2rem;
+        /* deep blue orb - slow, sweeping motion */
+        .orb-2 {
+            width: 90vh;
+            height: 90vh;
+            background: radial-gradient(circle at 70% 40%, #3b82f6, #1e3a8a);
+            bottom: -30%;
+            right: -15%;
+            animation: float2 32s ease-in-out infinite alternate;
         }
 
-        .warning-icon {
-            display: inline-flex;
+        /* deep magenta orb - subtle movement */
+        .orb-3 {
+            width: 60vh;
+            height: 60vh;
+            background: radial-gradient(circle at 50% 50%, #ec4899, #831843);
+            top: 40%;
+            left: 20%;
+            animation: float3 25s ease-in-out infinite alternate;
+        }
+
+        /* deep indigo orb - large and moody */
+        .orb-4 {
+            width: 100vh;
+            height: 100vh;
+            background: radial-gradient(circle at 20% 80%, #6366f1, #312e81);
+            bottom: 10%;
+            left: 30%;
+            animation: float4 40s ease-in-out infinite alternate;
+        }
+
+        /* deep crimson orb - adds warmth */
+        .orb-5 {
+            width: 50vh;
+            height: 50vh;
+            background: radial-gradient(circle at 60% 20%, #ef4444, #7f1d1d);
+            top: 60%;
+            right: 25%;
+            animation: float5 22s ease-in-out infinite alternate;
+        }
+
+        /* deep teal orb - cool contrast */
+        .orb-6 {
+            width: 80vh;
+            height: 80vh;
+            background: radial-gradient(circle at 40% 70%, #14b8a6, #115e59);
+            top: -20%;
+            right: 30%;
+            animation: float6 38s ease-in-out infinite alternate;
+        }
+
+        /* secondary layer with different blend for depth */
+        .orb-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(150px) saturate(180%);
+            mix-blend-mode: soft-light;
+            opacity: 0.4;
+            animation: orbitalSlow 45s ease-in-out infinite alternate;
+        }
+
+        .glow-1 {
+            width: 120vh;
+            height: 120vh;
+            background: #a78bfa;
+            top: -20%;
+            left: -10%;
+            animation: glowFloat1 50s ease-in-out infinite alternate;
+        }
+
+        .glow-2 {
+            width: 100vh;
+            height: 100vh;
+            background: #60a5fa;
+            bottom: -30%;
+            right: -10%;
+            animation: glowFloat2 55s ease-in-out infinite alternate;
+        }
+
+        /* complex movement patterns */
+        @keyframes float1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(15%, 10%) scale(1.3); opacity: 0.7; }
+            100% { transform: translate(8%, 20%) scale(1.1); opacity: 0.6; }
+        }
+        @keyframes float2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(-20%, -15%) scale(1.4); opacity: 0.8; }
+            100% { transform: translate(-10%, -25%) scale(1.2); opacity: 0.6; }
+        }
+        @keyframes float3 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(10%, -20%) scale(1.2); opacity: 0.6; }
+            100% { transform: translate(-10%, 5%) scale(0.9); opacity: 0.5; }
+        }
+        @keyframes float4 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(-15%, 10%) scale(1.5); opacity: 0.7; }
+            100% { transform: translate(10%, -10%) scale(1.2); opacity: 0.6; }
+        }
+        @keyframes float5 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(20%, -10%) scale(1.3); opacity: 0.6; }
+            100% { transform: translate(15%, 15%) scale(1.1); opacity: 0.5; }
+        }
+        @keyframes float6 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(-20%, 20%) scale(1.4); opacity: 0.7; }
+            100% { transform: translate(-25%, -5%) scale(1.1); opacity: 0.5; }
+        }
+        @keyframes glowFloat1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            100% { transform: translate(10%, -15%) scale(1.3); opacity: 0.5; }
+        }
+        @keyframes glowFloat2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            100% { transform: translate(-15%, 10%) scale(1.4); opacity: 0.5; }
+        }
+
+        /* subtle noise overlay for texture */
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(0.5px);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.3;
+            mix-blend-mode: overlay;
+        }
+
+        /* Scrollable content */
+        .content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
             align-items: center;
             justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: var(--danger);
-            color: white;
-            border-radius: 50%;
-            font-weight: bold;
-            margin-right: 1rem;
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
         }
 
-        .connection-status {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
+        /* Floating card - pure white blur, no borders */
+        .ethereal-card {
+            width: 100%;
+            max-width: 480px;
+            padding: 3rem 2.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 3.5rem;
+            box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* NO BORDERS, NO BACKGROUNDS on elements */
+        input, button, .tab, .logo-container, form, div {
+            background: transparent !important;
+            border: none !important;
+            outline: none !important;
+        }
+
+        /* Input styling - subtle bottom line */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.5rem;
+            z-index: 2;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .modern-input {
+            width: 100%;
+            padding: 1rem 0 1rem 2.5rem;
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 500;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2) !important;
+            transition: all 0.2s ease;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .modern-input:focus {
+            border-bottom-color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .modern-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            font-weight: 400;
+            font-size: 1rem;
+        }
+
+        /* Tabs - white text */
+        .tab-container {
+            display: flex;
+            justify-content: center;
+            gap: 2.5rem;
+            margin: 2rem 0 2.5rem;
+        }
+
+        .tab {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.2s;
+            padding: 0.25rem 0;
+            position: relative;
+        }
+
+        .tab.active {
+            color: white;
+        }
+
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: white;
+            border-radius: 2px;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+
+        /* Button - floating with glass effect */
+        .elegant-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.15) !important;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 3rem !important;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin: 1.5rem 0 0.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.4) !important;
+        }
+
+        .elegant-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.25) !important;
+            box-shadow: 0 25px 35px -8px rgba(0, 0, 0, 0.5) !important;
+        }
+
+        .elegant-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Logo - white with glow */
+        .logo {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 4rem;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+        }
+
+        .logo-text {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            line-height: 1.2;
+        }
+
+        .logo-tagline {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1rem;
+            font-weight: 400;
+            margin-top: 0.25rem;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
+        }
+
+        /* Warning - minimal */
+        .warning-message {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            padding: 0.75rem 1.5rem;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 50px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            z-index: 100;
+            color: rgba(255, 200, 150, 0.9);
+            font-size: 0.9rem;
+            margin: 1rem 0;
+            padding: 0.5rem 0;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
 
-        .connection-dot {
-            width: 10px;
-            height: 10px;
+        /* Grid for 2-column fields */
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem;
+        }
+
+        /* Messages */
+        .error-msg {
+            color: #ffa7a7;
+            font-size: 0.85rem;
+            text-align: center;
+            min-height: 1.5rem;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .success-msg {
+            color: #a7ffb0;
+            font-size: 0.85rem;
+            text-align: center;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        /* spinner */
+        .spinner {
+            width: 1.3rem;
+            height: 1.3rem;
+            border: 2px solid rgba(255,255,255,0.3);
             border-radius: 50%;
-            background: #94a3b8;
+            border-top-color: white;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Hide/Show */
+        .hidden {
+            display: none !important;
         }
 
-        .connection-dot.connected {
-            background: var(--success);
-            box-shadow: 0 0 0 3px rgba(0, 200, 83, 0.2);
-        }
-
-        .device-switch {
-            position: fixed;
-            bottom: 2rem;
-            left: 2rem;
-            z-index: 100;
-        }
-
-        .device-pill {
-            display: flex;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 50px;
-            overflow: hidden;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .device-option {
-            padding: 0.75rem 1.5rem;
-            font-weight: 600;
-            color: #64748b;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .device-option:hover {
-            background: #f8fafc;
-        }
-
-        .device-option.active {
-            background: var(--primary);
+        /* Master welcome */
+        .master-welcome {
             color: white;
-        }
-
-        @media (max-width: 768px) {
-            .logo {
-                font-size: 2.5rem;
-            }
-            
-            .access-section {
-                padding: 2rem;
-            }
-            
-            .connection-status,
-            .device-switch {
-                position: static;
-                margin: 1rem auto;
-                width: fit-content;
-            }
+            font-size: 1.1rem;
+            font-weight: 400;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 1.2rem;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
-    <!-- Connection Status -->
-    <div class="connection-status" id="connectionStatus">
-        <div class="connection-dot" id="connectionDot"></div>
-        <span class="has-text-weight-medium" id="connectionText">Connecting to Supabase...</span>
+    <!-- LIVING WALLPAPER - cinematic moving blur layers -->
+    <div class="wallpaper">
+        <!-- primary moving orbs -->
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="orb orb-5"></div>
+        <div class="orb orb-6"></div>
+        
+        <!-- secondary glow layers for depth -->
+        <div class="orb-glow glow-1"></div>
+        <div class="orb-glow glow-2"></div>
+        
+        <!-- subtle noise texture -->
+        <div class="noise"></div>
     </div>
 
-    <!-- Hero Section -->
-    <section class="section">
-        <div class="container">
-            <div class="logo-container has-text-centered">
-                <div class="hero-badge">
-                    <i class="fas fa-shield-check"></i>
-                    <span>End-to-End Encrypted</span>
-                </div>
-                <h1 class="logo gradient-text">MKBVAULT</h1>
-                <p class="subtitle is-5 has-text-grey mt-3">
-                    Military-grade encrypted vault for 2026
-                </p>
-            </div>
-
-            <div class="columns is-centered">
-                <div class="column is-10">
-                    <div class="has-text-centered mb-6">
-                        <h2 class="title is-2 mb-4">Secure Your Digital Life</h2>
-                        <p class="subtitle is-5 has-text-grey">
-                            A private, zero-knowledge vault where all encryption happens locally on your device.
-                            Your data remains inaccessible to everyone but you.
-                        </p>
-                    </div>
-
-                    <!-- Features Grid -->
-                    <div class="columns is-multiline mb-6">
-                        <div class="column is-4">
-                            <div class="feature-card">
-                                <div class="feature-icon">
-                                    <i class="fas fa-lock"></i>
-                                </div>
-                                <h3 class="title is-4 mb-3">AES-256 Encryption</h3>
-                                <p class="has-text-grey">
-                                    All data encrypted with AES-256-GCM locally before syncing to Supabase.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="column is-4">
-                            <div class="feature-card">
-                                <div class="feature-icon">
-                                    <i class="fas fa-cloud"></i>
-                                </div>
-                                <h3 class="title is-4 mb-3">Supabase Sync</h3>
-                                <p class="has-text-grey">
-                                    Securely synchronized with your Supabase project. Real-time updates for 2026.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="column is-4">
-                            <div class="feature-card">
-                                <div class="feature-icon">
-                                    <i class="fas fa-user-secret"></i>
-                                </div>
-                                <h3 class="title is-4 mb-3">Zero Knowledge</h3>
-                                <p class="has-text-grey">
-                                    Your master password never leaves your device. We cannot recover your data.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Access Section -->
-                    <div class="access-section">
-                        <div class="has-text-centered">
-                            <h2 class="title is-3 mb-4">Access Your Vault</h2>
-                            <p class="subtitle is-5 has-text-grey mb-4" id="vaultStatus">
-                                Loading vault information from Supabase...
-                            </p>
-                            
-                            <div class="contact-chip">
-                                <i class="fas fa-envelope"></i>
-                                <span>mkbertrand123@gmail.com</span>
-                            </div>
-                            
-                            <div class="buttons is-centered mt-5">
-                                <button class="button is-primary is-large" id="accessVault">
-                                    <span class="icon">
-                                        <i class="fas fa-key"></i>
-                                    </span>
-                                    <span id="accessText">Access Vault</span>
-                                </button>
-                                
-                                <button class="button is-info is-large" id="showDatabaseInfo">
-                                    <span class="icon">
-                                        <i class="fas fa-database"></i>
-                                    </span>
-                                    <span>Database Info</span>
-                                </button>
-                            </div>
-                            
-                            <p class="has-text-grey mt-4" id="lastSyncInfo">
-                                <i class="fas fa-sync"></i> Last sync: Checking...
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Warning Card -->
-                    <div class="warning-card">
-                        <div class="is-flex is-align-items-center mb-3">
-                            <div class="warning-icon">!</div>
-                            <h3 class="title is-4">Critical Security Notice (2026)</h3>
-                        </div>
-                        <p class="has-text-grey-dark">
-                            <strong>Your master password is never stored or transmitted.</strong> There is absolutely no password recovery mechanism. 
-                            Loss of your password results in permanent, irreversible data loss. This is a zero-knowledge system.
-                        </p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="columns">
-                <div class="column">
-                    <h3 class="title is-5 mb-3">MKBVAULT</h3>
-                    <p class="has-text-grey">
-                        Enterprise-grade encryption synchronized with Supabase. Built for 2026.
-                    </p>
-                    <div class="mt-3">
-                        <span class="icon-text">
-                            <span class="icon has-text-primary">
-                                <i class="fas fa-shield-alt"></i>
-                            </span>
-                            <span>AES-256 Encryption</span>
-                        </span>
-                    </div>
-                </div>
-                
-                <div class="column">
-                    <h4 class="title is-6 mb-3">Technology</h4>
-                    <ul>
-                        <li class="mb-2">Supabase PostgreSQL</li>
-                        <li class="mb-2">AES-256-GCM Encryption</li>
-                        <li class="mb-2">PBKDF2 Key Derivation</li>
-                    </ul>
-                </div>
-                
-                <div class="column">
-                    <h4 class="title is-6 mb-3">Connection</h4>
-                    <ul>
-                        <li class="mb-2" id="projectId">Project: jjvyhwnkyenlrpzdiiun</li>
-                        <li class="mb-2" id="connectionType">Status: Connecting...</li>
-                        <li class="mb-2" id="encryptionStatus">Encryption: Local</li>
-                    </ul>
-                </div>
-                
-                <div class="column">
-                    <h4 class="title is-6 mb-3">Contact</h4>
-                    <p class="mb-2">For vault access:</p>
-                    <p class="has-text-primary has-text-weight-semibold">mkbertrand123@gmail.com</p>
-                </div>
-            </div>
+    <!-- Content area with scroll -->
+    <div class="content">
+        <!-- Ethereal card - pure white blur -->
+        <div class="ethereal-card">
             
-            <hr class="my-5">
-            
-            <div class="has-text-centered">
-                <p class="has-text-grey">
-                    © 2026 MKBVAULT Secure Systems. All rights reserved. Version 3.0.0
-                </p>
+            <!-- Logo -->
+            <div class="logo">
+                <div class="logo-icon">🔐</div>
+                <div class="logo-text">BOVEDA</div>
+                <div class="logo-tagline">your private digital safe</div>
             </div>
-        </div>
-    </footer>
 
-    <!-- Device Switch -->
-    <div class="device-switch" id="deviceSwitch">
-        <div class="device-pill">
-            <div class="device-option active" data-device="auto">
-                <i class="fas fa-magic"></i>
-                <span>Auto</span>
+            <!-- Tabs -->
+            <div class="tab-container" id="tabSwitcher">
+                <button class="tab active" id="tabSignIn">Sign In</button>
+                <button class="tab" id="tabSignUp">Sign Up</button>
             </div>
-            <div class="device-option" data-device="desktop">
-                <i class="fas fa-desktop"></i>
-                <span>Desktop</span>
-            </div>
-            <div class="device-option" data-device="mobile">
-                <i class="fas fa-mobile-alt"></i>
-                <span>Mobile</span>
+
+            <!-- Forms Container -->
+            <div id="formContainer">
+
+                <!-- SIGN IN FORM -->
+                <form id="signInForm" class="space-y-2">
+                    <div class="input-wrapper">
+                        <i class='bx bx-envelope input-icon'></i>
+                        <input type="email" id="signinEmail" class="modern-input" placeholder="Email address">
+                    </div>
+                    <div class="input-wrapper">
+                        <i class='bx bx-lock-alt input-icon'></i>
+                        <input type="password" id="signinPassword" class="modern-input" placeholder="Account password">
+                    </div>
+                    <button type="submit" id="signinBtn" class="elegant-btn">Continue</button>
+                    <div id="signinError" class="error-msg"></div>
+                </form>
+
+                <!-- SIGN UP FORM -->
+                <form id="signUpForm" class="space-y-2 hidden">
+                    <div class="input-wrapper">
+                        <i class='bx bx-user input-icon'></i>
+                        <input type="text" id="signupName" class="modern-input" placeholder="Full name">
+                    </div>
+                    <div class="input-wrapper">
+                        <i class='bx bx-envelope input-icon'></i>
+                        <input type="email" id="signupEmail" class="modern-input" placeholder="Email address">
+                    </div>
+                    <div class="input-grid">
+                        <div class="input-wrapper">
+                            <i class='bx bx-lock-alt input-icon'></i>
+                            <input type="password" id="signupPassword" class="modern-input" placeholder="Password">
+                        </div>
+                        <div class="input-wrapper">
+                            <i class='bx bx-check-shield input-icon'></i>
+                            <input type="password" id="signupConfirmPassword" class="modern-input" placeholder="Confirm">
+                        </div>
+                    </div>
+                    <div class="input-grid">
+                        <div class="input-wrapper">
+                            <i class='bx bx-key input-icon'></i>
+                            <input type="password" id="signupMaster" class="modern-input" placeholder="Master key">
+                        </div>
+                        <div class="input-wrapper">
+                            <i class='bx bx-check-double input-icon'></i>
+                            <input type="password" id="signupConfirmMaster" class="modern-input" placeholder="Confirm">
+                        </div>
+                    </div>
+
+                    <div class="warning-message">
+                        <i class='bx bx-error-circle text-xl'></i>
+                        <span>If you forget your Master Password, your vault cannot be recovered.</span>
+                    </div>
+
+                    <button type="submit" id="signupBtn" class="elegant-btn">Request Access</button>
+                    <div id="signupError" class="error-msg"></div>
+                    <div id="signupSuccess" class="success-msg"></div>
+                </form>
+
+                <!-- MASTER PASSWORD FORM -->
+                <form id="masterForm" class="space-y-2 hidden">
+                    <div class="master-welcome" id="masterWelcome">
+                        Welcome back. Enter your Master Password to unlock.
+                    </div>
+                    <div class="input-wrapper">
+                        <i class='bx bx-key input-icon'></i>
+                        <input type="password" id="masterPassword" class="modern-input" placeholder="Master password">
+                    </div>
+                    <button type="submit" id="unlockBtn" class="elegant-btn">Unlock Vault</button>
+                    <div id="masterError" class="error-msg"></div>
+                </form>
             </div>
         </div>
     </div>
 
-    <!-- Supabase Client -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
-        // Wrap everything in an IIFE to prevent conflicts
-        (function() {
-            // Supabase Configuration for 2026
-            const SUPABASE_URL = 'https://jjvyhwnkyenlrpzdiiun.supabase.co';
-            const SUPABASE_KEY = 'sb_publishable_10ByUPmJAWHYw9Q1tlMtTg_O5q7v1Ih';
-            
-            // Application state (scoped to this IIFE)
-            let supabaseClient = null;
-            let isConnected = false;
-            let vaultData = null;
-            
-            // Initialize Supabase client
-            function initSupabase() {
-                try {
-                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    console.log('Supabase client initialized for 2026');
-                    return supabaseClient;
-                } catch (error) {
-                    console.error('Failed to initialize Supabase:', error);
-                    updateConnectionStatus('Supabase initialization failed', 'error');
-                    return null;
-                }
+    <!-- Firebase + Firestore -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0qgIGKko96RCyqVMWFWc8P-sp7LzuRo",
+            authDomain: "onvault-d261b.firebaseapp.com",
+            projectId: "onvault-d261b",
+            storageBucket: "onvault-d261b.firebasestorage.app",
+            messagingSenderId: "924974842099",
+            appId: "1:924974842099:web:e9b04ffbea0318ce99f786",
+            measurementId: "G-EFKXX58XL6"
+        };
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        window.cryptoModule = {
+            deriveAndVerify: async (masterPass, email) => {
+                await new Promise(r => setTimeout(r, 700 + Math.random()*200));
+                return { success: masterPass && masterPass.length > 0, key: 'key-' + email };
             }
-            
-            // Initialize connection
-            async function initializeConnection() {
-                try {
-                    updateConnectionStatus('Connecting to Supabase 2026...', 'warning');
-                    
-                    if (!supabaseClient) {
-                        supabaseClient = initSupabase();
-                        if (!supabaseClient) {
-                            throw new Error('Failed to initialize Supabase client');
-                        }
-                    }
-                    
-                    // Test connection by fetching vault meta
-                    const { data: meta, error } = await supabaseClient
-                        .from('vault_meta')
-                        .select('*')
-                        .limit(1);
-                    
-                    if (error) {
-                        // Table might not exist yet, which is okay for new vaults
-                        if (error.code === '42P01') {
-                            updateConnectionStatus('Ready to create new vault', 'success');
-                            document.getElementById('vaultStatus').textContent = 'No vault found. You can create a new one.';
-                            document.getElementById('accessText').textContent = 'Create New Vault';
-                        } else {
-                            throw error;
-                        }
-                    } else if (meta && meta.length > 0) {
-                        isConnected = true;
-                        vaultData = meta[0];
-                        updateConnectionStatus('Connected to Supabase vault', 'success');
-                        document.getElementById('vaultStatus').textContent = 'Vault detected. Ready to unlock.';
-                        document.getElementById('accessText').textContent = 'Unlock Existing Vault';
-                        
-                        // Update last sync info
-                        if (vaultData.updated_at) {
-                            const lastSync = new Date(vaultData.updated_at).toLocaleString();
-                            document.getElementById('lastSyncInfo').innerHTML = `<i class="fas fa-sync"></i> Last sync: ${lastSync}`;
-                        }
-                    } else {
-                        updateConnectionStatus('Connected (No vault yet)', 'success');
-                        document.getElementById('vaultStatus').textContent = 'No vault found. Ready to create a new one.';
-                        document.getElementById('accessText').textContent = 'Create New Vault';
-                    }
-                    
-                    // Update footer info
-                    document.getElementById('connectionType').textContent = 'Status: Connected';
-                    
-                } catch (error) {
-                    console.error('Connection error:', error);
-                    updateConnectionStatus('Connection failed', 'error');
-                    document.getElementById('vaultStatus').textContent = 'Unable to connect to Supabase. Please check your connection.';
-                    document.getElementById('connectionType').textContent = 'Status: Failed';
-                }
+        };
+
+        // DOM elements
+        const signInForm = document.getElementById('signInForm');
+        const signUpForm = document.getElementById('signUpForm');
+        const masterForm = document.getElementById('masterForm');
+        const tabSignIn = document.getElementById('tabSignIn');
+        const tabSignUp = document.getElementById('tabSignUp');
+        const tabSwitcher = document.getElementById('tabSwitcher');
+
+        const signinEmail = document.getElementById('signinEmail');
+        const signinPassword = document.getElementById('signinPassword');
+        const signinBtn = document.getElementById('signinBtn');
+        const signinError = document.getElementById('signinError');
+
+        const signupName = document.getElementById('signupName');
+        const signupEmail = document.getElementById('signupEmail');
+        const signupPassword = document.getElementById('signupPassword');
+        const signupConfirmPassword = document.getElementById('signupConfirmPassword');
+        const signupMaster = document.getElementById('signupMaster');
+        const signupConfirmMaster = document.getElementById('signupConfirmMaster');
+        const signupBtn = document.getElementById('signupBtn');
+        const signupError = document.getElementById('signupError');
+        const signupSuccess = document.getElementById('signupSuccess');
+
+        const masterPassword = document.getElementById('masterPassword');
+        const unlockBtn = document.getElementById('unlockBtn');
+        const masterError = document.getElementById('masterError');
+        const masterWelcome = document.getElementById('masterWelcome');
+
+        function setActiveTab(active) {
+            if (active === 'in') {
+                tabSignIn.classList.add('active');
+                tabSignUp.classList.remove('active');
+            } else {
+                tabSignUp.classList.add('active');
+                tabSignIn.classList.remove('active');
             }
-            
-            function updateConnectionStatus(message, type) {
-                const statusEl = document.getElementById('connectionText');
-                const dotEl = document.getElementById('connectionDot');
-                
-                if (statusEl) statusEl.textContent = message;
-                
-                if (dotEl) {
-                    dotEl.className = 'connection-dot';
-                    if (type === 'success') {
-                        dotEl.classList.add('connected');
-                    } else if (type === 'warning') {
-                        dotEl.style.background = 'var(--warning)';
-                    } else if (type === 'error') {
-                        dotEl.style.background = 'var(--danger)';
-                    }
-                }
+        }
+
+        function showSignIn() {
+            signInForm.classList.remove('hidden');
+            signUpForm.classList.add('hidden');
+            masterForm.classList.add('hidden');
+            tabSwitcher.classList.remove('hidden');
+            setActiveTab('in');
+            clearAll();
+        }
+
+        function showSignUp() {
+            signUpForm.classList.remove('hidden');
+            signInForm.classList.add('hidden');
+            masterForm.classList.add('hidden');
+            tabSwitcher.classList.remove('hidden');
+            setActiveTab('up');
+            clearAll();
+        }
+
+        function showMasterStep(email) {
+            signInForm.classList.add('hidden');
+            signUpForm.classList.add('hidden');
+            masterForm.classList.remove('hidden');
+            tabSwitcher.classList.add('hidden');
+            masterWelcome.innerText = `Welcome back, ${email}. Enter your Master Password to unlock.`;
+            masterPassword.value = '';
+            masterError.innerText = '';
+        }
+
+        function clearAll() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            signinError.innerText = signupError.innerText = masterError.innerText = '';
+            if (signupSuccess) signupSuccess.innerText = '';
+        }
+
+        function setButtonLoading(btn, isLoading, originalText) {
+            if (isLoading) {
+                btn.disabled = true;
+                btn.innerHTML = `<span class="flex items-center justify-center gap-2"><span class="spinner"></span> processing</span>`;
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
+        }
+
+        tabSignIn.addEventListener('click', showSignIn);
+        tabSignUp.addEventListener('click', showSignUp);
+
+        // SIGN IN
+        signInForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signinError.innerText = '';
+            const email = signinEmail.value.trim();
+            const pwd = signinPassword.value;
+            if (!email || !pwd) { signinError.innerText = 'All fields required'; return; }
             
-            // Device detection and redirection
-            function determineOptimalInterface() {
-                const userAgent = navigator.userAgent;
-                const screenWidth = window.screen.width;
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
-                const isTablet = /iPad|Android(?!.*Mobile)|Tablet/i.test(userAgent);
+            setButtonLoading(signinBtn, true, 'Continue');
+            try {
+                const userCred = await signInWithEmailAndPassword(auth, email, pwd);
+                const uid = userCred.user.uid;
                 
-                if (isMobile && !isTablet && screenWidth < 768) {
-                    return 'phone.html';
+                const userDoc = await getDoc(doc(db, 'users', uid));
+                if (!userDoc.exists()) throw new Error('no account');
+                
+                if (userDoc.data().status !== 'approved') {
+                    await auth.signOut();
+                    signinError.innerText = 'Account pending approval';
+                    signinPassword.value = '';
+                    return;
+                }
+                
+                showMasterStep(email);
+                signinPassword.value = '';
+            } catch (err) {
+                signinError.innerText = 'Authentication failed';
+                signinPassword.value = '';
+            } finally {
+                setButtonLoading(signinBtn, false, 'Continue');
+            }
+        });
+
+        // SIGN UP
+        signUpForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            signupError.innerText = '';
+            if (signupSuccess) signupSuccess.innerText = '';
+            
+            const name = signupName.value.trim();
+            const email = signupEmail.value.trim();
+            const pwd = signupPassword.value;
+            const cpwd = signupConfirmPassword.value;
+            const master = signupMaster.value;
+            const cmaster = signupConfirmMaster.value;
+
+            if (!name || !email || !pwd || !cpwd || !master || !cmaster) {
+                signupError.innerText = 'All fields required'; return;
+            }
+            if (pwd !== cpwd) {
+                signupError.innerText = 'Passwords do not match';
+                signupPassword.value = signupConfirmPassword.value = ''; return;
+            }
+            if (master !== cmaster) {
+                signupError.innerText = 'Master passwords do not match';
+                signupMaster.value = signupConfirmMaster.value = ''; return;
+            }
+
+            setButtonLoading(signupBtn, true, 'Request Access');
+            try {
+                const userCred = await createUserWithEmailAndPassword(auth, email, pwd);
+                const uid = userCred.user.uid;
+                
+                await setDoc(doc(db, 'users', uid), {
+                    name: name,
+                    email: email,
+                    status: 'pending',
+                    createdAt: new Date().toISOString(),
+                    masterHash: 'stub_hash'
+                });
+                
+                signupSuccess.innerText = '✓ Account created, pending admin approval';
+                signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
+                signupName.value = ''; signupEmail.value = '';
+                
+                setTimeout(() => showSignIn(), 2000);
+            } catch (err) {
+                signupError.innerText = 'Account creation failed';
+                signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
+            } finally {
+                setButtonLoading(signupBtn, false, 'Request Access');
+            }
+        });
+
+        // MASTER UNLOCK
+        masterForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            masterError.innerText = '';
+            const master = masterPassword.value;
+            if (!master) { masterError.innerText = 'Enter master password'; return; }
+
+            setButtonLoading(unlockBtn, true, 'Unlock Vault');
+            try {
+                const result = await window.cryptoModule.deriveAndVerify(master, '');
+                if (result.success) {
+                    sessionStorage.setItem('vaultKey', result.key);
+                    window.location.href = 'vault.html';
                 } else {
-                    return 'pc.html';
+                    masterError.innerText = 'Invalid master password';
+                    masterPassword.value = '';
                 }
+            } catch {
+                masterError.innerText = 'Unlock failed';
+                masterPassword.value = '';
+            } finally {
+                setButtonLoading(unlockBtn, false, 'Unlock Vault');
             }
-            
-            function redirectToInterface(interface = 'auto') {
-                let target;
-                
-                if (interface === 'auto') {
-                    target = determineOptimalInterface();
-                } else if (interface === 'desktop') {
-                    target = 'pc.html';
-                } else {
-                    target = 'phone.html';
-                }
-                
-                // Add transition effect
-                document.body.style.opacity = '0.7';
-                document.body.style.transition = 'opacity 0.3s ease';
-                
-                setTimeout(() => {
-                    window.location.href = target;
-                }, 300);
-            }
-            
-            // Show database information
-            function showDatabaseInfo() {
-                const info = `
-    Supabase Project Details (2026):
-    ---------------------------------
-    Project URL: ${SUPABASE_URL}
-    Project ID: jjvyhwnkyenlrpzdiiun
-    Status: ${isConnected ? 'Connected' : 'Disconnected'}
-    Vault: ${vaultData ? 'Exists' : 'Not created yet'}
-    Publishable Key: ${SUPABASE_KEY.substring(0, 20)}...
-    
-    Required Tables:
-    - vault_meta (for master password)
-    - vault_items (for all data)
-    - vault_files (for encrypted files)
-    
-    Your data will be encrypted locally before being stored in these tables.
-                `;
-                
-                alert(info);
-            }
-            
-            // Event Listeners
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialize Supabase connection
-                initializeConnection();
-                
-                // Access Vault button
-                const accessBtn = document.getElementById('accessVault');
-                if (accessBtn) {
-                    accessBtn.addEventListener('click', () => {
-                        // First check if we need to create a vault or unlock existing
-                        if (!vaultData) {
-                            const create = confirm('No existing vault found.\n\nWould you like to create a new vault?\n\nThis will initialize the Supabase tables with encrypted data.');
-                            if (create) {
-                                redirectToInterface('auto');
-                            }
-                        } else {
-                            redirectToInterface('auto');
-                        }
-                    });
-                    
-                    // Update button text based on device
-                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-                    const screenWidth = window.screen.width;
-                    
-                    if (isMobile && screenWidth < 768) {
-                        accessBtn.innerHTML = '<span class="icon"><i class="fas fa-mobile-alt"></i></span><span>Access Mobile Vault</span>';
-                    } else {
-                        accessBtn.innerHTML = '<span class="icon"><i class="fas fa-desktop"></i></span><span>Access Desktop Console</span>';
-                    }
-                }
-                
-                // Database Info button
-                const dbInfoBtn = document.getElementById('showDatabaseInfo');
-                if (dbInfoBtn) {
-                    dbInfoBtn.addEventListener('click', showDatabaseInfo);
-                }
-                
-                // Device switch
-                const deviceSwitch = document.getElementById('deviceSwitch');
-                const deviceOptions = document.querySelectorAll('.device-option');
-                
-                if (deviceOptions.length > 0) {
-                    deviceOptions.forEach(option => {
-                        option.addEventListener('click', function() {
-                            deviceOptions.forEach(opt => opt.classList.remove('active'));
-                            this.classList.add('active');
-                            
-                            const device = this.dataset.device;
-                            if (device !== 'auto') {
-                                redirectToInterface(device);
-                            }
-                        });
-                    });
-                }
-                
-                // Update footer with current year
-                const yearSpan = document.querySelector('footer p');
-                if (yearSpan) {
-                    yearSpan.innerHTML = yearSpan.innerHTML.replace('2026', new Date().getFullYear());
-                }
-            });
-            
-            // Make functions available globally if needed
-            window.MKBVAULT = {
-                showDatabaseInfo,
-                redirectToInterface,
-                initializeConnection
-            };
-            
-        })(); // End of IIFE
+        });
+
+        showSignIn();
+        tabSignIn.addEventListener('click', clearAll);
+        tabSignUp.addEventListener('click', clearAll);
     </script>
 </body>
 </html>
