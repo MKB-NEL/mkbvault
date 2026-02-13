@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boveda · admin panel</title>
+    <!-- Tailwind + Inter font -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            background: #0a0c12;
+        }
+
+        /* ===== LIVING WALLPAPER - same as index ===== */
+        .wallpaper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            background: #080b14;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px) saturate(200%);
+            mix-blend-mode: screen;
+            opacity: 0.6;
+            animation: orbital 35s cubic-bezier(0.45, 0.05, 0.2, 0.99) infinite alternate;
+            will-change: transform, opacity, background;
+        }
+
+        .orb-1 {
+            width: 70vh;
+            height: 70vh;
+            background: radial-gradient(circle at 30% 30%, #8b5cf6, #4c1d95);
+            top: -10%;
+            left: -10%;
+            animation: float1 28s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 90vh;
+            height: 90vh;
+            background: radial-gradient(circle at 70% 40%, #3b82f6, #1e3a8a);
+            bottom: -30%;
+            right: -15%;
+            animation: float2 32s ease-in-out infinite alternate;
+        }
+
+        .orb-3 {
+            width: 60vh;
+            height: 60vh;
+            background: radial-gradient(circle at 50% 50%, #ec4899, #831843);
+            top: 40%;
+            left: 20%;
+            animation: float3 25s ease-in-out infinite alternate;
+        }
+
+        .orb-4 {
+            width: 100vh;
+            height: 100vh;
+            background: radial-gradient(circle at 20% 80%, #6366f1, #312e81);
+            bottom: 10%;
+            left: 30%;
+            animation: float4 40s ease-in-out infinite alternate;
+        }
+
+        .orb-5 {
+            width: 50vh;
+            height: 50vh;
+            background: radial-gradient(circle at 60% 20%, #ef4444, #7f1d1d);
+            top: 60%;
+            right: 25%;
+            animation: float5 22s ease-in-out infinite alternate;
+        }
+
+        .orb-6 {
+            width: 80vh;
+            height: 80vh;
+            background: radial-gradient(circle at 40% 70%, #14b8a6, #115e59);
+            top: -20%;
+            right: 30%;
+            animation: float6 38s ease-in-out infinite alternate;
+        }
+
+        .orb-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(150px) saturate(180%);
+            mix-blend-mode: soft-light;
+            opacity: 0.4;
+            animation: orbitalSlow 45s ease-in-out infinite alternate;
+        }
+
+        .glow-1 {
+            width: 120vh;
+            height: 120vh;
+            background: #a78bfa;
+            top: -20%;
+            left: -10%;
+            animation: glowFloat1 50s ease-in-out infinite alternate;
+        }
+
+        .glow-2 {
+            width: 100vh;
+            height: 100vh;
+            background: #60a5fa;
+            bottom: -30%;
+            right: -10%;
+            animation: glowFloat2 55s ease-in-out infinite alternate;
+        }
+
+        @keyframes float1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(15%, 10%) scale(1.3); opacity: 0.7; }
+            100% { transform: translate(8%, 20%) scale(1.1); opacity: 0.6; }
+        }
+        @keyframes float2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(-20%, -15%) scale(1.4); opacity: 0.8; }
+            100% { transform: translate(-10%, -25%) scale(1.2); opacity: 0.6; }
+        }
+        @keyframes float3 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(10%, -20%) scale(1.2); opacity: 0.6; }
+            100% { transform: translate(-10%, 5%) scale(0.9); opacity: 0.5; }
+        }
+        @keyframes float4 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(-15%, 10%) scale(1.5); opacity: 0.7; }
+            100% { transform: translate(10%, -10%) scale(1.2); opacity: 0.6; }
+        }
+        @keyframes float5 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(20%, -10%) scale(1.3); opacity: 0.6; }
+            100% { transform: translate(15%, 15%) scale(1.1); opacity: 0.5; }
+        }
+        @keyframes float6 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(-20%, 20%) scale(1.4); opacity: 0.7; }
+            100% { transform: translate(-25%, -5%) scale(1.1); opacity: 0.5; }
+        }
+        @keyframes glowFloat1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            100% { transform: translate(10%, -15%) scale(1.3); opacity: 0.5; }
+        }
+        @keyframes glowFloat2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.3; }
+            100% { transform: translate(-15%, 10%) scale(1.4); opacity: 0.5; }
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(0.5px);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.3;
+            mix-blend-mode: overlay;
+        }
+
+        /* Scrollable content */
+        .content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+        }
+
+        /* Main admin card - larger for table */
+        .admin-card {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2.5rem 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 3rem;
+            box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Header section */
+        .admin-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+        }
+
+        .admin-badge {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1.5rem;
+            border-radius: 3rem;
+            color: white;
+            font-weight: 500;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Stats cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .stat-sub {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        /* Table styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            padding: 1.2rem 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        td {
+            padding: 1.2rem 1rem;
+            color: white;
+            font-weight: 400;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Status badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            border-radius: 3rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #fbbf24;
+        }
+
+        .status-approved {
+            background: rgba(16, 185, 129, 0.2);
+            border-color: rgba(16, 185, 129, 0.3);
+            color: #34d399;
+        }
+
+        .status-denied {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #f87171;
+        }
+
+        /* Action buttons */
+        .action-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.3rem;
+            padding: 0.5rem;
+            margin: 0 0.25rem;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.7;
+        }
+
+        .action-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-approve:hover { color: #34d399; }
+        .btn-deny:hover { color: #f87171; }
+        .btn-view:hover { color: #60a5fa; }
+
+        /* Filter tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 0.6rem 1.5rem;
+            border-radius: 3rem;
+            background: rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .filter-tab:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+
+        .filter-tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Search bar */
+        .search-wrapper {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 3rem;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        /* Loading state */
+        .loading-state {
+            text-align: center;
+            padding: 3rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .spinner {
+            width: 2rem;
+            height: 2rem;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.7s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Modal styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(20, 25, 40, 0.9);
+            backdrop-filter: blur(24px);
+            border-radius: 2.5rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .modal-close {
+            font-size: 1.8rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.6;
+        }
+
+        .user-detail {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 1rem;
+        }
+
+        .detail-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .detail-value {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        /* Logout button */
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.6rem 1.5rem;
+            border-radius: 3rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .admin-card {
+                padding: 1.5rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            td, th {
+                padding: 1rem 0.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LIVING WALLPAPER - same as index -->
+    <div class="wallpaper">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="orb orb-5"></div>
+        <div class="orb orb-6"></div>
+        <div class="orb-glow glow-1"></div>
+        <div class="orb-glow glow-2"></div>
+        <div class="noise"></div>
+    </div>
+
+    <!-- Content area -->
+    <div class="content">
+        <!-- Admin card -->
+        <div class="admin-card">
+            <!-- Header -->
+            <div class="admin-header">
+                <div class="logo-section">
+                    <div class="logo-icon">🔐</div>
+                    <div class="logo-text">BOVEDA</div>
+                    <div class="admin-badge">admin</div>
+                </div>
+                <button class="logout-btn" id="logoutBtn">
+                    <i class='bx bx-log-out'></i>
+                    <span>Sign Out</span>
+                </button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid" id="statsContainer">
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="totalUsers">0</div>
+                    <div class="stat-sub">registered accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Pending</div>
+                    <div class="stat-value" id="pendingUsers">0</div>
+                    <div class="stat-sub">awaiting approval</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Approved</div>
+                    <div class="stat-value" id="approvedUsers">0</div>
+                    <div class="stat-sub">active accounts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Denied</div>
+                    <div class="stat-value" id="deniedUsers">0</div>
+                    <div class="stat-sub">rejected accounts</div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All Users</button>
+                <button class="filter-tab" data-filter="pending">Pending</button>
+                <button class="filter-tab" data-filter="approved">Approved</button>
+                <button class="filter-tab" data-filter="denied">Denied</button>
+            </div>
+
+            <!-- Search -->
+            <div class="search-wrapper">
+                <i class='bx bx-search search-icon'></i>
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by name or email...">
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-container">
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Created</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Dynamic content will be inserted here -->
+                        <tr>
+                            <td colspan="5" class="loading-state">
+                                <div class="spinner"></div>
+                                <div>Loading users...</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Details Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 style="color: white; font-size: 1.5rem; font-weight: 600;">User Details</h2>
+                <i class='bx bx-x modal-close' id="closeModal"></i>
+            </div>
+            <div class="modal-body" id="modalBody">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase + Firestore -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+        import { getAuth, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0qgIGKko96RCyqVMWFWc8P-sp7LzuRo",
+            authDomain: "onvault-d261b.firebaseapp.com",
+            projectId: "onvault-d261b",
+            storageBucket: "onvault-d261b.firebasestorage.app",
+            messagingSenderId: "924974842099",
+            appId: "1:924974842099:web:e9b04ffbea0318ce99f786",
+            measurementId: "G-EFKXX58XL6"
+        };
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State
+        let allUsers = [];
+        let currentFilter = 'all';
+        let searchTerm = '';
+
+        // DOM elements
+        const tableBody = document.getElementById('tableBody');
+        const totalUsersEl = document.getElementById('totalUsers');
+        const pendingUsersEl = document.getElementById('pendingUsers');
+        const approvedUsersEl = document.getElementById('approvedUsers');
+        const deniedUsersEl = document.getElementById('deniedUsers');
+        const searchInput = document.getElementById('searchInput');
+        const filterTabs = document.querySelectorAll('.filter-tab');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const modal = document.getElementById('userModal');
+        const modalBody = document.getElementById('modalBody');
+        const closeModal = document.getElementById('closeModal');
+
+        // Load users
+        async function loadUsers() {
+            try {
+                const usersQuery = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+                const querySnapshot = await getDocs(usersQuery);
+                allUsers = [];
+                querySnapshot.forEach((doc) => {
+                    allUsers.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+                
+                updateStats();
+                renderTable();
+            } catch (error) {
+                console.error('Error loading users:', error);
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #f87171; padding: 3rem;">
+                            <i class='bx bx-error-circle' style="font-size: 2rem;"></i>
+                            <div>Error loading users. Please refresh.</div>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = allUsers.length;
+            const pending = allUsers.filter(u => u.status === 'pending').length;
+            const approved = allUsers.filter(u => u.status === 'approved').length;
+            const denied = allUsers.filter(u => u.status === 'denied').length;
+
+            totalUsersEl.textContent = total;
+            pendingUsersEl.textContent = pending;
+            approvedUsersEl.textContent = approved;
+            deniedUsersEl.textContent = denied;
+        }
+
+        // Render table with filters
+        function renderTable() {
+            let filteredUsers = allUsers;
+
+            // Apply status filter
+            if (currentFilter !== 'all') {
+                filteredUsers = filteredUsers.filter(u => u.status === currentFilter);
+            }
+
+            // Apply search filter
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredUsers = filteredUsers.filter(u => 
+                    u.name?.toLowerCase().includes(term) || 
+                    u.email?.toLowerCase().includes(term)
+                );
+            }
+
+            if (filteredUsers.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            <div class="empty-icon">🔍</div>
+                            <div>No users found</div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tableBody.innerHTML = filteredUsers.map(user => {
+                const date = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'Unknown';
+                const statusClass = user.status === 'pending' ? 'status-pending' : 
+                                  user.status === 'approved' ? 'status-approved' : 'status-denied';
+                const statusIcon = user.status === 'pending' ? 'bx-time' :
+                                 user.status === 'approved' ? 'bx-check-circle' : 'bx-x-circle';
+
+                return `
+                    <tr>
+                        <td>${user.name || 'No name'}</td>
+                        <td>${user.email}</td>
+                        <td>${date}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                <i class='bx ${statusIcon}'></i>
+                                ${user.status}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="action-btn btn-view" onclick="window.viewUser('${user.id}')" title="View Details">
+                                <i class='bx bx-show'></i>
+                            </button>
+                            ${user.status === 'pending' ? `
+                                <button class="action-btn btn-approve" onclick="window.approveUser('${user.id}')" title="Approve">
+                                    <i class='bx bx-check'></i>
+                                </button>
+                                <button class="action-btn btn-deny" onclick="window.denyUser('${user.id}')" title="Deny">
+                                    <i class='bx bx-x'></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Approve user
+        window.approveUser = async (userId) => {
+            if (confirm('Approve this user?')) {
+                try {
+                    await updateDoc(doc(db, 'users', userId), {
+                        status: 'approved'
+                    });
+                    await loadUsers(); // Reload
+                } catch (error) {
+                    alert('Error approving user');
+                }
+            }
+        };
+
+        // Deny user
+        window.denyUser = async (userId) => {
+            if (confirm('Deny this user?')) {
+                try {
+                    await updateDoc(doc(db, 'users', userId), {
+                        status: 'denied'
+                    });
+                    await loadUsers(); // Reload
+                } catch (error) {
+                    alert('Error denying user');
+                }
+            }
+        };
+
+        // View user details
+        window.viewUser = (userId) => {
+            const user = allUsers.find(u => u.id === userId);
+            if (user) {
+                const date = user.createdAt ? new Date(user.createdAt).toLocaleString() : 'Unknown';
+                modalBody.innerHTML = `
+                    <div class="user-detail">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value">${user.name || 'Not provided'}</div>
+                    </div>
+                    <div class="user-detail">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${user.email}</div>
+                    </div>
+                    <div class="user-detail">
+                        <div class="detail-label">User ID</div>
+                        <div class="detail-value" style="font-size: 0.9rem;">${user.id}</div>
+                    </div>
+                    <div class="user-detail">
+                        <div class="detail-label">Created</div>
+                        <div class="detail-value">${date}</div>
+                    </div>
+                    <div class="user-detail">
+                        <div class="detail-label">Status</div>
+                        <div class="detail-value" style="text-transform: capitalize;">${user.status}</div>
+                    </div>
+                `;
+                modal.classList.add('active');
+            }
+        };
+
+        // Filter tabs
+        filterTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                filterTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentFilter = tab.dataset.filter;
+                renderTable();
+            });
+        });
+
+        // Search
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderTable();
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await signOut(auth);
+                window.location.href = 'index.html';
+            } catch (error) {
+                alert('Error signing out');
+            }
+        });
+
+        // Modal close
+        closeModal.addEventListener('click', () => {
+            modal.classList.remove('active');
+        });
+
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+
+        // Initial load
+        loadUsers();
+
+        // Refresh every 30 seconds
+        setInterval(loadUsers, 30000);
+    </script>
+</body>
+</html>
