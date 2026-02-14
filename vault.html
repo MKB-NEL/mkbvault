@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boveda · your vault</title>
-    <!-- Inter font -->
+    <title>Boveda · document OS</title>
+    <!-- Inter font - 2026 standard -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
@@ -17,436 +17,476 @@
 
         body {
             font-family: "Inter", sans-serif;
-            background: #0a0c12;
+            background: #f5f5f7;
+            color: #1d1d1f;
             min-height: 100vh;
             position: relative;
-            overflow-x: hidden;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Living wallpaper */
-        .wallpaper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-            background: #080b14;
+        /* 2026 design system - no rounded corners, clean lines */
+        :root {
+            --primary: #0066CC;
+            --primary-light: #E3F0FF;
+            --secondary: #86868b;
+            --background: #f5f5f7;
+            --surface: #ffffff;
+            --border: #d2d2d7;
+            --text: #1d1d1f;
+            --text-light: #86868b;
+            --shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
         }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px) saturate(200%);
-            mix-blend-mode: screen;
-            opacity: 0.6;
-            will-change: transform, opacity, background;
-        }
-
-        .orb-1 {
-            width: 70vh;
-            height: 70vh;
-            background: radial-gradient(circle at 30% 30%, #8b5cf6, #4c1d95);
-            top: -10%;
-            left: -10%;
-            animation: float1 28s ease-in-out infinite alternate;
-        }
-
-        .orb-2 {
-            width: 90vh;
-            height: 90vh;
-            background: radial-gradient(circle at 70% 40%, #3b82f6, #1e3a8a);
-            bottom: -30%;
-            right: -15%;
-            animation: float2 32s ease-in-out infinite alternate;
-        }
-
-        .orb-3 {
-            width: 60vh;
-            height: 60vh;
-            background: radial-gradient(circle at 50% 50%, #ec4899, #831843);
-            top: 40%;
-            left: 20%;
-            animation: float3 25s ease-in-out infinite alternate;
-        }
-
-        .orb-4 {
-            width: 100vh;
-            height: 100vh;
-            background: radial-gradient(circle at 20% 80%, #6366f1, #312e81);
-            bottom: 10%;
-            left: 30%;
-            animation: float4 40s ease-in-out infinite alternate;
-        }
-
-        @keyframes float1 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            50% { transform: translate(15%, 10%) scale(1.3); opacity: 0.7; }
-            100% { transform: translate(8%, 20%) scale(1.1); opacity: 0.6; }
-        }
-        @keyframes float2 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            50% { transform: translate(-20%, -15%) scale(1.4); opacity: 0.8; }
-            100% { transform: translate(-10%, -25%) scale(1.2); opacity: 0.6; }
-        }
-        @keyframes float3 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-            50% { transform: translate(10%, -20%) scale(1.2); opacity: 0.6; }
-            100% { transform: translate(-10%, 5%) scale(0.9); opacity: 0.5; }
-        }
-        @keyframes float4 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            50% { transform: translate(-15%, 10%) scale(1.5); opacity: 0.7; }
-            100% { transform: translate(10%, -10%) scale(1.2); opacity: 0.6; }
-        }
-
-        .noise {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.02);
-            backdrop-filter: blur(0.5px);
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0.3;
-            mix-blend-mode: overlay;
-        }
-
-        /* Content */
-        .content {
-            position: relative;
-            z-index: 10;
+        /* Layout */
+        .app {
             min-height: 100vh;
-            padding: 1.5rem;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Main container */
-        .vault-container {
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        .vault-header {
+        /* Top Bar - macOS style */
+        .top-bar {
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 0.75rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding: 1rem 1.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .header-left {
+        .top-bar-left {
             display: flex;
             align-items: center;
-            gap: 1rem;
-        }
-
-        .back-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 3rem;
-            height: 3rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateX(-3px);
+            gap: 2rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+            color: var(--text);
         }
 
         .logo-icon {
-            font-size: 2rem;
-        }
-
-        .logo-text {
             font-size: 1.5rem;
-            font-weight: 600;
-            color: white;
+            color: var(--primary);
         }
 
-        .header-right {
+        /* Navigation */
+        .nav-menu {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .nav-item {
+            padding: 0.5rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: var(--text);
+            background: rgba(0,0,0,0.02);
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -0.75rem;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        /* Top bar right */
+        .top-bar-right {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
+            gap: 1.5rem;
         }
 
-        .search-wrapper {
+        .search-container {
             position: relative;
-            min-width: 250px;
+            width: 280px;
         }
 
         .search-icon {
             position: absolute;
-            left: 1rem;
+            left: 0.75rem;
             top: 50%;
             transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 1.2rem;
+            color: var(--text-light);
+            font-size: 1.1rem;
         }
 
         .search-input {
             width: 100%;
-            padding: 0.8rem 1rem 0.8rem 2.8rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 2rem;
-            color: white;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            background: rgba(0,0,0,0.02);
+            border: 1px solid var(--border);
             font-size: 0.95rem;
+            color: var(--text);
             transition: all 0.2s;
         }
 
         .search-input:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.12);
-        }
-
-        .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.4);
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            background: rgba(255, 255, 255, 0.08);
-            padding: 0.5rem 1rem 0.5rem 1.5rem;
-            border-radius: 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            cursor: pointer;
         }
 
-        .user-name {
-            color: white;
-            font-weight: 500;
-        }
-
-        .logout-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--primary-light);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .logout-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* Category Tabs */
-        .category-tabs {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            padding: 0.5rem;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 3rem;
-            backdrop-filter: blur(12px);
-        }
-
-        .category-tab {
-            padding: 0.8rem 1.8rem;
-            border-radius: 2rem;
-            color: rgba(255, 255, 255, 0.6);
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            border: none;
-            background: transparent;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .category-tab i {
-            font-size: 1.2rem;
-        }
-
-        .category-tab:hover {
-            color: white;
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        .category-tab.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        /* Add Button */
-        .add-btn {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            border: none;
-            padding: 0.8rem 2rem;
-            border-radius: 2rem;
             font-weight: 600;
+            color: var(--primary);
+        }
+
+        .user-name {
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Main content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Document header */
+        .doc-header {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
-        }
-
-        .add-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.4);
-        }
-
-        /* Items Grid */
-        .items-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
+            justify-content: space-between;
             margin-bottom: 2rem;
         }
 
-        /* Item Card */
-        .item-card {
-            background: rgba(255, 255, 255, 0.08);
-            backdrop-filter: blur(12px);
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .item-card:hover {
-            transform: translateY(-4px);
-            background: rgba(255, 255, 255, 0.12);
-            border-color: rgba(255, 255, 255, 0.2);
-        }
-
-        .item-header {
+        .doc-header-left {
             display: flex;
             align-items: center;
             gap: 1rem;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-title {
+            font-size: 1.75rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .doc-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .doc-btn {
+            padding: 0.6rem 1.2rem;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .doc-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .doc-btn.primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .doc-btn.primary:hover {
+            background: #0052a3;
+        }
+
+        /* Workspace tabs - document style */
+        .workspace-tabs {
+            display: flex;
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+        }
+
+        .workspace-tab {
+            padding: 1rem 2rem;
+            background: white;
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .workspace-tab i {
+            font-size: 1.25rem;
+        }
+
+        .workspace-tab:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+
+        .workspace-tab.active {
+            background: white;
+            color: var(--primary);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        /* Document grid - 2026 style */
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 1px;
+            background: var(--border);
+            border: 1px solid var(--border);
+        }
+
+        .document-item {
+            background: white;
+            padding: 1.5rem;
+            transition: all 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .document-item:hover {
+            background: #fafafa;
+        }
+
+        .document-item.selected {
+            background: var(--primary-light);
+            border-left: 3px solid var(--primary);
+        }
+
+        .document-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
             margin-bottom: 1rem;
         }
 
-        .item-icon {
-            width: 3rem;
-            height: 3rem;
-            background: rgba(99, 102, 241, 0.2);
-            border-radius: 1rem;
+        .document-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
-            color: #818cf8;
+            color: var(--primary);
         }
 
-        .item-title {
-            color: white;
-            font-weight: 600;
+        .document-type {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-light);
+            padding: 0.25rem 0.5rem;
+            border: 1px solid var(--border);
+            background: white;
+        }
+
+        .document-title {
             font-size: 1.1rem;
-            margin-bottom: 0.25rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text);
         }
 
-        .item-subtitle {
-            color: rgba(255, 255, 255, 0.5);
+        .document-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
             font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 1rem;
         }
 
-        .item-content {
-            color: rgba(255, 255, 255, 0.8);
+        .document-preview {
             font-size: 0.95rem;
-            line-height: 1.5;
+            color: var(--text-light);
             margin-bottom: 1rem;
-            max-height: 100px;
+            line-height: 1.6;
+            max-height: 4.8rem;
             overflow: hidden;
         }
 
-        .item-image {
+        .document-image {
             width: 100%;
-            height: 150px;
+            height: 180px;
             object-fit: cover;
-            border-radius: 1rem;
+            border: 1px solid var(--border);
             margin-bottom: 1rem;
         }
 
-        .item-footer {
+        .document-footer {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.8rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
         }
 
-        .item-actions {
+        .document-tags {
             display: flex;
             gap: 0.5rem;
         }
 
-        .item-action {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: rgba(255, 255, 255, 0.6);
-            width: 2rem;
-            height: 2rem;
-            border-radius: 50%;
+        .tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border: 1px solid var(--border);
+            background: white;
+            color: var(--text-light);
+        }
+
+        .document-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .doc-action-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border);
+            background: white;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 1rem;
+            color: var(--text-light);
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .item-action:hover {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+        .doc-action-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
-        /* Modal */
+        /* Login specific styles */
+        .login-credentials {
+            background: var(--primary-light);
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            margin: 1rem 0;
+            font-family: monospace;
+        }
+
+        /* Folder specific */
+        .folder-stats {
+            display: flex;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .stat {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        /* Project specific */
+        .project-progress {
+            margin: 1rem 0;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--border);
+            position: relative;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+        }
+
+        /* Modal - sharp corners */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(8px);
-            z-index: 1000;
+            background: rgba(0,0,0,0.5);
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
+            z-index: 1000;
         }
 
         .modal.active {
@@ -454,168 +494,79 @@
         }
 
         .modal-content {
-            background: rgba(20, 25, 40, 0.95);
-            backdrop-filter: blur(24px);
-            border-radius: 2rem;
-            padding: 2rem;
-            max-width: 500px;
+            background: white;
+            border: 1px solid var(--border);
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            max-height: 90vh;
-            overflow-y: auto;
+            max-width: 600px;
+            box-shadow: var(--shadow);
         }
 
         .modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 2rem;
-            color: white;
+            justify-content: space-between;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
         }
 
         .modal-close {
-            font-size: 2rem;
+            font-size: 1.5rem;
+            color: var(--text-light);
             cursor: pointer;
-            opacity: 0.7;
-            transition: opacity 0.2s;
+            transition: color 0.2s;
         }
 
         .modal-close:hover {
-            opacity: 1;
+            color: var(--text);
         }
 
         .modal-body {
-            color: white;
+            padding: 1.5rem;
         }
 
-        /* Form styles */
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+        }
+
+        /* Form elements - sharp corners */
         .form-group {
             margin-bottom: 1.5rem;
         }
 
         .form-label {
             display: block;
-            color: rgba(255, 255, 255, 0.7);
             font-size: 0.9rem;
+            font-weight: 500;
             margin-bottom: 0.5rem;
         }
 
         .form-input, .form-textarea {
             width: 100%;
-            padding: 0.8rem 1rem;
-            background: rgba(255, 255, 255, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 1rem;
-            color: white;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background: white;
             font-size: 1rem;
             transition: all 0.2s;
         }
 
         .form-input:focus, .form-textarea:focus {
             outline: none;
-            border-color: rgba(255, 255, 255, 0.3);
-            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
         }
 
         .form-textarea {
-            min-height: 100px;
+            min-height: 120px;
             resize: vertical;
-        }
-
-        .file-input {
-            padding: 0.5rem;
-            color: white;
-        }
-
-        .file-input::file-selector-button {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 2rem;
-            padding: 0.5rem 1rem;
-            color: white;
-            cursor: pointer;
-            margin-right: 1rem;
-        }
-
-        .image-preview {
-            width: 100%;
-            max-height: 200px;
-            object-fit: cover;
-            border-radius: 1rem;
-            margin-top: 1rem;
-            display: none;
-        }
-
-        .image-preview.visible {
-            display: block;
-        }
-
-        .submit-btn {
-            width: 100%;
-            padding: 1rem;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            color: white;
-            border: none;
-            border-radius: 2rem;
-            font-weight: 600;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
-        }
-
-        /* Folder view */
-        .folder-content {
-            padding: 1rem;
-        }
-
-        .folder-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .folder-back {
-            background: rgba(255, 255, 255, 0.1);
-            border: none;
-            color: white;
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        .folder-title {
-            color: white;
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 2rem;
-            backdrop-filter: blur(12px);
-        }
-
-        .empty-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
         }
 
         /* Breadcrumb */
@@ -623,187 +574,227 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 1rem;
-            color: rgba(255, 255, 255, 0.6);
-            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
         }
 
         .breadcrumb-item {
+            font-size: 0.95rem;
+            color: var(--text-light);
             cursor: pointer;
-            transition: color 0.2s;
         }
 
         .breadcrumb-item:hover {
-            color: white;
+            color: var(--primary);
+        }
+
+        .breadcrumb-item.active {
+            color: var(--text);
+            font-weight: 500;
         }
 
         .breadcrumb-separator {
-            color: rgba(255, 255, 255, 0.3);
+            color: var(--border);
+        }
+
+        /* Empty state */
+        .empty-state {
+            grid-column: 1 / -1;
+            padding: 4rem;
+            text-align: center;
+            background: white;
+            border: 1px solid var(--border);
+        }
+
+        .empty-icon {
+            font-size: 3rem;
+            color: var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .empty-text {
+            font-size: 1.1rem;
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
         }
 
         /* Responsive */
+        @media (max-width: 1024px) {
+            .top-bar {
+                padding: 0.75rem 1rem;
+            }
+            
+            .search-container {
+                width: 200px;
+            }
+            
+            .workspace-tab {
+                padding: 1rem;
+            }
+        }
+
         @media (max-width: 768px) {
-            .vault-header {
+            .nav-menu {
+                display: none;
+            }
+            
+            .search-container {
+                width: 160px;
+            }
+            
+            .doc-header {
                 flex-direction: column;
-                align-items: stretch;
+                align-items: flex-start;
+                gap: 1rem;
             }
-
-            .header-right {
+            
+            .workspace-tabs {
                 flex-direction: column;
             }
-
-            .search-wrapper {
-                width: 100%;
-            }
-
-            .category-tabs {
-                overflow-x: auto;
-                padding: 0.5rem;
-                flex-wrap: nowrap;
-            }
-
-            .category-tab {
-                white-space: nowrap;
-            }
-
-            .items-grid {
+            
+            .document-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Living wallpaper -->
-    <div class="wallpaper">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="orb orb-4"></div>
-        <div class="noise"></div>
-    </div>
+    <div class="app">
+        <!-- Top Bar - macOS style -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <div class="logo">
+                    <span class="logo-icon">🔐</span>
+                    <span>BOVEDA</span>
+                </div>
+                <div class="nav-menu">
+                    <button class="nav-item active">Documents</button>
+                    <button class="nav-item">Recent</button>
+                    <button class="nav-item">Shared</button>
+                    <button class="nav-item">Trash</button>
+                </div>
+            </div>
+            <div class="top-bar-right">
+                <div class="search-container">
+                    <i class='bx bx-search search-icon'></i>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search documents...">
+                </div>
+                <div class="user-menu">
+                    <div class="user-avatar">JD</div>
+                    <span class="user-name" id="userName">John</span>
+                </div>
+            </div>
+        </div>
 
-    <!-- Content -->
-    <div class="content">
-        <div class="vault-container">
-            <!-- Header -->
-            <div class="vault-header">
-                <div class="header-left">
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Document Header -->
+            <div class="doc-header">
+                <div class="doc-header-left">
                     <button class="back-btn" id="backBtn">
                         <i class='bx bx-arrow-back'></i>
                     </button>
-                    <div class="logo">
-                        <div class="logo-icon">🔐</div>
-                        <div class="logo-text">BOVEDA</div>
-                    </div>
+                    <h1 class="page-title">Document Workspace</h1>
                 </div>
-                <div class="header-right">
-                    <div class="search-wrapper">
-                        <i class='bx bx-search search-icon'></i>
-                        <input type="text" class="search-input" id="searchInput" placeholder="Search vault...">
-                    </div>
-                    <div class="user-menu">
-                        <span class="user-name" id="userName">User</span>
-                        <button class="logout-btn" id="logoutBtn">
-                            <i class='bx bx-log-out'></i>
-                        </button>
-                    </div>
+                <div class="doc-actions">
+                    <button class="doc-btn" id="exportBtn">
+                        <i class='bx bx-export'></i>
+                        Export
+                    </button>
+                    <button class="doc-btn primary" id="addBtn">
+                        <i class='bx bx-plus'></i>
+                        New Document
+                    </button>
                 </div>
             </div>
 
             <!-- Breadcrumb -->
             <div class="breadcrumb" id="breadcrumb">
-                <span class="breadcrumb-item" data-path="root">Vault</span>
+                <span class="breadcrumb-item active">All Documents</span>
             </div>
 
-            <!-- Category Tabs -->
-            <div class="category-tabs" id="categoryTabs">
-                <button class="category-tab active" data-category="logins">
+            <!-- Workspace Tabs -->
+            <div class="workspace-tabs" id="workspaceTabs">
+                <button class="workspace-tab active" data-category="logins">
                     <i class='bx bx-lock-alt'></i>
                     <span>Logins</span>
                 </button>
-                <button class="category-tab" data-category="notes">
+                <button class="workspace-tab" data-category="notes">
                     <i class='bx bx-note'></i>
                     <span>Notes</span>
                 </button>
-                <button class="category-tab" data-category="projects">
+                <button class="workspace-tab" data-category="projects">
                     <i class='bx bx-briefcase'></i>
                     <span>Projects</span>
                 </button>
-                <button class="category-tab" data-category="folders">
+                <button class="workspace-tab" data-category="folders">
                     <i class='bx bx-folder'></i>
                     <span>Folders</span>
                 </button>
             </div>
 
-            <!-- Add Button -->
-            <button class="add-btn" id="addBtn">
-                <i class='bx bx-plus'></i>
-                <span>Add New</span>
-            </button>
-
-            <!-- Items Grid -->
-            <div class="items-grid" id="itemsGrid">
-                <!-- Dynamic content -->
+            <!-- Document Grid -->
+            <div class="document-grid" id="documentGrid">
+                <!-- Dynamic content will be inserted here -->
             </div>
         </div>
     </div>
 
-    <!-- Add/Edit Modal -->
-    <div class="modal" id="itemModal">
+    <!-- Document Modal -->
+    <div class="modal" id="documentModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="modalTitle">Add New</h2>
+                <h2 class="modal-title" id="modalTitle">New Document</h2>
                 <i class='bx bx-x modal-close' id="closeModal"></i>
             </div>
             <div class="modal-body">
-                <form id="itemForm">
-                    <div class="form-group" id="nameField">
+                <form id="documentForm">
+                    <div class="form-group">
                         <label class="form-label" id="nameLabel">Title</label>
-                        <input type="text" class="form-input" id="itemName" required>
+                        <input type="text" class="form-input" id="docName" required>
                     </div>
                     
-                    <div class="form-group" id="usernameField">
+                    <div class="form-group" id="usernameGroup">
                         <label class="form-label">Username</label>
-                        <input type="text" class="form-input" id="itemUsername">
+                        <input type="text" class="form-input" id="docUsername">
                     </div>
                     
-                    <div class="form-group" id="passwordField">
+                    <div class="form-group" id="passwordGroup">
                         <label class="form-label">Password</label>
-                        <input type="password" class="form-input" id="itemPassword">
+                        <input type="password" class="form-input" id="docPassword">
                     </div>
                     
-                    <div class="form-group" id="textField">
-                        <label class="form-label" id="textLabel">Content</label>
-                        <textarea class="form-textarea" id="itemText"></textarea>
+                    <div class="form-group" id="contentGroup">
+                        <label class="form-label" id="contentLabel">Content</label>
+                        <textarea class="form-textarea" id="docContent"></textarea>
                     </div>
                     
-                    <div class="form-group" id="imageField">
-                        <label class="form-label">Image</label>
-                        <input type="file" class="form-input file-input" id="itemImage" accept="image/*">
-                        <img class="image-preview" id="imagePreview" src="#" alt="Preview">
+                    <div class="form-group" id="imageGroup">
+                        <label class="form-label">Image URL</label>
+                        <input type="url" class="form-input" id="docImage" placeholder="https://...">
                     </div>
-                    
-                    <button type="submit" class="submit-btn" id="submitBtn">Save</button>
                 </form>
+            </div>
+            <div class="modal-footer">
+                <button class="doc-btn" id="cancelModal">Cancel</button>
+                <button class="doc-btn primary" id="saveDocument">Save Document</button>
             </div>
         </div>
     </div>
 
-    <!-- Folder View Modal -->
+    <!-- Folder Modal -->
     <div class="modal" id="folderModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 id="folderModalTitle">Folder</h2>
+                <h2 class="modal-title" id="folderModalTitle">Folder Contents</h2>
                 <i class='bx bx-x modal-close' id="closeFolderModal"></i>
             </div>
             <div class="modal-body">
-                <div class="folder-header">
-                    <button class="folder-back" id="folderBackBtn">
-                        <i class='bx bx-arrow-back'></i>
-                    </button>
-                    <span class="folder-title" id="folderTitle"></span>
+                <div class="folder-header" style="margin-bottom: 1.5rem;">
+                    <h3 id="folderModalName" style="font-size: 1.5rem; font-weight: 600;"></h3>
                 </div>
-                <div class="items-grid" id="folderItemsGrid">
+                <div class="document-grid" id="folderItemsGrid" style="grid-template-columns: 1fr;">
                     <!-- Folder items will be displayed here -->
                 </div>
             </div>
@@ -811,90 +802,71 @@
     </div>
 
     <script type="module">
-        // ImageBB API key
-        const IMAGEBB_API_KEY = 'ba8023ca74166460c442e8e703d2a1b0';
-
-        // Sample data structure
+        // Sample data structure - 2026 style
         let vaultData = {
-            logins: JSON.parse(localStorage.getItem('boveda_logins')) || [],
-            notes: JSON.parse(localStorage.getItem('boveda_notes')) || [],
-            projects: JSON.parse(localStorage.getItem('boveda_projects')) || [],
-            folders: JSON.parse(localStorage.getItem('boveda_folders')) || []
+            logins: [
+                { id: '1', name: 'Google Workspace', username: 'john.doe', password: '••••••••', createdAt: '2026-02-10', tags: ['work', 'email'] },
+                { id: '2', name: 'GitHub', username: 'johndoe-dev', password: '••••••••', createdAt: '2026-02-09', tags: ['dev', 'code'] },
+                { id: '3', name: 'Figma', username: 'john.design', password: '••••••••', createdAt: '2026-02-08', tags: ['design'] }
+            ],
+            notes: [
+                { id: '4', name: 'Meeting Notes - Q1 Planning', text: 'Discuss Q1 goals, allocate resources, set milestones...', createdAt: '2026-02-11', tags: ['work', 'meeting'] },
+                { id: '5', name: 'Product Ideas', text: 'New features for mobile app: dark mode, offline sync, widgets...', createdAt: '2026-02-07', tags: ['ideas'] },
+                { id: '6', name: 'Research Notes', text: 'Competitor analysis: market trends, pricing strategies...', createdAt: '2026-02-05', tags: ['research'] }
+            ],
+            projects: [
+                { id: '7', name: 'Website Redesign', text: 'Complete overhaul of company website', image: 'https://images.unsplash.com/photo-1581291518633-83b4ebd1d83e?w=400', progress: 75, createdAt: '2026-02-01', tags: ['design', 'dev'] },
+                { id: '8', name: 'Mobile App Launch', text: 'iOS and Android app development', image: 'https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?w=400', progress: 45, createdAt: '2026-01-28', tags: ['mobile'] },
+                { id: '9', name: 'Brand Guidelines', text: 'Updated brand identity and guidelines', image: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=400', progress: 90, createdAt: '2026-01-25', tags: ['brand'] }
+            ],
+            folders: [
+                { id: '10', name: 'Work Documents', items: ['1', '4', '7'], createdAt: '2026-02-01', tags: ['work'] },
+                { id: '11', name: 'Personal', items: ['5', '8'], createdAt: '2026-01-15', tags: ['personal'] },
+                { id: '12', name: 'Archive', items: ['3', '6', '9'], createdAt: '2026-01-01', tags: ['archive'] }
+            ]
         };
 
         let currentCategory = 'logins';
-        let currentFolder = null;
         let searchTerm = '';
-        let editingItem = null;
+        let selectedItems = new Set();
 
         // DOM elements
-        const itemsGrid = document.getElementById('itemsGrid');
+        const documentGrid = document.getElementById('documentGrid');
         const searchInput = document.getElementById('searchInput');
-        const categoryTabs = document.querySelectorAll('.category-tab');
+        const workspaceTabs = document.querySelectorAll('.workspace-tab');
         const addBtn = document.getElementById('addBtn');
-        const itemModal = document.getElementById('itemModal');
+        const exportBtn = document.getElementById('exportBtn');
+        const backBtn = document.getElementById('backBtn');
+        const documentModal = document.getElementById('documentModal');
         const folderModal = document.getElementById('folderModal');
         const closeModal = document.getElementById('closeModal');
         const closeFolderModal = document.getElementById('closeFolderModal');
-        const itemForm = document.getElementById('itemForm');
+        const cancelModal = document.getElementById('cancelModal');
+        const saveDocument = document.getElementById('saveDocument');
         const modalTitle = document.getElementById('modalTitle');
-        const itemName = document.getElementById('itemName');
-        const itemUsername = document.getElementById('itemUsername');
-        const itemPassword = document.getElementById('itemPassword');
-        const itemText = document.getElementById('itemText');
-        const itemImage = document.getElementById('itemImage');
-        const imagePreview = document.getElementById('imagePreview');
+        const docName = document.getElementById('docName');
+        const docUsername = document.getElementById('docUsername');
+        const docPassword = document.getElementById('docPassword');
+        const docContent = document.getElementById('docContent');
+        const docImage = document.getElementById('docImage');
         const nameLabel = document.getElementById('nameLabel');
-        const textLabel = document.getElementById('textLabel');
-        const submitBtn = document.getElementById('submitBtn');
+        const contentLabel = document.getElementById('contentLabel');
+        const usernameGroup = document.getElementById('usernameGroup');
+        const passwordGroup = document.getElementById('passwordGroup');
+        const contentGroup = document.getElementById('contentGroup');
+        const imageGroup = document.getElementById('imageGroup');
         const userName = document.getElementById('userName');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const backBtn = document.getElementById('backBtn');
-        const breadcrumb = document.getElementById('breadcrumb');
-        const folderBackBtn = document.getElementById('folderBackBtn');
-        const folderTitle = document.getElementById('folderTitle');
+        const folderModalName = document.getElementById('folderModalName');
         const folderItemsGrid = document.getElementById('folderItemsGrid');
-        const folderModalTitle = document.getElementById('folderModalTitle');
 
-        // Set user name from session
-        const userEmail = sessionStorage.getItem('userEmail') || 'User';
+        // Set user name
+        const userEmail = sessionStorage.getItem('userEmail') || 'john.doe@example.com';
         userName.textContent = userEmail.split('@')[0];
 
-        // Save data to localStorage
-        function saveData() {
-            localStorage.setItem('boveda_logins', JSON.stringify(vaultData.logins));
-            localStorage.setItem('boveda_notes', JSON.stringify(vaultData.notes));
-            localStorage.setItem('boveda_projects', JSON.stringify(vaultData.projects));
-            localStorage.setItem('boveda_folders', JSON.stringify(vaultData.folders));
-        }
-
-        // Upload image to ImageBB
-        async function uploadImage(file) {
-            const formData = new FormData();
-            formData.append('image', file);
-
-            try {
-                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMAGEBB_API_KEY}`, {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.success) {
-                    return data.data.url;
-                } else {
-                    throw new Error('Upload failed');
-                }
-            } catch (error) {
-                console.error('Image upload error:', error);
-                return null;
-            }
-        }
-
-        // Render items based on current category and search
-        function renderItems() {
+        // Render documents
+        function renderDocuments() {
             let items = vaultData[currentCategory] || [];
             
-            // Apply search filter
             if (searchTerm) {
                 const term = searchTerm.toLowerCase();
                 items = items.filter(item => 
@@ -905,89 +877,122 @@
             }
 
             if (items.length === 0) {
-                itemsGrid.innerHTML = `
+                documentGrid.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">📂</div>
-                        <div>No ${currentCategory} found</div>
+                        <div class="empty-icon">📄</div>
+                        <div class="empty-text">No documents found</div>
+                        <button class="doc-btn primary" onclick="document.getElementById('addBtn').click()">
+                            Create your first document
+                        </button>
                     </div>
                 `;
                 return;
             }
 
-            itemsGrid.innerHTML = items.map(item => {
+            documentGrid.innerHTML = items.map(item => {
                 if (currentCategory === 'logins') {
                     return `
-                        <div class="item-card" data-id="${item.id}">
-                            <div class="item-header">
-                                <div class="item-icon"><i class='bx bx-lock-alt'></i></div>
-                                <div>
-                                    <div class="item-title">${item.name}</div>
-                                    <div class="item-subtitle">${item.username}</div>
-                                </div>
+                        <div class="document-item ${selectedItems.has(item.id) ? 'selected' : ''}" data-id="${item.id}">
+                            <div class="document-header">
+                                <div class="document-icon"><i class='bx bx-lock-alt'></i></div>
+                                <span class="document-type">Login</span>
                             </div>
-                            <div class="item-footer">
-                                <span>Password: ••••••••</span>
-                                <div class="item-actions">
-                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
-                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                            <div class="document-title">${item.name}</div>
+                            <div class="document-meta">
+                                <span><i class='bx bx-user'></i> ${item.username}</span>
+                                <span><i class='bx bx-calendar'></i> ${item.createdAt}</span>
+                            </div>
+                            <div class="login-credentials">
+                                <div>Password: ••••••••</div>
+                            </div>
+                            <div class="document-footer">
+                                <div class="document-tags">
+                                    ${item.tags?.map(tag => `<span class="tag">${tag}</span>`).join('') || ''}
+                                </div>
+                                <div class="document-actions">
+                                    <button class="doc-action-btn" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="doc-action-btn" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else if (currentCategory === 'notes') {
                     return `
-                        <div class="item-card" data-id="${item.id}">
-                            <div class="item-header">
-                                <div class="item-icon"><i class='bx bx-note'></i></div>
-                                <div>
-                                    <div class="item-title">${item.name}</div>
-                                </div>
+                        <div class="document-item ${selectedItems.has(item.id) ? 'selected' : ''}" data-id="${item.id}">
+                            <div class="document-header">
+                                <div class="document-icon"><i class='bx bx-note'></i></div>
+                                <span class="document-type">Note</span>
                             </div>
-                            <div class="item-content">${item.text || ''}</div>
-                            <div class="item-footer">
-                                <span>${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
-                                <div class="item-actions">
-                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
-                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                            <div class="document-title">${item.name}</div>
+                            <div class="document-meta">
+                                <span><i class='bx bx-calendar'></i> ${item.createdAt}</span>
+                            </div>
+                            <div class="document-preview">${item.text?.substring(0, 120)}${item.text?.length > 120 ? '...' : ''}</div>
+                            <div class="document-footer">
+                                <div class="document-tags">
+                                    ${item.tags?.map(tag => `<span class="tag">${tag}</span>`).join('') || ''}
+                                </div>
+                                <div class="document-actions">
+                                    <button class="doc-action-btn" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="doc-action-btn" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else if (currentCategory === 'projects') {
                     return `
-                        <div class="item-card" data-id="${item.id}">
-                            <div class="item-header">
-                                <div class="item-icon"><i class='bx bx-briefcase'></i></div>
-                                <div>
-                                    <div class="item-title">${item.name}</div>
+                        <div class="document-item ${selectedItems.has(item.id) ? 'selected' : ''}" data-id="${item.id}">
+                            <div class="document-header">
+                                <div class="document-icon"><i class='bx bx-briefcase'></i></div>
+                                <span class="document-type">Project</span>
+                            </div>
+                            <div class="document-title">${item.name}</div>
+                            <div class="document-meta">
+                                <span><i class='bx bx-calendar'></i> ${item.createdAt}</span>
+                                <span><i class='bx bx-trending-up'></i> ${item.progress}%</span>
+                            </div>
+                            ${item.image ? `<img src="${item.image}" class="document-image" alt="Project">` : ''}
+                            <div class="project-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${item.progress}%"></div>
                                 </div>
                             </div>
-                            ${item.image ? `<img src="${item.image}" class="item-image" alt="Project image">` : ''}
-                            <div class="item-content">${item.text || ''}</div>
-                            <div class="item-footer">
-                                <span>${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
-                                <div class="item-actions">
-                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
-                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                            <div class="document-preview">${item.text?.substring(0, 100)}${item.text?.length > 100 ? '...' : ''}</div>
+                            <div class="document-footer">
+                                <div class="document-tags">
+                                    ${item.tags?.map(tag => `<span class="tag">${tag}</span>`).join('') || ''}
+                                </div>
+                                <div class="document-actions">
+                                    <button class="doc-action-btn" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="doc-action-btn" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else if (currentCategory === 'folders') {
                     return `
-                        <div class="item-card" onclick="window.openFolder('${item.id}')">
-                            <div class="item-header">
-                                <div class="item-icon"><i class='bx bx-folder'></i></div>
-                                <div>
-                                    <div class="item-title">${item.name}</div>
-                                    <div class="item-subtitle">${item.items?.length || 0} items</div>
-                                </div>
+                        <div class="document-item" onclick="window.openFolder('${item.id}')">
+                            <div class="document-header">
+                                <div class="document-icon"><i class='bx bx-folder'></i></div>
+                                <span class="document-type">Folder</span>
                             </div>
-                            <div class="item-footer">
-                                <span>${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
-                                <div class="item-actions" onclick="event.stopPropagation()">
-                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
-                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                            <div class="document-title">${item.name}</div>
+                            <div class="document-meta">
+                                <span><i class='bx bx-calendar'></i> ${item.createdAt}</span>
+                                <span><i class='bx bx-file'></i> ${item.items?.length || 0} items</span>
+                            </div>
+                            <div class="folder-stats">
+                                <span class="stat"><i class='bx bx-lock-alt'></i> ${item.items?.filter(id => vaultData.logins.find(l => l.id === id)).length || 0} logins</span>
+                                <span class="stat"><i class='bx bx-note'></i> ${item.items?.filter(id => vaultData.notes.find(n => n.id === id)).length || 0} notes</span>
+                                <span class="stat"><i class='bx bx-briefcase'></i> ${item.items?.filter(id => vaultData.projects.find(p => p.id === id)).length || 0} projects</span>
+                            </div>
+                            <div class="document-footer">
+                                <div class="document-tags">
+                                    ${item.tags?.map(tag => `<span class="tag">${tag}</span>`).join('') || ''}
+                                </div>
+                                <div class="document-actions" onclick="event.stopPropagation()">
+                                    <button class="doc-action-btn" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="doc-action-btn" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
                                 </div>
                             </div>
                         </div>
@@ -1000,29 +1005,39 @@
         window.openFolder = (folderId) => {
             const folder = vaultData.folders.find(f => f.id === folderId);
             if (folder) {
-                currentFolder = folder;
-                folderTitle.textContent = folder.name;
-                folderModalTitle.textContent = folder.name;
+                folderModalName.textContent = folder.name;
                 
                 const items = folder.items || [];
                 if (items.length === 0) {
                     folderItemsGrid.innerHTML = `
                         <div class="empty-state">
                             <div class="empty-icon">📂</div>
-                            <div>Folder is empty</div>
+                            <div class="empty-text">Folder is empty</div>
                         </div>
                     `;
                 } else {
-                    folderItemsGrid.innerHTML = items.map(item => `
-                        <div class="item-card">
-                            <div class="item-header">
-                                <div class="item-icon"><i class='bx bx-file'></i></div>
-                                <div>
-                                    <div class="item-title">${item.name}</div>
+                    folderItemsGrid.innerHTML = items.map(id => {
+                        // Find item in any category
+                        const login = vaultData.logins.find(l => l.id === id);
+                        const note = vaultData.notes.find(n => n.id === id);
+                        const project = vaultData.projects.find(p => p.id === id);
+                        const item = login || note || project;
+                        
+                        if (item) {
+                            return `
+                                <div class="document-item">
+                                    <div class="document-header">
+                                        <div class="document-icon"><i class='bx bx-file'></i></div>
+                                        <span class="document-type">${login ? 'Login' : note ? 'Note' : 'Project'}</span>
+                                    </div>
+                                    <div class="document-title">${item.name}</div>
+                                    <div class="document-meta">
+                                        <span>${item.username || ''}</span>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    `).join('');
+                            `;
+                        }
+                    }).join('');
                 }
                 
                 folderModal.classList.add('active');
@@ -1033,179 +1048,106 @@
         window.editItem = (id) => {
             const item = vaultData[currentCategory].find(i => i.id === id);
             if (item) {
-                editingItem = item;
-                modalTitle.textContent = 'Edit Item';
-                itemName.value = item.name || '';
-                itemUsername.value = item.username || '';
-                itemPassword.value = item.password || '';
-                itemText.value = item.text || '';
+                modalTitle.textContent = 'Edit Document';
+                docName.value = item.name || '';
+                docUsername.value = item.username || '';
+                docPassword.value = item.password || '';
+                docContent.value = item.text || '';
+                docImage.value = item.image || '';
                 
-                // Show/hide fields based on category
-                document.getElementById('usernameField').style.display = currentCategory === 'logins' ? 'block' : 'none';
-                document.getElementById('passwordField').style.display = currentCategory === 'logins' ? 'block' : 'none';
-                document.getElementById('imageField').style.display = currentCategory === 'projects' ? 'block' : 'none';
-                
-                nameLabel.textContent = currentCategory === 'logins' ? 'Website/App Name' : 'Title';
-                textLabel.textContent = currentCategory === 'notes' ? 'Note' : currentCategory === 'projects' ? 'Description' : 'Content';
-                
-                itemModal.classList.add('active');
+                updateFormFields();
+                documentModal.classList.add('active');
             }
         };
 
         // Delete item
         window.deleteItem = (id) => {
-            if (confirm('Are you sure you want to delete this item?')) {
+            if (confirm('Delete this document?')) {
                 vaultData[currentCategory] = vaultData[currentCategory].filter(i => i.id !== id);
-                saveData();
-                renderItems();
+                renderDocuments();
             }
         };
 
-        // Category tab click
-        categoryTabs.forEach(tab => {
+        // Update form fields based on category
+        function updateFormFields() {
+            usernameGroup.style.display = currentCategory === 'logins' ? 'block' : 'none';
+            passwordGroup.style.display = currentCategory === 'logins' ? 'block' : 'none';
+            imageGroup.style.display = currentCategory === 'projects' ? 'block' : 'none';
+            
+            nameLabel.textContent = currentCategory === 'logins' ? 'Website/App Name' : 'Title';
+            contentLabel.textContent = currentCategory === 'notes' ? 'Note Content' : 
+                                     currentCategory === 'projects' ? 'Description' : 'Content';
+        }
+
+        // Event listeners
+        workspaceTabs.forEach(tab => {
             tab.addEventListener('click', () => {
-                categoryTabs.forEach(t => t.classList.remove('active'));
+                workspaceTabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
                 currentCategory = tab.dataset.category;
-                renderItems();
-                
-                // Update add button text
-                const addBtnText = addBtn.querySelector('span');
-                if (addBtnText) {
-                    addBtnText.textContent = `Add ${currentCategory.slice(0, -1)}`;
-                }
+                renderDocuments();
+                updateFormFields();
             });
         });
 
-        // Search
         searchInput.addEventListener('input', (e) => {
             searchTerm = e.target.value;
-            renderItems();
+            renderDocuments();
         });
 
-        // Add button
         addBtn.addEventListener('click', () => {
-            editingItem = null;
-            modalTitle.textContent = `Add ${currentCategory.slice(0, -1)}`;
-            itemForm.reset();
-            imagePreview.classList.remove('visible');
-            
-            // Show/hide fields based on category
-            document.getElementById('usernameField').style.display = currentCategory === 'logins' ? 'block' : 'none';
-            document.getElementById('passwordField').style.display = currentCategory === 'logins' ? 'block' : 'none';
-            document.getElementById('imageField').style.display = currentCategory === 'projects' ? 'block' : 'none';
-            
-            nameLabel.textContent = currentCategory === 'logins' ? 'Website/App Name' : 'Title';
-            textLabel.textContent = currentCategory === 'notes' ? 'Note' : currentCategory === 'projects' ? 'Description' : 'Content';
-            
-            itemModal.classList.add('active');
+            modalTitle.textContent = 'New Document';
+            document.getElementById('documentForm').reset();
+            updateFormFields();
+            documentModal.classList.add('active');
         });
 
-        // Form submit
-        itemForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const itemData = {
-                id: editingItem?.id || Date.now().toString(),
-                name: itemName.value,
-                createdAt: editingItem?.createdAt || new Date().toISOString()
-            };
-
-            // Add category-specific fields
-            if (currentCategory === 'logins') {
-                itemData.username = itemUsername.value;
-                itemData.password = itemPassword.value;
-            } else if (currentCategory === 'notes') {
-                itemData.text = itemText.value;
-            } else if (currentCategory === 'projects') {
-                itemData.text = itemText.value;
-                
-                // Handle image upload
-                if (itemImage.files[0]) {
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = 'Uploading image...';
-                    
-                    const imageUrl = await uploadImage(itemImage.files[0]);
-                    if (imageUrl) {
-                        itemData.image = imageUrl;
-                    }
-                    
-                    submitBtn.disabled = false;
-                    submitBtn.textContent = 'Save';
-                }
-            } else if (currentCategory === 'folders') {
-                itemData.items = editingItem?.items || [];
-            }
-
-            if (editingItem) {
-                // Update existing item
-                const index = vaultData[currentCategory].findIndex(i => i.id === editingItem.id);
-                if (index !== -1) {
-                    vaultData[currentCategory][index] = { ...vaultData[currentCategory][index], ...itemData };
-                }
-            } else {
-                // Add new item
-                vaultData[currentCategory].push(itemData);
-            }
-
-            saveData();
-            renderItems();
-            itemModal.classList.remove('active');
+        exportBtn.addEventListener('click', () => {
+            const data = JSON.stringify(vaultData, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `boveda-export-${new Date().toISOString()}.json`;
+            a.click();
         });
 
-        // Image preview
-        itemImage.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    imagePreview.src = e.target.result;
-                    imagePreview.classList.add('visible');
-                };
-                reader.readAsDataURL(file);
-            }
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
         });
 
-        // Close modals
+        // Modal close
         closeModal.addEventListener('click', () => {
-            itemModal.classList.remove('active');
+            documentModal.classList.remove('active');
         });
 
         closeFolderModal.addEventListener('click', () => {
             folderModal.classList.remove('active');
         });
 
-        folderBackBtn.addEventListener('click', () => {
-            folderModal.classList.remove('active');
+        cancelModal.addEventListener('click', () => {
+            documentModal.classList.remove('active');
         });
 
-        // Click outside to close
-        itemModal.addEventListener('click', (e) => {
-            if (e.target === itemModal) {
-                itemModal.classList.remove('active');
-            }
-        });
+        saveDocument.addEventListener('click', () => {
+            const newItem = {
+                id: Date.now().toString(),
+                name: docName.value,
+                username: docUsername.value,
+                password: docPassword.value,
+                text: docContent.value,
+                image: docImage.value,
+                createdAt: new Date().toISOString().split('T')[0],
+                tags: []
+            };
 
-        folderModal.addEventListener('click', (e) => {
-            if (e.target === folderModal) {
-                folderModal.classList.remove('active');
-            }
-        });
-
-        // Logout
-        logoutBtn.addEventListener('click', () => {
-            sessionStorage.removeItem('vaultKey');
-            sessionStorage.removeItem('userEmail');
-            window.location.href = 'index.html';
-        });
-
-        // Back button
-        backBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
+            vaultData[currentCategory].push(newItem);
+            renderDocuments();
+            documentModal.classList.remove('active');
         });
 
         // Initialize
-        renderItems();
+        renderDocuments();
 
         // Make functions global
         window.editItem = editItem;
