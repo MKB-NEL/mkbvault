@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boveda · your vault</title>
+    <!-- Inter font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <!-- Boxicons -->
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Inter", sans-serif;
+            background: #0a0c12;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Living wallpaper */
+        .wallpaper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            background: #080b14;
+        }
+
+        .orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px) saturate(200%);
+            mix-blend-mode: screen;
+            opacity: 0.6;
+            will-change: transform, opacity, background;
+        }
+
+        .orb-1 {
+            width: 70vh;
+            height: 70vh;
+            background: radial-gradient(circle at 30% 30%, #8b5cf6, #4c1d95);
+            top: -10%;
+            left: -10%;
+            animation: float1 28s ease-in-out infinite alternate;
+        }
+
+        .orb-2 {
+            width: 90vh;
+            height: 90vh;
+            background: radial-gradient(circle at 70% 40%, #3b82f6, #1e3a8a);
+            bottom: -30%;
+            right: -15%;
+            animation: float2 32s ease-in-out infinite alternate;
+        }
+
+        .orb-3 {
+            width: 60vh;
+            height: 60vh;
+            background: radial-gradient(circle at 50% 50%, #ec4899, #831843);
+            top: 40%;
+            left: 20%;
+            animation: float3 25s ease-in-out infinite alternate;
+        }
+
+        .orb-4 {
+            width: 100vh;
+            height: 100vh;
+            background: radial-gradient(circle at 20% 80%, #6366f1, #312e81);
+            bottom: 10%;
+            left: 30%;
+            animation: float4 40s ease-in-out infinite alternate;
+        }
+
+        @keyframes float1 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(15%, 10%) scale(1.3); opacity: 0.7; }
+            100% { transform: translate(8%, 20%) scale(1.1); opacity: 0.6; }
+        }
+        @keyframes float2 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(-20%, -15%) scale(1.4); opacity: 0.8; }
+            100% { transform: translate(-10%, -25%) scale(1.2); opacity: 0.6; }
+        }
+        @keyframes float3 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            50% { transform: translate(10%, -20%) scale(1.2); opacity: 0.6; }
+            100% { transform: translate(-10%, 5%) scale(0.9); opacity: 0.5; }
+        }
+        @keyframes float4 {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            50% { transform: translate(-15%, 10%) scale(1.5); opacity: 0.7; }
+            100% { transform: translate(10%, -10%) scale(1.2); opacity: 0.6; }
+        }
+
+        .noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.02);
+            backdrop-filter: blur(0.5px);
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.3;
+            mix-blend-mode: overlay;
+        }
+
+        /* Content */
+        .content {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            padding: 1.5rem;
+            overflow-y: auto;
+        }
+
+        /* Main container */
+        .vault-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .vault-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 3rem;
+            height: 3rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(-3px);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 2rem;
+        }
+
+        .logo-text {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .search-wrapper {
+            position: relative;
+            min-width: 250px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem 0.8rem 2.8rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 2rem;
+            color: white;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 0.5rem 1rem 0.5rem 1.5rem;
+            border-radius: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-name {
+            color: white;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Category Tabs */
+        .category-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            padding: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .category-tab {
+            padding: 0.8rem 1.8rem;
+            border-radius: 2rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .category-tab i {
+            font-size: 1.2rem;
+        }
+
+        .category-tab:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .category-tab.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Add Button */
+        .add-btn {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px -5px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Items Grid */
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Item Card */
+        .item-card {
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .item-card:hover {
+            transform: translateY(-4px);
+            background: rgba(255, 255, 255, 0.12);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .item-icon {
+            width: 3rem;
+            height: 3rem;
+            background: rgba(99, 102, 241, 0.2);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #818cf8;
+        }
+
+        .item-title {
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .item-subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+        }
+
+        .item-content {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+            max-height: 100px;
+            overflow: hidden;
+        }
+
+        .item-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .item-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.8rem;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .item-action {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            width: 2rem;
+            height: 2rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .item-action:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgba(20, 25, 40, 0.95);
+            backdrop-filter: blur(24px);
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            color: white;
+        }
+
+        .modal-close {
+            font-size: 2rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            color: white;
+        }
+
+        /* Form styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 1rem;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus {
+            outline: none;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .file-input {
+            padding: 0.5rem;
+            color: white;
+        }
+
+        .file-input::file-selector-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 2rem;
+            padding: 0.5rem 1rem;
+            color: white;
+            cursor: pointer;
+            margin-right: 1rem;
+        }
+
+        .image-preview {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .image-preview.visible {
+            display: block;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 2rem;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -5px rgba(99, 102, 241, 0.3);
+        }
+
+        /* Folder view */
+        .folder-content {
+            padding: 1rem;
+        }
+
+        .folder-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .folder-back {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .folder-title {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2rem;
+            backdrop-filter: blur(12px);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            color: rgba(255, 255, 255, 0.6);
+            flex-wrap: wrap;
+        }
+
+        .breadcrumb-item {
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .breadcrumb-item:hover {
+            color: white;
+        }
+
+        .breadcrumb-separator {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .vault-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .header-right {
+                flex-direction: column;
+            }
+
+            .search-wrapper {
+                width: 100%;
+            }
+
+            .category-tabs {
+                overflow-x: auto;
+                padding: 0.5rem;
+                flex-wrap: nowrap;
+            }
+
+            .category-tab {
+                white-space: nowrap;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Living wallpaper -->
+    <div class="wallpaper">
+        <div class="orb orb-1"></div>
+        <div class="orb orb-2"></div>
+        <div class="orb orb-3"></div>
+        <div class="orb orb-4"></div>
+        <div class="noise"></div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <div class="vault-container">
+            <!-- Header -->
+            <div class="vault-header">
+                <div class="header-left">
+                    <button class="back-btn" id="backBtn">
+                        <i class='bx bx-arrow-back'></i>
+                    </button>
+                    <div class="logo">
+                        <div class="logo-icon">🔐</div>
+                        <div class="logo-text">BOVEDA</div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="search-wrapper">
+                        <i class='bx bx-search search-icon'></i>
+                        <input type="text" class="search-input" id="searchInput" placeholder="Search vault...">
+                    </div>
+                    <div class="user-menu">
+                        <span class="user-name" id="userName">User</span>
+                        <button class="logout-btn" id="logoutBtn">
+                            <i class='bx bx-log-out'></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb" id="breadcrumb">
+                <span class="breadcrumb-item" data-path="root">Vault</span>
+            </div>
+
+            <!-- Category Tabs -->
+            <div class="category-tabs" id="categoryTabs">
+                <button class="category-tab active" data-category="logins">
+                    <i class='bx bx-lock-alt'></i>
+                    <span>Logins</span>
+                </button>
+                <button class="category-tab" data-category="notes">
+                    <i class='bx bx-note'></i>
+                    <span>Notes</span>
+                </button>
+                <button class="category-tab" data-category="projects">
+                    <i class='bx bx-briefcase'></i>
+                    <span>Projects</span>
+                </button>
+                <button class="category-tab" data-category="folders">
+                    <i class='bx bx-folder'></i>
+                    <span>Folders</span>
+                </button>
+            </div>
+
+            <!-- Add Button -->
+            <button class="add-btn" id="addBtn">
+                <i class='bx bx-plus'></i>
+                <span>Add New</span>
+            </button>
+
+            <!-- Items Grid -->
+            <div class="items-grid" id="itemsGrid">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal" id="itemModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Add New</h2>
+                <i class='bx bx-x modal-close' id="closeModal"></i>
+            </div>
+            <div class="modal-body">
+                <form id="itemForm">
+                    <div class="form-group" id="nameField">
+                        <label class="form-label" id="nameLabel">Title</label>
+                        <input type="text" class="form-input" id="itemName" required>
+                    </div>
+                    
+                    <div class="form-group" id="usernameField">
+                        <label class="form-label">Username</label>
+                        <input type="text" class="form-input" id="itemUsername">
+                    </div>
+                    
+                    <div class="form-group" id="passwordField">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="itemPassword">
+                    </div>
+                    
+                    <div class="form-group" id="textField">
+                        <label class="form-label" id="textLabel">Content</label>
+                        <textarea class="form-textarea" id="itemText"></textarea>
+                    </div>
+                    
+                    <div class="form-group" id="imageField">
+                        <label class="form-label">Image</label>
+                        <input type="file" class="form-input file-input" id="itemImage" accept="image/*">
+                        <img class="image-preview" id="imagePreview" src="#" alt="Preview">
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Folder View Modal -->
+    <div class="modal" id="folderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="folderModalTitle">Folder</h2>
+                <i class='bx bx-x modal-close' id="closeFolderModal"></i>
+            </div>
+            <div class="modal-body">
+                <div class="folder-header">
+                    <button class="folder-back" id="folderBackBtn">
+                        <i class='bx bx-arrow-back'></i>
+                    </button>
+                    <span class="folder-title" id="folderTitle"></span>
+                </div>
+                <div class="items-grid" id="folderItemsGrid">
+                    <!-- Folder items will be displayed here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ImageBB API key
+        const IMAGEBB_API_KEY = 'ba8023ca74166460c442e8e703d2a1b0';
+
+        // Sample data structure
+        let vaultData = {
+            logins: JSON.parse(localStorage.getItem('boveda_logins')) || [],
+            notes: JSON.parse(localStorage.getItem('boveda_notes')) || [],
+            projects: JSON.parse(localStorage.getItem('boveda_projects')) || [],
+            folders: JSON.parse(localStorage.getItem('boveda_folders')) || []
+        };
+
+        let currentCategory = 'logins';
+        let currentFolder = null;
+        let searchTerm = '';
+        let editingItem = null;
+
+        // DOM elements
+        const itemsGrid = document.getElementById('itemsGrid');
+        const searchInput = document.getElementById('searchInput');
+        const categoryTabs = document.querySelectorAll('.category-tab');
+        const addBtn = document.getElementById('addBtn');
+        const itemModal = document.getElementById('itemModal');
+        const folderModal = document.getElementById('folderModal');
+        const closeModal = document.getElementById('closeModal');
+        const closeFolderModal = document.getElementById('closeFolderModal');
+        const itemForm = document.getElementById('itemForm');
+        const modalTitle = document.getElementById('modalTitle');
+        const itemName = document.getElementById('itemName');
+        const itemUsername = document.getElementById('itemUsername');
+        const itemPassword = document.getElementById('itemPassword');
+        const itemText = document.getElementById('itemText');
+        const itemImage = document.getElementById('itemImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const nameLabel = document.getElementById('nameLabel');
+        const textLabel = document.getElementById('textLabel');
+        const submitBtn = document.getElementById('submitBtn');
+        const userName = document.getElementById('userName');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const backBtn = document.getElementById('backBtn');
+        const breadcrumb = document.getElementById('breadcrumb');
+        const folderBackBtn = document.getElementById('folderBackBtn');
+        const folderTitle = document.getElementById('folderTitle');
+        const folderItemsGrid = document.getElementById('folderItemsGrid');
+        const folderModalTitle = document.getElementById('folderModalTitle');
+
+        // Set user name from session
+        const userEmail = sessionStorage.getItem('userEmail') || 'User';
+        userName.textContent = userEmail.split('@')[0];
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('boveda_logins', JSON.stringify(vaultData.logins));
+            localStorage.setItem('boveda_notes', JSON.stringify(vaultData.notes));
+            localStorage.setItem('boveda_projects', JSON.stringify(vaultData.projects));
+            localStorage.setItem('boveda_folders', JSON.stringify(vaultData.folders));
+        }
+
+        // Upload image to ImageBB
+        async function uploadImage(file) {
+            const formData = new FormData();
+            formData.append('image', file);
+
+            try {
+                const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMAGEBB_API_KEY}`, {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    return data.data.url;
+                } else {
+                    throw new Error('Upload failed');
+                }
+            } catch (error) {
+                console.error('Image upload error:', error);
+                return null;
+            }
+        }
+
+        // Render items based on current category and search
+        function renderItems() {
+            let items = vaultData[currentCategory] || [];
+            
+            // Apply search filter
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                items = items.filter(item => 
+                    item.name?.toLowerCase().includes(term) ||
+                    item.username?.toLowerCase().includes(term) ||
+                    item.text?.toLowerCase().includes(term)
+                );
+            }
+
+            if (items.length === 0) {
+                itemsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📂</div>
+                        <div>No ${currentCategory} found</div>
+                    </div>
+                `;
+                return;
+            }
+
+            itemsGrid.innerHTML = items.map(item => {
+                if (currentCategory === 'logins') {
+                    return `
+                        <div class="item-card" data-id="${item.id}">
+                            <div class="item-header">
+                                <div class="item-icon"><i class='bx bx-lock-alt'></i></div>
+                                <div>
+                                    <div class="item-title">${item.name}</div>
+                                    <div class="item-subtitle">${item.username}</div>
+                                </div>
+                            </div>
+                            <div class="item-footer">
+                                <span>Password: ••••••••</span>
+                                <div class="item-actions">
+                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (currentCategory === 'notes') {
+                    return `
+                        <div class="item-card" data-id="${item.id}">
+                            <div class="item-header">
+                                <div class="item-icon"><i class='bx bx-note'></i></div>
+                                <div>
+                                    <div class="item-title">${item.name}</div>
+                                </div>
+                            </div>
+                            <div class="item-content">${item.text || ''}</div>
+                            <div class="item-footer">
+                                <span>${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
+                                <div class="item-actions">
+                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (currentCategory === 'projects') {
+                    return `
+                        <div class="item-card" data-id="${item.id}">
+                            <div class="item-header">
+                                <div class="item-icon"><i class='bx bx-briefcase'></i></div>
+                                <div>
+                                    <div class="item-title">${item.name}</div>
+                                </div>
+                            </div>
+                            ${item.image ? `<img src="${item.image}" class="item-image" alt="Project image">` : ''}
+                            <div class="item-content">${item.text || ''}</div>
+                            <div class="item-footer">
+                                <span>${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
+                                <div class="item-actions">
+                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else if (currentCategory === 'folders') {
+                    return `
+                        <div class="item-card" onclick="window.openFolder('${item.id}')">
+                            <div class="item-header">
+                                <div class="item-icon"><i class='bx bx-folder'></i></div>
+                                <div>
+                                    <div class="item-title">${item.name}</div>
+                                    <div class="item-subtitle">${item.items?.length || 0} items</div>
+                                </div>
+                            </div>
+                            <div class="item-footer">
+                                <span>${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
+                                <div class="item-actions" onclick="event.stopPropagation()">
+                                    <button class="item-action" onclick="window.editItem('${item.id}')"><i class='bx bx-edit'></i></button>
+                                    <button class="item-action" onclick="window.deleteItem('${item.id}')"><i class='bx bx-trash'></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            }).join('');
+        }
+
+        // Open folder
+        window.openFolder = (folderId) => {
+            const folder = vaultData.folders.find(f => f.id === folderId);
+            if (folder) {
+                currentFolder = folder;
+                folderTitle.textContent = folder.name;
+                folderModalTitle.textContent = folder.name;
+                
+                const items = folder.items || [];
+                if (items.length === 0) {
+                    folderItemsGrid.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📂</div>
+                            <div>Folder is empty</div>
+                        </div>
+                    `;
+                } else {
+                    folderItemsGrid.innerHTML = items.map(item => `
+                        <div class="item-card">
+                            <div class="item-header">
+                                <div class="item-icon"><i class='bx bx-file'></i></div>
+                                <div>
+                                    <div class="item-title">${item.name}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                folderModal.classList.add('active');
+            }
+        };
+
+        // Edit item
+        window.editItem = (id) => {
+            const item = vaultData[currentCategory].find(i => i.id === id);
+            if (item) {
+                editingItem = item;
+                modalTitle.textContent = 'Edit Item';
+                itemName.value = item.name || '';
+                itemUsername.value = item.username || '';
+                itemPassword.value = item.password || '';
+                itemText.value = item.text || '';
+                
+                // Show/hide fields based on category
+                document.getElementById('usernameField').style.display = currentCategory === 'logins' ? 'block' : 'none';
+                document.getElementById('passwordField').style.display = currentCategory === 'logins' ? 'block' : 'none';
+                document.getElementById('imageField').style.display = currentCategory === 'projects' ? 'block' : 'none';
+                
+                nameLabel.textContent = currentCategory === 'logins' ? 'Website/App Name' : 'Title';
+                textLabel.textContent = currentCategory === 'notes' ? 'Note' : currentCategory === 'projects' ? 'Description' : 'Content';
+                
+                itemModal.classList.add('active');
+            }
+        };
+
+        // Delete item
+        window.deleteItem = (id) => {
+            if (confirm('Are you sure you want to delete this item?')) {
+                vaultData[currentCategory] = vaultData[currentCategory].filter(i => i.id !== id);
+                saveData();
+                renderItems();
+            }
+        };
+
+        // Category tab click
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentCategory = tab.dataset.category;
+                renderItems();
+                
+                // Update add button text
+                const addBtnText = addBtn.querySelector('span');
+                if (addBtnText) {
+                    addBtnText.textContent = `Add ${currentCategory.slice(0, -1)}`;
+                }
+            });
+        });
+
+        // Search
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            renderItems();
+        });
+
+        // Add button
+        addBtn.addEventListener('click', () => {
+            editingItem = null;
+            modalTitle.textContent = `Add ${currentCategory.slice(0, -1)}`;
+            itemForm.reset();
+            imagePreview.classList.remove('visible');
+            
+            // Show/hide fields based on category
+            document.getElementById('usernameField').style.display = currentCategory === 'logins' ? 'block' : 'none';
+            document.getElementById('passwordField').style.display = currentCategory === 'logins' ? 'block' : 'none';
+            document.getElementById('imageField').style.display = currentCategory === 'projects' ? 'block' : 'none';
+            
+            nameLabel.textContent = currentCategory === 'logins' ? 'Website/App Name' : 'Title';
+            textLabel.textContent = currentCategory === 'notes' ? 'Note' : currentCategory === 'projects' ? 'Description' : 'Content';
+            
+            itemModal.classList.add('active');
+        });
+
+        // Form submit
+        itemForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const itemData = {
+                id: editingItem?.id || Date.now().toString(),
+                name: itemName.value,
+                createdAt: editingItem?.createdAt || new Date().toISOString()
+            };
+
+            // Add category-specific fields
+            if (currentCategory === 'logins') {
+                itemData.username = itemUsername.value;
+                itemData.password = itemPassword.value;
+            } else if (currentCategory === 'notes') {
+                itemData.text = itemText.value;
+            } else if (currentCategory === 'projects') {
+                itemData.text = itemText.value;
+                
+                // Handle image upload
+                if (itemImage.files[0]) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Uploading image...';
+                    
+                    const imageUrl = await uploadImage(itemImage.files[0]);
+                    if (imageUrl) {
+                        itemData.image = imageUrl;
+                    }
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Save';
+                }
+            } else if (currentCategory === 'folders') {
+                itemData.items = editingItem?.items || [];
+            }
+
+            if (editingItem) {
+                // Update existing item
+                const index = vaultData[currentCategory].findIndex(i => i.id === editingItem.id);
+                if (index !== -1) {
+                    vaultData[currentCategory][index] = { ...vaultData[currentCategory][index], ...itemData };
+                }
+            } else {
+                // Add new item
+                vaultData[currentCategory].push(itemData);
+            }
+
+            saveData();
+            renderItems();
+            itemModal.classList.remove('active');
+        });
+
+        // Image preview
+        itemImage.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imagePreview.src = e.target.result;
+                    imagePreview.classList.add('visible');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Close modals
+        closeModal.addEventListener('click', () => {
+            itemModal.classList.remove('active');
+        });
+
+        closeFolderModal.addEventListener('click', () => {
+            folderModal.classList.remove('active');
+        });
+
+        folderBackBtn.addEventListener('click', () => {
+            folderModal.classList.remove('active');
+        });
+
+        // Click outside to close
+        itemModal.addEventListener('click', (e) => {
+            if (e.target === itemModal) {
+                itemModal.classList.remove('active');
+            }
+        });
+
+        folderModal.addEventListener('click', (e) => {
+            if (e.target === folderModal) {
+                folderModal.classList.remove('active');
+            }
+        });
+
+        // Logout
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('vaultKey');
+            sessionStorage.removeItem('userEmail');
+            window.location.href = 'index.html';
+        });
+
+        // Back button
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // Initialize
+        renderItems();
+
+        // Make functions global
+        window.editItem = editItem;
+        window.deleteItem = deleteItem;
+        window.openFolder = openFolder;
+    </script>
+</body>
+</html>
