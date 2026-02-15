@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boveda · document studio</title>
-    <!-- Inter font - 2026 standard -->
+    <title>Boveda · professional document studio</title>
+    <!-- Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <!-- Boxicons -->
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <!-- CKEditor 5 -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
     <style>
         * {
             margin: 0;
@@ -17,8 +19,8 @@
 
         body {
             font-family: "Inter", sans-serif;
-            background: #f8f9fc;
-            color: #1e293b;
+            background: #f5f5f7;
+            color: #1d1d1f;
             min-height: 100vh;
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
@@ -26,16 +28,15 @@
 
         /* 2026 design system - subtle rounded corners (4px) */
         :root {
-            --primary: #2563eb;
-            --primary-light: #dbeafe;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
+            --primary: #0066CC;
+            --primary-light: #E3F0FF;
+            --secondary: #86868b;
+            --background: #f5f5f7;
             --surface: #ffffff;
-            --background: #f8f9fc;
-            --border: #e2e8f0;
-            --text: #1e293b;
-            --text-light: #64748b;
-            --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+            --border: #d2d2d7;
+            --text: #1d1d1f;
+            --text-light: #86868b;
+            --shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
             --radius: 4px;
         }
 
@@ -48,9 +49,11 @@
 
         /* Top Bar */
         .top-bar {
-            background: var(--surface);
+            background: rgba(255,255,255,0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
+            padding: 0.75rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -96,6 +99,7 @@
         .search-input {
             width: 100%;
             padding: 0.6rem 1rem 0.6rem 2.5rem;
+            background: rgba(0,0,0,0.02);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-size: 0.95rem;
@@ -106,7 +110,8 @@
         .search-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
         }
 
         .user-menu {
@@ -245,75 +250,6 @@
             overflow: hidden;
         }
 
-        /* Document toolbar - WPS style */
-        .document-toolbar {
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
-            padding: 0.75rem 1.5rem;
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .toolbar-group {
-            display: flex;
-            align-items: center;
-            gap: 0.25rem;
-            padding-right: 1rem;
-            border-right: 1px solid var(--border);
-        }
-
-        .toolbar-group:last-child {
-            border-right: none;
-        }
-
-        .toolbar-btn {
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: transparent;
-            border: 1px solid transparent;
-            border-radius: var(--radius);
-            color: var(--text);
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .toolbar-btn:hover {
-            background: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .toolbar-btn.active {
-            background: var(--primary-light);
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .toolbar-select {
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: white;
-            font-size: 0.95rem;
-            color: var(--text);
-            cursor: pointer;
-        }
-
-        .toolbar-color {
-            width: 36px;
-            height: 36px;
-            padding: 0;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            cursor: pointer;
-        }
-
         /* Document info bar */
         .document-info {
             padding: 1rem 1.5rem;
@@ -345,6 +281,16 @@
             outline: none;
             border-color: var(--primary);
             background: white;
+        }
+
+        .document-type-badge {
+            padding: 0.25rem 0.75rem;
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius);
+            color: var(--primary);
+            font-size: 0.85rem;
+            font-weight: 500;
         }
 
         .document-actions {
@@ -379,7 +325,7 @@
         }
 
         .doc-action.primary:hover {
-            background: var(--primary-dark);
+            background: #0052a3;
         }
 
         /* Three dots menu */
@@ -459,131 +405,104 @@
         }
 
         .editor-container {
-            max-width: 800px;
+            max-width: 1000px;
             margin: 0 auto;
             background: white;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             min-height: 600px;
-            padding: 2rem;
         }
 
-        .editor-content {
-            width: 100%;
-            min-height: 500px;
-            border: none;
-            outline: none;
-            font-size: 1rem;
-            line-height: 1.6;
-            color: var(--text);
-            resize: none;
-            font-family: "Inter", sans-serif;
-        }
-
-        .editor-content[contenteditable="true"] {
-            cursor: text;
-        }
-
-        /* Image in editor */
-        .editor-image {
-            max-width: 100%;
-            margin: 1rem 0;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-        }
-
-        .image-container {
-            position: relative;
-            display: inline-block;
-        }
-
-        .image-remove {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            width: 30px;
-            height: 30px;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .image-container:hover .image-remove {
-            opacity: 1;
-        }
-
-        /* Login specific */
+        /* Login specific fields */
         .login-fields {
             background: var(--primary-light);
-            padding: 1rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            margin-bottom: 1rem;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
         }
 
         .login-field {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            margin-bottom: 0.5rem;
+        }
+
+        .login-field i {
+            color: var(--primary);
+            font-size: 1.2rem;
         }
 
         .login-field input {
             flex: 1;
-            padding: 0.5rem;
+            padding: 0.6rem;
             border: 1px solid var(--border);
             border-radius: var(--radius);
             font-size: 0.95rem;
         }
 
-        /* Project specific */
-        .project-progress {
-            margin: 1rem 0;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background: var(--border);
-            position: relative;
-            border-radius: var(--radius);
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            border-radius: var(--radius);
-        }
-
-        /* Folder view */
-        .folder-view {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .folder-item-card {
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .folder-item-card:hover {
+        .login-field input:focus {
+            outline: none;
             border-color: var(--primary);
-            box-shadow: var(--shadow);
         }
 
-        /* Modal - subtle rounded corners */
+        /* Project specific fields */
+        .project-fields {
+            background: var(--primary-light);
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .progress-control {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .progress-slider {
+            flex: 1;
+            height: 4px;
+            -webkit-appearance: none;
+            background: var(--border);
+            border-radius: var(--radius);
+        }
+
+        .progress-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            cursor: pointer;
+        }
+
+        .progress-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* CKEditor customization */
+        .ck-editor__editable {
+            min-height: 400px;
+            max-height: 600px;
+        }
+
+        .ck.ck-editor {
+            border: none !important;
+        }
+
+        .ck.ck-toolbar {
+            border: none !important;
+            border-bottom: 1px solid var(--border) !important;
+            border-radius: var(--radius) var(--radius) 0 0 !important;
+        }
+
+        .ck.ck-content {
+            border: none !important;
+        }
+
+        /* Modal */
         .modal {
             position: fixed;
             top: 0;
@@ -594,7 +513,7 @@
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 2000;
         }
 
         .modal.active {
@@ -654,7 +573,7 @@
             margin-bottom: 0.5rem;
         }
 
-        .form-input, .form-textarea {
+        .form-input {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
@@ -663,10 +582,10 @@
             transition: all 0.2s;
         }
 
-        .form-input:focus, .form-textarea:focus {
+        .form-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
         }
 
         .folder-select {
@@ -676,19 +595,6 @@
             border-radius: var(--radius);
             background: white;
             font-size: 1rem;
-        }
-
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-light);
-        }
-
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
         }
 
         /* Responsive */
@@ -713,12 +619,18 @@
                 max-height: 300px;
             }
             
-            .document-toolbar {
-                overflow-x: auto;
+            .document-info {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
             }
             
             .title-input {
-                width: 200px;
+                width: 100%;
+            }
+            
+            .login-fields {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -768,9 +680,7 @@
 
                 <div class="nav-section">
                     <div class="nav-section-title">Folders</div>
-                    <div class="folders-list" id="foldersList">
-                        <!-- Folders will be added here dynamically -->
-                    </div>
+                    <div class="folders-list" id="foldersList"></div>
                     <div class="nav-item" id="addFolderBtn">
                         <i class='bx bx-folder-plus'></i>
                         <span>New Folder</span>
@@ -787,55 +697,11 @@
 
             <!-- Main Content Area -->
             <div class="main-content">
-                <!-- Document Toolbar - WPS Style -->
-                <div class="document-toolbar" id="documentToolbar">
-                    <div class="toolbar-group">
-                        <select class="toolbar-select" id="fontFamily">
-                            <option value="Inter">Inter</option>
-                            <option value="Arial">Arial</option>
-                            <option value="Times New Roman">Times New Roman</option>
-                            <option value="Courier New">Courier New</option>
-                        </select>
-                        <select class="toolbar-select" id="fontSize">
-                            <option value="12">12px</option>
-                            <option value="14">14px</option>
-                            <option value="16" selected>16px</option>
-                            <option value="18">18px</option>
-                            <option value="20">20px</option>
-                            <option value="24">24px</option>
-                        </select>
-                    </div>
-                    <div class="toolbar-group">
-                        <button class="toolbar-btn" id="boldBtn" title="Bold"><i class='bx bx-bold'></i></button>
-                        <button class="toolbar-btn" id="italicBtn" title="Italic"><i class='bx bx-italic'></i></button>
-                        <button class="toolbar-btn" id="underlineBtn" title="Underline"><i class='bx bx-underline'></i></button>
-                        <button class="toolbar-btn" id="strikethroughBtn" title="Strikethrough"><i class='bx bx-strikethrough'></i></button>
-                    </div>
-                    <div class="toolbar-group">
-                        <button class="toolbar-btn" id="alignLeftBtn" title="Align Left"><i class='bx bx-align-left'></i></button>
-                        <button class="toolbar-btn" id="alignCenterBtn" title="Align Center"><i class='bx bx-align-middle'></i></button>
-                        <button class="toolbar-btn" id="alignRightBtn" title="Align Right"><i class='bx bx-align-right'></i></button>
-                        <button class="toolbar-btn" id="alignJustifyBtn" title="Justify"><i class='bx bx-align-justify'></i></button>
-                    </div>
-                    <div class="toolbar-group">
-                        <button class="toolbar-btn" id="bulletListBtn" title="Bullet List"><i class='bx bx-list-ul'></i></button>
-                        <button class="toolbar-btn" id="numberListBtn" title="Number List"><i class='bx bx-list-ol'></i></button>
-                    </div>
-                    <div class="toolbar-group">
-                        <input type="color" class="toolbar-color" id="textColor" value="#2563eb">
-                        <input type="color" class="toolbar-color" id="bgColor" value="#ffffff">
-                    </div>
-                    <div class="toolbar-group">
-                        <button class="toolbar-btn" id="imageBtn" title="Insert Image"><i class='bx bx-image-add'></i></button>
-                        <button class="toolbar-btn" id="linkBtn" title="Insert Link"><i class='bx bx-link'></i></button>
-                    </div>
-                </div>
-
                 <!-- Document Info Bar -->
                 <div class="document-info">
                     <div class="document-title">
                         <input type="text" class="title-input" id="docTitle" placeholder="Untitled Document">
-                        <span class="document-type" id="docTypeBadge">Note</span>
+                        <span class="document-type-badge" id="docTypeBadge">Note</span>
                     </div>
                     <div class="document-actions">
                         <button class="doc-action" id="saveDocBtn">
@@ -871,16 +737,16 @@
                 <!-- Document Editor -->
                 <div class="document-editor">
                     <div class="editor-container">
-                        <!-- Login specific fields (shown only for logins) -->
+                        <!-- Login specific fields -->
                         <div id="loginFields" style="display: none;">
                             <div class="login-fields">
                                 <div class="login-field">
                                     <i class='bx bx-globe'></i>
-                                    <input type="url" id="loginUrl" placeholder="https://example.com">
+                                    <input type="url" id="loginUrl" placeholder="Website URL (e.g., https://example.com)">
                                 </div>
                                 <div class="login-field">
                                     <i class='bx bx-user'></i>
-                                    <input type="text" id="loginUsername" placeholder="Username">
+                                    <input type="text" id="loginUsername" placeholder="Username / Email">
                                 </div>
                                 <div class="login-field">
                                     <i class='bx bx-lock-alt'></i>
@@ -889,21 +755,20 @@
                             </div>
                         </div>
 
-                        <!-- Project progress (shown only for projects) -->
+                        <!-- Project specific fields -->
                         <div id="projectFields" style="display: none;">
-                            <div class="project-progress">
-                                <label>Progress: <span id="progressValue">0</span>%</label>
-                                <input type="range" id="progressSlider" min="0" max="100" value="0">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                            <div class="project-fields">
+                                <div class="progress-control">
+                                    <i class='bx bx-trending-up'></i>
+                                    <span>Progress:</span>
+                                    <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0">
+                                    <span class="progress-value" id="progressValue">0%</span>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Main editor content -->
-                        <div id="editor" class="editor-content" contenteditable="true">
-                            Start writing your document...
-                        </div>
+                        <!-- CKEditor container -->
+                        <textarea id="editor"></textarea>
                     </div>
                 </div>
             </div>
@@ -952,7 +817,7 @@
         </div>
     </div>
 
-    <!-- Delete Confirmation Modal (in-app, no browser confirm) -->
+    <!-- Delete Confirmation Modal -->
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -969,21 +834,43 @@
         </div>
     </div>
 
-    <script>
-        // Data store
-        let documents = {
-            logins: JSON.parse(localStorage.getItem('boveda_logins')) || [],
-            notes: JSON.parse(localStorage.getItem('boveda_notes')) || [],
-            projects: JSON.parse(localStorage.getItem('boveda_projects')) || [],
-            folders: JSON.parse(localStorage.getItem('boveda_folders')) || []
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCW0qgIGKko96RCyqVMWFWc8P-sp7LzuRo",
+            authDomain: "onvault-d261b.firebaseapp.com",
+            projectId: "onvault-d261b",
+            storageBucket: "onvault-d261b.firebasestorage.app",
+            messagingSenderId: "924974842099",
+            appId: "1:924974842099:web:e9b04ffbea0318ce99f786",
+            measurementId: "G-EFKXX58XL6"
         };
 
-        let currentType = 'notes';
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        // State
+        let currentUser = null;
         let currentDocId = null;
+        let currentType = 'notes';
         let currentFolder = null;
+        let editor = null;
+        let documents = {
+            logins: [],
+            notes: [],
+            projects: [],
+            folders: []
+        };
 
         // DOM elements
-        const editor = document.getElementById('editor');
+        const editorElement = document.getElementById('editor');
         const docTitle = document.getElementById('docTitle');
         const docTypeBadge = document.getElementById('docTypeBadge');
         const loginFields = document.getElementById('loginFields');
@@ -993,7 +880,6 @@
         const loginPassword = document.getElementById('loginPassword');
         const progressSlider = document.getElementById('progressSlider');
         const progressValue = document.getElementById('progressValue');
-        const progressFill = document.getElementById('progressFill');
         const foldersList = document.getElementById('foldersList');
         const loginCount = document.getElementById('loginCount');
         const noteCount = document.getElementById('noteCount');
@@ -1001,6 +887,92 @@
         const threeDotsBtn = document.getElementById('threeDotsBtn');
         const dotsDropdown = document.getElementById('dotsDropdown');
         const folderSelect = document.getElementById('folderSelect');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const globalSearch = document.getElementById('globalSearch');
+
+        // Initialize CKEditor
+        ClassicEditor
+            .create(editorElement, {
+                toolbar: [
+                    'heading', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'alignment', '|',
+                    'bulletedList', 'numberedList', '|',
+                    'fontFamily', 'fontSize', 'fontColor', 'fontBackgroundColor', '|',
+                    'link', 'blockQuote', 'insertTable', '|',
+                    'undo', 'redo'
+                ],
+                heading: {
+                    options: [
+                        { model: 'paragraph', title: 'Paragraph', class: 'ck-heading_paragraph' },
+                        { model: 'heading1', view: 'h1', title: 'Heading 1', class: 'ck-heading_heading1' },
+                        { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
+                        { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
+                    ]
+                },
+                fontSize: {
+                    options: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48]
+                },
+                fontFamily: {
+                    options: [
+                        'Inter, sans-serif',
+                        'Arial, sans-serif',
+                        'Times New Roman, serif',
+                        'Courier New, monospace'
+                    ]
+                }
+            })
+            .then(ckeditor => {
+                editor = ckeditor;
+                console.log('CKEditor initialized');
+            })
+            .catch(error => {
+                console.error('CKEditor error:', error);
+            });
+
+        // Load user data
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                userName.textContent = user.email.split('@')[0];
+                userAvatar.textContent = user.email.charAt(0).toUpperCase();
+                await loadUserData();
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // Load user data from Firestore
+        async function loadUserData() {
+            try {
+                // Load logins
+                const loginsQuery = query(collection(db, 'logins'), where('userId', '==', currentUser.uid));
+                const loginsSnapshot = await getDocs(loginsQuery);
+                documents.logins = loginsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load notes
+                const notesQuery = query(collection(db, 'notes'), where('userId', '==', currentUser.uid));
+                const notesSnapshot = await getDocs(notesQuery);
+                documents.notes = notesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load projects
+                const projectsQuery = query(collection(db, 'projects'), where('userId', '==', currentUser.uid));
+                const projectsSnapshot = await getDocs(projectsQuery);
+                documents.projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                // Load folders
+                const foldersQuery = query(collection(db, 'folders'), where('userId', '==', currentUser.uid));
+                const foldersSnapshot = await getDocs(foldersQuery);
+                documents.folders = foldersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                updateCounts();
+                renderFolders();
+                renderDocuments();
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
 
         // Update counts
         function updateCounts() {
@@ -1023,48 +995,37 @@
                 folderElement.addEventListener('click', () => openFolder(folder.id));
                 foldersList.appendChild(folderElement);
             });
+
+            // Update folder select in move modal
+            folderSelect.innerHTML = '<option value="">Root (No Folder)</option>';
+            documents.folders.forEach(folder => {
+                const option = document.createElement('option');
+                option.value = folder.id;
+                option.textContent = folder.name;
+                folderSelect.appendChild(option);
+            });
         }
 
-        // Open folder
-        function openFolder(folderId) {
-            currentFolder = folderId;
-            // Filter documents in this folder
-            const folder = documents.folders.find(f => f.id === folderId);
-            if (folder) {
-                // Show folder view in editor
-                editor.innerHTML = '<div class="folder-view"></div>';
-                const folderView = editor.querySelector('.folder-view');
-                
-                folder.items.forEach(itemId => {
-                    // Find item in any category
-                    const item = [...documents.logins, ...documents.notes, ...documents.projects]
-                        .find(d => d.id === itemId);
-                    if (item) {
-                        const itemCard = document.createElement('div');
-                        itemCard.className = 'folder-item-card';
-                        itemCard.innerHTML = `
-                            <i class='bx bx-file'></i>
-                            <strong>${item.title || 'Untitled'}</strong>
-                        `;
-                        folderView.appendChild(itemCard);
-                    }
-                });
-            }
+        // Render documents in grid (for left nav)
+        function renderDocuments() {
+            // This would update the grid view if we had one
+            // For now, we'll just update counts
+            updateCounts();
         }
 
         // Save current document
-        function saveDocument() {
-            if (!currentDocId) {
-                // Create new document
-                currentDocId = Date.now().toString();
-            }
+        async function saveDocument() {
+            if (!currentUser) return;
 
+            const content = editor ? editor.getData() : '';
+            const title = docTitle.value || 'Untitled';
+            
             const docData = {
-                id: currentDocId,
-                title: docTitle.value || 'Untitled',
-                content: editor.innerHTML,
+                title: title,
+                content: content,
                 lastModified: new Date().toISOString(),
-                folder: currentFolder || null
+                folderId: currentFolder,
+                userId: currentUser.uid
             };
 
             // Add type-specific fields
@@ -1072,48 +1033,226 @@
                 docData.url = loginUrl.value;
                 docData.username = loginUsername.value;
                 docData.password = loginPassword.value;
-                documents.logins = documents.logins.filter(d => d.id !== currentDocId);
-                documents.logins.push(docData);
+                
+                if (currentDocId) {
+                    await updateDoc(doc(db, 'logins', currentDocId), docData);
+                } else {
+                    const docRef = await addDoc(collection(db, 'logins'), docData);
+                    currentDocId = docRef.id;
+                }
             } else if (currentType === 'notes') {
-                documents.notes = documents.notes.filter(d => d.id !== currentDocId);
-                documents.notes.push(docData);
+                if (currentDocId) {
+                    await updateDoc(doc(db, 'notes', currentDocId), docData);
+                } else {
+                    const docRef = await addDoc(collection(db, 'notes'), docData);
+                    currentDocId = docRef.id;
+                }
             } else if (currentType === 'projects') {
                 docData.progress = progressSlider.value;
-                documents.projects = documents.projects.filter(d => d.id !== currentDocId);
-                documents.projects.push(docData);
+                
+                if (currentDocId) {
+                    await updateDoc(doc(db, 'projects', currentDocId), docData);
+                } else {
+                    const docRef = await addDoc(collection(db, 'projects'), docData);
+                    currentDocId = docRef.id;
+                }
             }
 
-            // Save to localStorage
-            localStorage.setItem('boveda_logins', JSON.stringify(documents.logins));
-            localStorage.setItem('boveda_notes', JSON.stringify(documents.notes));
-            localStorage.setItem('boveda_projects', JSON.stringify(documents.projects));
-            localStorage.setItem('boveda_folders', JSON.stringify(documents.folders));
-
-            updateCounts();
+            await loadUserData();
+            showNotification('Document saved successfully');
         }
 
-        // Navigation
+        // Load document into editor
+        async function loadDocument(docId, type) {
+            currentType = type;
+            currentDocId = docId;
+            docTypeBadge.textContent = type.charAt(0).toUpperCase() + type.slice(1);
+            
+            // Show/hide type-specific fields
+            loginFields.style.display = type === 'logins' ? 'block' : 'none';
+            projectFields.style.display = type === 'projects' ? 'block' : 'none';
+
+            const doc = documents[type].find(d => d.id === docId);
+            if (doc) {
+                docTitle.value = doc.title || '';
+                if (editor) {
+                    editor.setData(doc.content || '');
+                }
+                
+                if (type === 'logins') {
+                    loginUrl.value = doc.url || '';
+                    loginUsername.value = doc.username || '';
+                    loginPassword.value = doc.password || '';
+                } else if (type === 'projects') {
+                    progressSlider.value = doc.progress || 0;
+                    progressValue.textContent = doc.progress + '%';
+                }
+                
+                currentFolder = doc.folderId || null;
+            }
+        }
+
+        // Open folder
+        async function openFolder(folderId) {
+            const folder = documents.folders.find(f => f.id === folderId);
+            if (folder) {
+                // Load all items in folder
+                const items = [];
+                if (folder.items) {
+                    for (const itemId of folder.items) {
+                        const login = documents.logins.find(l => l.id === itemId);
+                        const note = documents.notes.find(n => n.id === itemId);
+                        const project = documents.projects.find(p => p.id === itemId);
+                        if (login) items.push({ ...login, type: 'login' });
+                        if (note) items.push({ ...note, type: 'note' });
+                        if (project) items.push({ ...project, type: 'project' });
+                    }
+                }
+                
+                // Display folder contents in editor
+                if (editor) {
+                    let html = '<div style="padding: 2rem;">';
+                    html += `<h2>📁 ${folder.name}</h2>`;
+                    html += '<div style="display: grid; gap: 1rem; margin-top: 1rem;">';
+                    
+                    items.forEach(item => {
+                        html += `
+                            <div style="padding: 1rem; border: 1px solid var(--border); cursor: pointer;" onclick="window.loadDocument('${item.id}', '${item.type}s')">
+                                <strong>${item.title || 'Untitled'}</strong>
+                                <span style="color: var(--text-light); margin-left: 1rem;">${item.type}</span>
+                            </div>
+                        `;
+                    });
+                    
+                    if (items.length === 0) {
+                        html += '<p style="color: var(--text-light);">Folder is empty</p>';
+                    }
+                    
+                    html += '</div></div>';
+                    editor.setData(html);
+                }
+            }
+        }
+
+        // Delete document
+        async function deleteDocument() {
+            if (!currentDocId || !currentUser) return;
+
+            try {
+                if (currentType === 'logins') {
+                    await deleteDoc(doc(db, 'logins', currentDocId));
+                } else if (currentType === 'notes') {
+                    await deleteDoc(doc(db, 'notes', currentDocId));
+                } else if (currentType === 'projects') {
+                    await deleteDoc(doc(db, 'projects', currentDocId));
+                }
+
+                // Remove from folders
+                for (const folder of documents.folders) {
+                    if (folder.items && folder.items.includes(currentDocId)) {
+                        folder.items = folder.items.filter(id => id !== currentDocId);
+                        await updateDoc(doc(db, 'folders', folder.id), { items: folder.items });
+                    }
+                }
+
+                await loadUserData();
+                
+                // Clear editor
+                currentDocId = null;
+                docTitle.value = '';
+                editor.setData('');
+                loginUrl.value = '';
+                loginUsername.value = '';
+                loginPassword.value = '';
+                progressSlider.value = 0;
+                progressValue.textContent = '0%';
+                
+                deleteModal.classList.remove('active');
+                showNotification('Document deleted');
+            } catch (error) {
+                console.error('Error deleting:', error);
+            }
+        }
+
+        // Move document to folder
+        async function moveDocument() {
+            if (!currentDocId) return;
+
+            const targetFolderId = folderSelect.value;
+            
+            // Remove from old folder
+            for (const folder of documents.folders) {
+                if (folder.items && folder.items.includes(currentDocId)) {
+                    folder.items = folder.items.filter(id => id !== currentDocId);
+                    await updateDoc(doc(db, 'folders', folder.id), { items: folder.items });
+                }
+            }
+            
+            // Add to new folder
+            if (targetFolderId) {
+                const targetFolder = documents.folders.find(f => f.id === targetFolderId);
+                if (targetFolder) {
+                    targetFolder.items = targetFolder.items || [];
+                    targetFolder.items.push(currentDocId);
+                    await updateDoc(doc(db, 'folders', targetFolder.id), { items: targetFolder.items });
+                }
+            }
+            
+            currentFolder = targetFolderId || null;
+            await loadUserData();
+            moveModal.classList.remove('active');
+            showNotification('Document moved');
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                background: var(--surface);
+                border: 1px solid var(--border);
+                border-radius: var(--radius);
+                padding: 1rem 1.5rem;
+                box-shadow: var(--shadow);
+                z-index: 3000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Event Listeners
         document.querySelectorAll('.nav-item[data-type]').forEach(item => {
-            item.addEventListener('click', (e) => {
+            item.addEventListener('click', () => {
                 document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
                 item.classList.add('active');
                 currentType = item.dataset.type;
                 docTypeBadge.textContent = currentType.charAt(0).toUpperCase() + currentType.slice(1);
                 
-                // Show/hide type-specific fields
+                // Clear for new document
+                currentDocId = null;
+                docTitle.value = '';
+                editor.setData('');
+                
+                // Show/hide fields
                 loginFields.style.display = currentType === 'logins' ? 'block' : 'none';
                 projectFields.style.display = currentType === 'projects' ? 'block' : 'none';
                 
-                // Clear editor for new document
-                currentDocId = null;
-                docTitle.value = '';
-                editor.innerHTML = 'Start writing your document...';
-                loginUrl.value = '';
-                loginUsername.value = '';
-                loginPassword.value = '';
-                progressSlider.value = 0;
-                progressFill.style.width = '0%';
-                progressValue.textContent = '0';
+                if (currentType === 'logins') {
+                    loginUrl.value = '';
+                    loginUsername.value = '';
+                    loginPassword.value = '';
+                } else if (currentType === 'projects') {
+                    progressSlider.value = 0;
+                    progressValue.textContent = '0%';
+                }
             });
         });
 
@@ -1121,13 +1260,12 @@
         document.getElementById('newDocumentBtn').addEventListener('click', () => {
             currentDocId = null;
             docTitle.value = '';
-            editor.innerHTML = 'Start writing your document...';
+            editor.setData('');
             loginUrl.value = '';
             loginUsername.value = '';
             loginPassword.value = '';
             progressSlider.value = 0;
-            progressFill.style.width = '0%';
-            progressValue.textContent = '0';
+            progressValue.textContent = '0%';
         });
 
         // Save button
@@ -1135,9 +1273,7 @@
 
         // Progress slider
         progressSlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            progressValue.textContent = val;
-            progressFill.style.width = val + '%';
+            progressValue.textContent = e.target.value + '%';
         });
 
         // Three dots menu
@@ -1145,14 +1281,13 @@
             dotsDropdown.classList.toggle('show');
         });
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!threeDotsBtn.contains(e.target)) {
                 dotsDropdown.classList.remove('show');
             }
         });
 
-        // Delete document (in-app modal)
+        // Delete
         const deleteModal = document.getElementById('deleteModal');
         const closeDeleteModal = document.getElementById('closeDeleteModal');
         const cancelDelete = document.getElementById('cancelDelete');
@@ -1167,29 +1302,7 @@
 
         closeDeleteModal.addEventListener('click', () => deleteModal.classList.remove('active'));
         cancelDelete.addEventListener('click', () => deleteModal.classList.remove('active'));
-
-        confirmDelete.addEventListener('click', () => {
-            if (currentDocId) {
-                // Remove from appropriate array
-                if (currentType === 'logins') {
-                    documents.logins = documents.logins.filter(d => d.id !== currentDocId);
-                } else if (currentType === 'notes') {
-                    documents.notes = documents.notes.filter(d => d.id !== currentDocId);
-                } else if (currentType === 'projects') {
-                    documents.projects = documents.projects.filter(d => d.id !== currentDocId);
-                }
-                
-                localStorage.setItem('boveda_logins', JSON.stringify(documents.logins));
-                localStorage.setItem('boveda_notes', JSON.stringify(documents.notes));
-                localStorage.setItem('boveda_projects', JSON.stringify(documents.projects));
-                
-                currentDocId = null;
-                docTitle.value = '';
-                editor.innerHTML = 'Start writing your document...';
-                updateCounts();
-                deleteModal.classList.remove('active');
-            }
-        });
+        confirmDelete.addEventListener('click', deleteDocument);
 
         // Move to folder
         const moveModal = document.getElementById('moveModal');
@@ -1198,41 +1311,50 @@
 
         document.getElementById('moveToFolder').addEventListener('click', () => {
             dotsDropdown.classList.remove('show');
-            // Populate folder select
-            folderSelect.innerHTML = '<option value="">Root (No Folder)</option>';
-            documents.folders.forEach(folder => {
-                const option = document.createElement('option');
-                option.value = folder.id;
-                option.textContent = folder.name;
-                folderSelect.appendChild(option);
-            });
-            moveModal.classList.add('active');
+            if (currentDocId) {
+                moveModal.classList.add('active');
+            }
         });
 
         closeMoveModal.addEventListener('click', () => moveModal.classList.remove('active'));
         cancelMove.addEventListener('click', () => moveModal.classList.remove('active'));
+        document.getElementById('moveDocument').addEventListener('click', moveDocument);
 
-        document.getElementById('moveDocument').addEventListener('click', () => {
-            if (currentDocId) {
-                const targetFolder = folderSelect.value;
+        // Duplicate
+        document.getElementById('duplicateDoc').addEventListener('click', async () => {
+            if (!currentDocId || !currentUser) return;
+            
+            const doc = documents[currentType].find(d => d.id === currentDocId);
+            if (doc) {
+                const newDoc = { ...doc, id: undefined, title: doc.title + ' (Copy)' };
+                delete newDoc.id;
                 
-                // Remove from old folder if any
-                documents.folders.forEach(f => {
-                    f.items = f.items?.filter(id => id !== currentDocId) || [];
-                });
-                
-                // Add to new folder
-                if (targetFolder) {
-                    const folder = documents.folders.find(f => f.id === targetFolder);
-                    if (folder) {
-                        folder.items = folder.items || [];
-                        folder.items.push(currentDocId);
-                    }
+                if (currentType === 'logins') {
+                    await addDoc(collection(db, 'logins'), newDoc);
+                } else if (currentType === 'notes') {
+                    await addDoc(collection(db, 'notes'), newDoc);
+                } else if (currentType === 'projects') {
+                    await addDoc(collection(db, 'projects'), newDoc);
                 }
                 
-                currentFolder = targetFolder || null;
-                localStorage.setItem('boveda_folders', JSON.stringify(documents.folders));
-                moveModal.classList.remove('active');
+                await loadUserData();
+                showNotification('Document duplicated');
+            }
+        });
+
+        // Export
+        document.getElementById('exportDoc').addEventListener('click', () => {
+            if (!currentDocId) return;
+            
+            const doc = documents[currentType].find(d => d.id === currentDocId);
+            if (doc) {
+                const data = JSON.stringify(doc, null, 2);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${doc.title || 'document'}.json`;
+                a.click();
             }
         });
 
@@ -1250,147 +1372,87 @@
         closeFolderModal.addEventListener('click', () => folderModal.classList.remove('active'));
         cancelFolder.addEventListener('click', () => folderModal.classList.remove('active'));
 
-        createFolder.addEventListener('click', () => {
-            if (folderName.value.trim()) {
-                const newFolder = {
-                    id: Date.now().toString(),
+        createFolder.addEventListener('click', async () => {
+            if (folderName.value.trim() && currentUser) {
+                await addDoc(collection(db, 'folders'), {
                     name: folderName.value,
-                    items: []
-                };
-                documents.folders.push(newFolder);
-                localStorage.setItem('boveda_folders', JSON.stringify(documents.folders));
-                renderFolders();
+                    items: [],
+                    userId: currentUser.uid,
+                    createdAt: new Date().toISOString()
+                });
+                await loadUserData();
                 folderModal.classList.remove('active');
                 folderName.value = '';
-            }
-        });
-
-        // Text formatting
-        document.getElementById('boldBtn').addEventListener('click', () => {
-            document.execCommand('bold', false, null);
-        });
-
-        document.getElementById('italicBtn').addEventListener('click', () => {
-            document.execCommand('italic', false, null);
-        });
-
-        document.getElementById('underlineBtn').addEventListener('click', () => {
-            document.execCommand('underline', false, null);
-        });
-
-        document.getElementById('strikethroughBtn').addEventListener('click', () => {
-            document.execCommand('strikethrough', false, null);
-        });
-
-        document.getElementById('alignLeftBtn').addEventListener('click', () => {
-            document.execCommand('justifyLeft', false, null);
-        });
-
-        document.getElementById('alignCenterBtn').addEventListener('click', () => {
-            document.execCommand('justifyCenter', false, null);
-        });
-
-        document.getElementById('alignRightBtn').addEventListener('click', () => {
-            document.execCommand('justifyRight', false, null);
-        });
-
-        document.getElementById('alignJustifyBtn').addEventListener('click', () => {
-            document.execCommand('justifyFull', false, null);
-        });
-
-        document.getElementById('bulletListBtn').addEventListener('click', () => {
-            document.execCommand('insertUnorderedList', false, null);
-        });
-
-        document.getElementById('numberListBtn').addEventListener('click', () => {
-            document.execCommand('insertOrderedList', false, null);
-        });
-
-        document.getElementById('fontFamily').addEventListener('change', (e) => {
-            document.execCommand('fontName', false, e.target.value);
-        });
-
-        document.getElementById('fontSize').addEventListener('change', (e) => {
-            document.execCommand('fontSize', false, e.target.value);
-        });
-
-        document.getElementById('textColor').addEventListener('input', (e) => {
-            document.execCommand('foreColor', false, e.target.value);
-        });
-
-        document.getElementById('bgColor').addEventListener('input', (e) => {
-            document.execCommand('hiliteColor', false, e.target.value);
-        });
-
-        // Image insertion
-        document.getElementById('imageBtn').addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const img = document.createElement('img');
-                    img.src = event.target.result;
-                    img.className = 'editor-image';
-                    
-                    const container = document.createElement('div');
-                    container.className = 'image-container';
-                    
-                    const removeBtn = document.createElement('div');
-                    removeBtn.className = 'image-remove';
-                    removeBtn.innerHTML = '<i class="bx bx-x"></i>';
-                    removeBtn.onclick = () => container.remove();
-                    
-                    container.appendChild(img);
-                    container.appendChild(removeBtn);
-                    
-                    // Insert at cursor position
-                    const selection = window.getSelection();
-                    if (selection.rangeCount > 0) {
-                        const range = selection.getRangeAt(0);
-                        range.insertNode(container);
-                        range.collapse(false);
-                    } else {
-                        editor.appendChild(container);
-                    }
-                };
-                reader.readAsDataURL(file);
-            };
-            input.click();
-        });
-
-        // Link insertion
-        document.getElementById('linkBtn').addEventListener('click', () => {
-            const url = prompt('Enter URL:');
-            if (url) {
-                document.execCommand('createLink', false, url);
+                showNotification('Folder created');
             }
         });
 
         // Global search
-        document.getElementById('globalSearch').addEventListener('input', (e) => {
+        globalSearch.addEventListener('input', async (e) => {
             const term = e.target.value.toLowerCase();
-            // Filter documents in current view
-            if (term) {
-                const allDocs = [...documents.logins, ...documents.notes, ...documents.projects];
-                const filtered = allDocs.filter(doc => 
-                    doc.title?.toLowerCase().includes(term) ||
-                    doc.content?.toLowerCase().includes(term)
-                );
-                // Display results in editor
-                editor.innerHTML = '<div class="search-results"></div>';
-                const results = editor.querySelector('.search-results');
-                filtered.forEach(doc => {
-                    results.innerHTML += `<div>📄 ${doc.title}</div>`;
-                });
+            if (!term) {
+                await loadUserData();
+                return;
+            }
+
+            // Search in all document types
+            const allDocs = [
+                ...documents.logins.map(d => ({ ...d, type: 'login' })),
+                ...documents.notes.map(d => ({ ...d, type: 'note' })),
+                ...documents.projects.map(d => ({ ...d, type: 'project' }))
+            ];
+
+            const results = allDocs.filter(doc => 
+                doc.title?.toLowerCase().includes(term) ||
+                doc.content?.toLowerCase().includes(term) ||
+                doc.username?.toLowerCase().includes(term) ||
+                doc.url?.toLowerCase().includes(term)
+            );
+
+            // Display results in editor
+            if (editor) {
+                let html = '<div style="padding: 2rem;">';
+                html += '<h2>🔍 Search Results</h2>';
+                
+                if (results.length === 0) {
+                    html += '<p style="color: var(--text-light);">No results found</p>';
+                } else {
+                    html += '<div style="display: grid; gap: 1rem; margin-top: 1rem;">';
+                    results.forEach(doc => {
+                        html += `
+                            <div style="padding: 1rem; border: 1px solid var(--border); cursor: pointer;" onclick="window.loadDocument('${doc.id}', '${doc.type}s')">
+                                <strong>${doc.title || 'Untitled'}</strong>
+                                <span style="color: var(--text-light); margin-left: 1rem;">${doc.type}</span>
+                                <div style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">
+                                    ${doc.content?.substring(0, 100) || ''}...
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                }
+                
+                html += '</div>';
+                editor.setData(html);
             }
         });
 
-        // Initialize
-        updateCounts();
-        renderFolders();
+        // Make loadDocument global for onclick handlers
+        window.loadDocument = loadDocument;
+
+        // Add animation styles
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
