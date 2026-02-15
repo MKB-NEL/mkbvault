@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boveda · document OS</title>
+    <title>Boveda · your cozy workspace</title>
     <!-- Inter font - 2026 standard -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <!-- Boxicons -->
@@ -17,46 +17,70 @@
 
         body {
             font-family: "Inter", sans-serif;
-            background: #f5f5f7;
-            color: #1d1d1f;
+            background: #f8f5f2;
+            color: #2c3e50;
             min-height: 100vh;
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 2026 design system - clean lines */
+        /* Warm, welcoming color palette */
         :root {
-            --primary: #0066CC;
-            --primary-light: #E3F0FF;
-            --secondary: #86868b;
-            --background: #f5f5f7;
+            --primary: #6b4f8b;
+            --primary-light: #f0e9f5;
+            --primary-soft: #a58bc1;
+            --secondary: #e8b4b8;
+            --secondary-light: #fde9ea;
+            --accent: #7fb7be;
+            --background: #f8f5f2;
             --surface: #ffffff;
-            --border: #d2d2d7;
-            --text: #1d1d1f;
-            --text-light: #86868b;
-            --shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
+            --surface-soft: #fefcf9;
+            --border: #e2d9d1;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow-sm: 0 4px 12px rgba(107, 79, 139, 0.08);
+            --shadow-md: 0 8px 24px rgba(107, 79, 139, 0.12);
+            --radius: 16px;
+            --radius-sm: 12px;
         }
 
-        /* Layout */
+        /* Smooth animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
         .app {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            animation: fadeIn 0.5s ease;
         }
 
-        /* Top Bar */
+        /* Top Bar - warm and welcoming */
         .top-bar {
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 2rem;
+            padding: 1rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
 
         .top-bar-left {
@@ -68,52 +92,61 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             font-weight: 600;
-            font-size: 1.25rem;
-            color: var(--text);
+            font-size: 1.4rem;
+            color: var(--primary);
             cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        .logo:hover {
+            transform: scale(1.02);
         }
 
         .logo-icon {
-            font-size: 1.5rem;
-            color: var(--primary);
+            font-size: 1.8rem;
+            filter: drop-shadow(0 2px 4px rgba(107, 79, 139, 0.2));
         }
 
         .nav-menu {
             display: flex;
-            gap: 0.25rem;
+            gap: 0.5rem;
         }
 
         .nav-item {
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.2rem;
             font-size: 0.95rem;
             font-weight: 500;
             color: var(--text-light);
             cursor: pointer;
             border: none;
             background: transparent;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             position: relative;
+            border-radius: var(--radius-sm);
         }
 
         .nav-item:hover {
-            color: var(--text);
-            background: rgba(0,0,0,0.02);
+            color: var(--primary);
+            background: var(--primary-light);
         }
 
         .nav-item.active {
             color: var(--primary);
+            background: var(--primary-light);
         }
 
         .nav-item.active::after {
             content: '';
             position: absolute;
-            bottom: -0.75rem;
-            left: 0;
-            width: 100%;
-            height: 2px;
+            bottom: -1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
             background: var(--primary);
+            border-radius: 2px;
         }
 
         .top-bar-right {
@@ -124,12 +157,12 @@
 
         .search-container {
             position: relative;
-            width: 280px;
+            width: 300px;
         }
 
         .search-icon {
             position: absolute;
-            left: 0.75rem;
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-light);
@@ -138,44 +171,55 @@
 
         .search-input {
             width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            background: rgba(0,0,0,0.02);
+            padding: 0.75rem 1rem 0.75rem 2.8rem;
+            background: white;
             border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             font-size: 0.95rem;
             color: var(--text);
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         .search-input:focus {
             outline: none;
             border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+            box-shadow: 0 0 0 4px rgba(107, 79, 139, 0.1);
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.25rem 0.5rem;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
             cursor: pointer;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .user-menu:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-soft);
         }
 
         .user-avatar {
             width: 32px;
             height: 32px;
-            background: var(--primary-light);
-            border: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            color: var(--primary);
+            color: white;
         }
 
         .user-name {
             font-size: 0.95rem;
             font-weight: 500;
+            color: var(--text);
         }
 
         /* Main content */
@@ -185,6 +229,7 @@
             max-width: 1600px;
             margin: 0 auto;
             width: 100%;
+            animation: slideIn 0.5s ease;
         }
 
         /* Document header */
@@ -193,6 +238,7 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 2rem;
+            animation: fadeIn 0.6s ease;
         }
 
         .doc-header-left {
@@ -202,54 +248,62 @@
         }
 
         .back-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border: 1px solid var(--border);
             background: white;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            color: var(--text);
+            font-size: 1.3rem;
+            color: var(--primary);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
         }
 
         .back-btn:hover {
             background: var(--primary-light);
             border-color: var(--primary);
-            color: var(--primary);
+            transform: translateX(-3px);
         }
 
         .page-title {
-            font-size: 1.75rem;
+            font-size: 2rem;
             font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             letter-spacing: -0.02em;
         }
 
         .doc-actions {
             display: flex;
-            gap: 0.75rem;
+            gap: 1rem;
         }
 
         .doc-btn {
-            padding: 0.6rem 1.2rem;
+            padding: 0.7rem 1.5rem;
             border: 1px solid var(--border);
             background: white;
+            border-radius: var(--radius-sm);
             font-size: 0.95rem;
             font-weight: 500;
             color: var(--text);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
         }
 
         .doc-btn:hover {
             background: var(--primary-light);
             border-color: var(--primary);
             color: var(--primary);
+            transform: translateY(-2px);
         }
 
         .doc-btn.primary {
@@ -259,117 +313,147 @@
         }
 
         .doc-btn.primary:hover {
-            background: #0052a3;
+            background: #5a4275;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
         }
 
         /* Workspace tabs */
         .workspace-tabs {
             display: flex;
-            gap: 1px;
-            background: var(--border);
-            border: 1px solid var(--border);
+            gap: 0.5rem;
             margin-bottom: 2rem;
+            flex-wrap: wrap;
+            animation: fadeIn 0.7s ease;
         }
 
         .workspace-tab {
             padding: 1rem 2rem;
             background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
             font-size: 1rem;
             font-weight: 500;
             color: var(--text-light);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            flex: 1;
-            justify-content: center;
+            box-shadow: var(--shadow-sm);
         }
 
         .workspace-tab i {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
+            color: var(--primary-soft);
+            transition: all 0.2s ease;
         }
 
         .workspace-tab:hover {
             background: var(--primary-light);
+            border-color: var(--primary-soft);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .workspace-tab:hover i {
             color: var(--primary);
         }
 
         .workspace-tab.active {
-            background: white;
-            color: var(--primary);
-            border-bottom: 2px solid var(--primary);
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        .workspace-tab.active i {
+            color: white;
         }
 
         /* Document grid */
         .document-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-            gap: 1px;
-            background: var(--border);
-            border: 1px solid var(--border);
+            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+            gap: 1.5rem;
+            animation: fadeIn 0.8s ease;
         }
 
         .document-item {
             background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
             padding: 1.5rem;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.2, 0, 0, 1);
             cursor: pointer;
             position: relative;
+            box-shadow: var(--shadow-sm);
+            animation: scaleIn 0.5s ease;
         }
 
         .document-item:hover {
-            background: #fafafa;
+            transform: translateY(-4px) scale(1.02);
+            border-color: var(--primary-soft);
+            box-shadow: var(--shadow-md);
         }
 
         .document-item.selected {
             background: var(--primary-light);
-            border-left: 3px solid var(--primary);
+            border-left: 4px solid var(--primary);
         }
 
         .document-header {
             display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
             margin-bottom: 1rem;
         }
 
         .document-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--primary-light);
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-light), white);
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--primary);
+            border: 1px solid var(--border);
         }
 
         .document-type {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--text-light);
-            padding: 0.25rem 0.5rem;
+            padding: 0.3rem 0.8rem;
             border: 1px solid var(--border);
-            background: white;
+            background: var(--surface-soft);
+            border-radius: 20px;
         }
 
         .document-title {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             font-weight: 600;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             color: var(--text);
+            line-height: 1.4;
         }
 
         .document-meta {
             display: flex;
             align-items: center;
-            gap: 1rem;
-            font-size: 0.85rem;
+            gap: 1.5rem;
+            font-size: 0.9rem;
             color: var(--text-light);
             margin-bottom: 1rem;
             flex-wrap: wrap;
+        }
+
+        .document-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         .document-preview {
@@ -385,6 +469,7 @@
             width: 100%;
             height: 180px;
             object-fit: cover;
+            border-radius: var(--radius-sm);
             border: 1px solid var(--border);
             margin-bottom: 1rem;
         }
@@ -405,19 +490,22 @@
         }
 
         .tag {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
             border: 1px solid var(--border);
-            background: white;
+            background: var(--surface-soft);
+            border-radius: 20px;
             color: var(--text-light);
         }
 
         .status-badge {
-            font-size: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            background: var(--primary-light);
-            border: 1px solid var(--primary);
-            color: var(--primary);
+            font-size: 0.8rem;
+            padding: 0.3rem 1rem;
+            background: var(--secondary-light);
+            border: 1px solid var(--secondary);
+            border-radius: 20px;
+            color: #c45d65;
+            font-weight: 500;
         }
 
         .document-actions {
@@ -426,103 +514,121 @@
         }
 
         .doc-action-btn {
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             border: 1px solid var(--border);
             background: white;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: var(--text-light);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .doc-action-btn:hover {
             background: var(--primary-light);
             border-color: var(--primary);
             color: var(--primary);
+            transform: scale(1.1);
         }
 
-        /* Login specific */
-        .login-credentials {
-            background: var(--primary-light);
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            margin: 1rem 0;
-            font-family: monospace;
+        /* Login modal specific */
+        .login-details {
+            background: linear-gradient(135deg, var(--primary-light), white);
+            padding: 2rem;
+            border-radius: var(--radius);
         }
 
-        /* Folder specific */
-        .folder-stats {
-            display: flex;
-            gap: 1rem;
-            margin-top: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .stat {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        /* Project specific */
-        .project-progress {
-            margin: 1rem 0;
-        }
-
-        .progress-bar {
-            height: 4px;
-            background: var(--border);
-            position: relative;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-        }
-
-        .collaborators {
-            margin-top: 1rem;
-            padding: 1rem;
-            background: var(--primary-light);
-            border: 1px solid var(--border);
-        }
-
-        .collaborator {
+        .detail-row {
             display: flex;
             align-items: center;
             gap: 1rem;
-            margin-bottom: 0.5rem;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            margin-bottom: 0.75rem;
         }
 
-        .collaborator i {
+        .detail-row i {
+            font-size: 1.3rem;
+            color: var(--primary);
+            width: 30px;
+        }
+
+        .detail-content {
+            flex: 1;
+            font-family: 'Inter', monospace;
+            font-size: 1rem;
+        }
+
+        .copy-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: white;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
             color: var(--primary);
         }
 
-        .collaborator a {
+        /* Folder modal */
+        .folder-items {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .folder-item-card {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+
+        .folder-item-card:hover {
+            background: var(--primary-light);
+            border-color: var(--primary-soft);
+            transform: translateX(4px);
+        }
+
+        .folder-item-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
             color: var(--primary);
-            text-decoration: none;
         }
 
-        .collaborator a:hover {
-            text-decoration: underline;
-        }
-
-        /* Modal */
+        /* Modal - warm and welcoming */
         .modal {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(44, 62, 80, 0.3);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
-            z-index: 1000;
+            z-index: 2000;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal.active {
@@ -532,9 +638,11 @@
         .modal-content {
             background: white;
             border: 1px solid var(--border);
+            border-radius: var(--radius);
             width: 100%;
-            max-width: 600px;
-            box-shadow: var(--shadow);
+            max-width: 500px;
+            box-shadow: var(--shadow-md);
+            animation: scaleIn 0.3s ease;
         }
 
         .modal-header {
@@ -543,26 +651,33 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: linear-gradient(135deg, var(--primary-light), white);
+            border-radius: var(--radius) var(--radius) 0 0;
         }
 
         .modal-title {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .modal-close {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--text-light);
             cursor: pointer;
-            transition: color 0.2s;
+            transition: all 0.2s ease;
         }
 
         .modal-close:hover {
-            color: var(--text);
+            color: var(--primary);
+            transform: rotate(90deg);
         }
 
         .modal-body {
-            padding: 1.5rem;
+            padding: 2rem;
             max-height: 70vh;
             overflow-y: auto;
         }
@@ -573,114 +688,20 @@
             display: flex;
             justify-content: flex-end;
             gap: 1rem;
+            background: var(--surface-soft);
+            border-radius: 0 0 var(--radius) var(--radius);
         }
 
-        /* Form elements */
-        .form-group {
-            margin-bottom: 1.5rem;
+        /* Delete modal */
+        .delete-warning {
+            text-align: center;
+            color: #c45d65;
         }
 
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-input, .form-textarea, .form-select {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            background: white;
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        .form-input:focus, .form-textarea:focus, .form-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-        }
-
-        .form-textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        /* Collaborator row */
-        .collaborator-row {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-            align-items: center;
-        }
-
-        .collaborator-row input {
-            flex: 1;
-            padding: 0.5rem;
-            border: 1px solid var(--border);
-        }
-
-        .remove-collab {
-            width: 30px;
-            height: 30px;
-            border: 1px solid var(--border);
-            background: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .remove-collab:hover {
-            background: #fee2e2;
-            border-color: #dc2626;
-            color: #dc2626;
-        }
-
-        .add-collab {
-            margin-top: 0.5rem;
-            padding: 0.5rem;
-            border: 1px dashed var(--border);
-            background: transparent;
-            width: 100%;
-            cursor: pointer;
-            color: var(--primary);
-        }
-
-        /* Breadcrumb */
-        .breadcrumb {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .breadcrumb-item {
-            font-size: 0.95rem;
-            color: var(--text-light);
-            cursor: pointer;
-        }
-
-        .breadcrumb-item:hover {
-            color: var(--primary);
-        }
-
-        .breadcrumb-item.active {
-            color: var(--text);
-            font-weight: 500;
-        }
-
-        .breadcrumb-separator {
-            color: var(--border);
+        .delete-icon {
+            font-size: 3rem;
+            color: #c45d65;
+            margin-bottom: 1rem;
         }
 
         /* Empty state */
@@ -690,32 +711,30 @@
             text-align: center;
             background: white;
             border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
         }
 
         .empty-icon {
-            font-size: 3rem;
+            font-size: 4rem;
             color: var(--border);
             margin-bottom: 1rem;
         }
 
         .empty-text {
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             color: var(--text-light);
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
         }
 
         /* Responsive */
         @media (max-width: 1024px) {
             .top-bar {
-                padding: 0.75rem 1rem;
+                padding: 1rem;
             }
             
             .search-container {
-                width: 200px;
-            }
-            
-            .workspace-tab {
-                padding: 1rem;
+                width: 240px;
             }
         }
 
@@ -725,7 +744,7 @@
             }
             
             .search-container {
-                width: 160px;
+                width: 180px;
             }
             
             .doc-header {
@@ -738,11 +757,12 @@
                 flex-direction: column;
             }
             
-            .document-grid {
-                grid-template-columns: 1fr;
+            .workspace-tab {
+                width: 100%;
+                justify-content: center;
             }
             
-            .form-row {
+            .document-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -755,7 +775,7 @@
             <div class="top-bar-left">
                 <div class="logo" onclick="window.location.href='vault.html'">
                     <span class="logo-icon">🔐</span>
-                    <span>BOVEDA</span>
+                    <span>Boveda</span>
                 </div>
                 <div class="nav-menu">
                     <button class="nav-item active">Documents</button>
@@ -767,7 +787,7 @@
             <div class="top-bar-right">
                 <div class="search-container">
                     <i class='bx bx-search search-icon'></i>
-                    <input type="text" class="search-input" id="searchInput" placeholder="Search documents...">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search your vault...">
                 </div>
                 <div class="user-menu">
                     <div class="user-avatar">JD</div>
@@ -784,22 +804,17 @@
                     <button class="back-btn" id="backBtn">
                         <i class='bx bx-arrow-back'></i>
                     </button>
-                    <h1 class="page-title">Document Workspace</h1>
+                    <h1 class="page-title">Your Vault</h1>
                 </div>
                 <div class="doc-actions">
                     <button class="doc-btn" id="exportBtn">
                         <i class='bx bx-export'></i>
-                        Export All
+                        Export
                     </button>
                 </div>
             </div>
 
             <!-- Breadcrumb -->
-            <div class="breadcrumb" id="breadcrumb">
-                <span class="breadcrumb-item active">All Documents</span>
-            </div>
-
-            <!-- Workspace Tabs -->
             <div class="workspace-tabs" id="workspaceTabs">
                 <button class="workspace-tab active" data-category="logins">
                     <i class='bx bx-lock-alt'></i>
@@ -826,20 +841,52 @@
         </div>
     </div>
 
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">
+                    <i class='bx bx-lock-alt'></i>
+                    Login Details
+                </h2>
+                <i class='bx bx-x modal-close' id="closeLoginModal"></i>
+            </div>
+            <div class="modal-body">
+                <div class="login-details" id="loginDetails">
+                    <!-- Dynamic content -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="doc-btn" id="editLoginBtn">
+                    <i class='bx bx-edit'></i>
+                    Edit
+                </button>
+                <button class="doc-btn primary" id="closeLoginBtn">Close</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Folder Modal -->
     <div class="modal" id="folderModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title" id="folderModalTitle">Folder Contents</h2>
+                <h2 class="modal-title">
+                    <i class='bx bx-folder'></i>
+                    <span id="folderModalTitle">Folder</span>
+                </h2>
                 <i class='bx bx-x modal-close' id="closeFolderModal"></i>
             </div>
             <div class="modal-body">
-                <div class="folder-header" style="margin-bottom: 1.5rem;">
-                    <h3 id="folderModalName" style="font-size: 1.5rem; font-weight: 600;"></h3>
-                </div>
-                <div class="document-grid" id="folderItemsGrid" style="grid-template-columns: 1fr;">
+                <div class="folder-items" id="folderItems">
                     <!-- Folder items will be displayed here -->
                 </div>
+            </div>
+            <div class="modal-footer">
+                <button class="doc-btn" id="editFolderBtn">
+                    <i class='bx bx-edit'></i>
+                    Rename
+                </button>
+                <button class="doc-btn primary" id="closeFolderBtn">Close</button>
             </div>
         </div>
     </div>
@@ -848,15 +895,21 @@
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Delete Document</h2>
+                <h2 class="modal-title">
+                    <i class='bx bx-trash'></i>
+                    Delete Document
+                </h2>
                 <i class='bx bx-x modal-close' id="closeDeleteModal"></i>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this document? This action cannot be undone.</p>
+                <div class="delete-warning">
+                    <div class="delete-icon">💫</div>
+                    <p>Are you sure you want to delete this? It will be gone forever (a long time).</p>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="doc-btn" id="cancelDelete">Cancel</button>
-                <button class="doc-btn primary" style="background: #dc2626;" id="confirmDelete">Delete</button>
+                <button class="doc-btn primary" style="background: #c45d65;" id="confirmDelete">Delete</button>
             </div>
         </div>
     </div>
@@ -873,6 +926,8 @@
         let currentCategory = 'logins';
         let searchTerm = '';
         let itemToDelete = null;
+        let currentLogin = null;
+        let currentFolder = null;
 
         // DOM elements
         const documentGrid = document.getElementById('documentGrid');
@@ -880,23 +935,68 @@
         const workspaceTabs = document.querySelectorAll('.workspace-tab');
         const exportBtn = document.getElementById('exportBtn');
         const backBtn = document.getElementById('backBtn');
+        const userName = document.getElementById('userName');
+        
+        // Login modal
+        const loginModal = document.getElementById('loginModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeLoginBtn = document.getElementById('closeLoginBtn');
+        const editLoginBtn = document.getElementById('editLoginBtn');
+        const loginDetails = document.getElementById('loginDetails');
+        
+        // Folder modal
         const folderModal = document.getElementById('folderModal');
         const closeFolderModal = document.getElementById('closeFolderModal');
-        const folderModalName = document.getElementById('folderModalName');
-        const folderItemsGrid = document.getElementById('folderItemsGrid');
-        const userName = document.getElementById('userName');
+        const closeFolderBtn = document.getElementById('closeFolderBtn');
+        const editFolderBtn = document.getElementById('editFolderBtn');
+        const folderModalTitle = document.getElementById('folderModalTitle');
+        const folderItems = document.getElementById('folderItems');
+        
+        // Delete modal
         const deleteModal = document.getElementById('deleteModal');
         const closeDeleteModal = document.getElementById('closeDeleteModal');
         const cancelDelete = document.getElementById('cancelDelete');
         const confirmDelete = document.getElementById('confirmDelete');
 
         // Set user name
-        const userEmail = sessionStorage.getItem('userEmail') || 'john.doe@example.com';
+        const userEmail = sessionStorage.getItem('userEmail') || 'guest@boveda.com';
         userName.textContent = userEmail.split('@')[0];
 
         // Save data
         function saveData() {
             localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
+        }
+
+        // Copy to clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('Copied to clipboard!');
+            });
+        }
+
+        // Show notification
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                bottom: 2rem;
+                right: 2rem;
+                background: white;
+                border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
+                padding: 1rem 1.5rem;
+                box-shadow: var(--shadow-md);
+                z-index: 3000;
+                animation: slideIn 0.3s ease;
+                color: var(--text);
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'fadeOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 2000);
         }
 
         // Render documents
@@ -906,21 +1006,20 @@
             if (searchTerm) {
                 const term = searchTerm.toLowerCase();
                 items = items.filter(item => 
-                    item.title?.toLowerCase().includes(term) ||
-                    item.username?.toLowerCase().includes(term) ||
-                    item.text?.toLowerCase().includes(term) ||
-                    item.content?.toLowerCase().includes(term)
+                    (item.title || item.name || '').toLowerCase().includes(term) ||
+                    (item.username || '').toLowerCase().includes(term) ||
+                    (item.content || '').toLowerCase().includes(term)
                 );
             }
 
             if (items.length === 0) {
                 documentGrid.innerHTML = `
                     <div class="empty-state">
-                        <div class="empty-icon">📄</div>
-                        <div class="empty-text">No ${currentCategory} found</div>
-                        <button class="doc-btn primary" onclick="createNewDocument()">
+                        <div class="empty-icon">✨</div>
+                        <div class="empty-text">No ${currentCategory} yet</div>
+                        <button class="doc-btn primary" onclick="createNew()">
                             <i class='bx bx-plus'></i>
-                            Create New ${currentCategory.slice(0, -1)}
+                            Create your first ${currentCategory.slice(0, -1)}
                         </button>
                     </div>
                 `;
@@ -930,7 +1029,7 @@
             documentGrid.innerHTML = items.map(item => {
                 if (currentCategory === 'logins') {
                     return `
-                        <div class="document-item" onclick="openDocument('${item.id}', 'logins')">
+                        <div class="document-item" onclick="openLogin('${item.id}')">
                             <div class="document-header">
                                 <div class="document-icon"><i class='bx bx-lock-alt'></i></div>
                                 <span class="document-type">Login</span>
@@ -938,22 +1037,22 @@
                             <div class="document-title">${item.title || 'Untitled'}</div>
                             <div class="document-meta">
                                 <span><i class='bx bx-globe'></i> ${item.url || 'No URL'}</span>
-                                <span><i class='bx bx-user'></i> ${item.username || 'No username'}</span>
                             </div>
                             <div class="document-footer">
                                 <div class="document-tags">
-                                    <span class="tag">${item.folder ? 'In folder' : 'Root'}</span>
+                                    <span class="tag">${item.username || 'No username'}</span>
                                 </div>
                                 <div class="document-actions" onclick="event.stopPropagation()">
-                                    <button class="doc-action-btn" onclick="editDocument('${item.id}', 'logins')"><i class='bx bx-edit'></i></button>
-                                    <button class="doc-action-btn" onclick="deleteDocument('${item.id}', 'logins')"><i class='bx bx-trash'></i></button>
+                                    <button class="doc-action-btn" onclick="deleteItem('${item.id}', 'logins')">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else if (currentCategory === 'notes') {
                     return `
-                        <div class="document-item" onclick="openDocument('${item.id}', 'notes')">
+                        <div class="document-item" onclick="openNote('${item.id}')">
                             <div class="document-header">
                                 <div class="document-icon"><i class='bx bx-note'></i></div>
                                 <span class="document-type">Note</span>
@@ -962,21 +1061,19 @@
                             <div class="document-meta">
                                 <span><i class='bx bx-calendar'></i> ${new Date(item.createdAt || Date.now()).toLocaleDateString()}</span>
                             </div>
-                            <div class="document-preview">${(item.content || '').replace(/<[^>]*>/g, '').substring(0, 120)}...</div>
+                            <div class="document-preview">${(item.content || '').replace(/<[^>]*>/g, '').substring(0, 100)}...</div>
                             <div class="document-footer">
-                                <div class="document-tags">
-                                    <span class="tag">${item.folder ? 'In folder' : 'Root'}</span>
-                                </div>
                                 <div class="document-actions" onclick="event.stopPropagation()">
-                                    <button class="doc-action-btn" onclick="editDocument('${item.id}', 'notes')"><i class='bx bx-edit'></i></button>
-                                    <button class="doc-action-btn" onclick="deleteDocument('${item.id}', 'notes')"><i class='bx bx-trash'></i></button>
+                                    <button class="doc-action-btn" onclick="deleteItem('${item.id}', 'notes')">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
                     `;
                 } else if (currentCategory === 'projects') {
                     return `
-                        <div class="document-item" onclick="openDocument('${item.id}', 'projects')">
+                        <div class="document-item" onclick="openProject('${item.id}')">
                             <div class="document-header">
                                 <div class="document-icon"><i class='bx bx-briefcase'></i></div>
                                 <span class="document-type">Project</span>
@@ -987,18 +1084,11 @@
                                 <span class="status-badge">${item.status || 'starting'}</span>
                             </div>
                             ${item.image ? `<img src="${item.image}" class="document-image" alt="Project">` : ''}
-                            <div class="project-progress">
-                                <div class="progress-bar">
-                                    <div class="progress-fill" style="width: ${item.progress || 0}%"></div>
-                                </div>
-                            </div>
                             <div class="document-footer">
-                                <div class="document-tags">
-                                    <span class="tag">${item.folder ? 'In folder' : 'Root'}</span>
-                                </div>
                                 <div class="document-actions" onclick="event.stopPropagation()">
-                                    <button class="doc-action-btn" onclick="editDocument('${item.id}', 'projects')"><i class='bx bx-edit'></i></button>
-                                    <button class="doc-action-btn" onclick="deleteDocument('${item.id}', 'projects')"><i class='bx bx-trash'></i></button>
+                                    <button class="doc-action-btn" onclick="deleteItem('${item.id}', 'projects')">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1015,15 +1105,11 @@
                             <div class="document-meta">
                                 <span><i class='bx bx-file'></i> ${items.length} items</span>
                             </div>
-                            <div class="folder-stats">
-                                <span class="stat"><i class='bx bx-lock-alt'></i> ${items.filter(id => vaultData.logins.find(l => l.id === id)).length}</span>
-                                <span class="stat"><i class='bx bx-note'></i> ${items.filter(id => vaultData.notes.find(n => n.id === id)).length}</span>
-                                <span class="stat"><i class='bx bx-briefcase'></i> ${items.filter(id => vaultData.projects.find(p => p.id === id)).length}</span>
-                            </div>
                             <div class="document-footer">
                                 <div class="document-actions" onclick="event.stopPropagation()">
-                                    <button class="doc-action-btn" onclick="editFolder('${item.id}')"><i class='bx bx-edit'></i></button>
-                                    <button class="doc-action-btn" onclick="deleteFolder('${item.id}')"><i class='bx bx-trash'></i></button>
+                                    <button class="doc-action-btn" onclick="deleteItem('${item.id}', 'folders')">
+                                        <i class='bx bx-trash'></i>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -1032,81 +1118,74 @@
             }).join('');
         }
 
-        // Open document in doc.html
-        function openDocument(id, type) {
-            sessionStorage.setItem('currentDocId', id);
-            sessionStorage.setItem('currentDocType', type);
-            window.location.href = 'doc.html';
-        }
-
-        // Create new document
-        window.createNewDocument = function() {
-            sessionStorage.removeItem('currentDocId');
-            sessionStorage.setItem('currentDocType', currentCategory.slice(0, -1));
-            window.location.href = 'doc.html';
-        };
-
-        // Edit document
-        window.editDocument = function(id, type) {
-            sessionStorage.setItem('currentDocId', id);
-            sessionStorage.setItem('currentDocType', type);
-            window.location.href = 'doc.html';
-        };
-
-        // Delete document
-        window.deleteDocument = function(id, type) {
-            itemToDelete = { id, type };
-            deleteModal.classList.add('active');
-        };
-
-        // Confirm delete
-        confirmDelete.addEventListener('click', () => {
-            if (itemToDelete) {
-                vaultData[itemToDelete.type] = vaultData[itemToDelete.type].filter(item => item.id !== itemToDelete.id);
-                
-                // Remove from folders
-                vaultData.folders.forEach(folder => {
-                    if (folder.items) {
-                        folder.items = folder.items.filter(itemId => itemId !== itemToDelete.id);
-                    }
-                });
-                
-                saveData();
-                renderDocuments();
-                deleteModal.classList.remove('active');
-                itemToDelete = null;
+        // Open login modal
+        window.openLogin = (id) => {
+            const login = vaultData.logins.find(l => l.id === id);
+            if (login) {
+                currentLogin = login;
+                loginDetails.innerHTML = `
+                    <div class="detail-row">
+                        <i class='bx bx-globe'></i>
+                        <div class="detail-content">${login.url || 'No URL'}</div>
+                        <button class="copy-btn" onclick="copyToClipboard('${login.url || ''}')">Copy</button>
+                    </div>
+                    <div class="detail-row">
+                        <i class='bx bx-user'></i>
+                        <div class="detail-content">${login.username || 'No username'}</div>
+                        <button class="copy-btn" onclick="copyToClipboard('${login.username || ''}')">Copy</button>
+                    </div>
+                    <div class="detail-row">
+                        <i class='bx bx-lock-alt'></i>
+                        <div class="detail-content">••••••••</div>
+                        <button class="copy-btn" onclick="copyToClipboard('${login.password || ''}')">Copy</button>
+                    </div>
+                `;
+                loginModal.classList.add('active');
             }
-        });
+        };
 
-        // Open folder
-        window.openFolder = (folderId) => {
-            const folder = vaultData.folders.find(f => f.id === folderId);
+        // Open note in doc.html
+        window.openNote = (id) => {
+            sessionStorage.setItem('currentDocId', id);
+            sessionStorage.setItem('currentDocType', 'note');
+            window.location.href = 'doc.html';
+        };
+
+        // Open project in doc.html
+        window.openProject = (id) => {
+            sessionStorage.setItem('currentDocId', id);
+            sessionStorage.setItem('currentDocType', 'project');
+            window.location.href = 'doc.html';
+        };
+
+        // Open folder modal
+        window.openFolder = (id) => {
+            const folder = vaultData.folders.find(f => f.id === id);
             if (folder) {
-                folderModalName.textContent = folder.name;
+                currentFolder = folder;
+                folderModalTitle.textContent = folder.name;
                 
                 const items = folder.items || [];
                 if (items.length === 0) {
-                    folderItemsGrid.innerHTML = `
-                        <div class="empty-state">
-                            <div class="empty-icon">📂</div>
-                            <div class="empty-text">Folder is empty</div>
-                        </div>
-                    `;
+                    folderItems.innerHTML = '<p style="color: var(--text-light); text-align: center;">This folder is empty ✨</p>';
                 } else {
-                    folderItemsGrid.innerHTML = items.map(id => {
-                        const login = vaultData.logins.find(l => l.id === id);
-                        const note = vaultData.notes.find(n => n.id === id);
-                        const project = vaultData.projects.find(p => p.id === id);
+                    folderItems.innerHTML = items.map(itemId => {
+                        const login = vaultData.logins.find(l => l.id === itemId);
+                        const note = vaultData.notes.find(n => n.id === itemId);
+                        const project = vaultData.projects.find(p => p.id === itemId);
                         const item = login || note || project;
                         
                         if (item) {
+                            const type = login ? 'login' : note ? 'note' : 'project';
                             return `
-                                <div class="document-item" onclick="openDocument('${item.id}', '${login ? 'logins' : note ? 'notes' : 'projects'}')">
-                                    <div class="document-header">
-                                        <div class="document-icon"><i class='bx ${login ? 'bx-lock-alt' : note ? 'bx-note' : 'bx-briefcase'}'></i></div>
-                                        <span class="document-type">${login ? 'Login' : note ? 'Note' : 'Project'}</span>
+                                <div class="folder-item-card" onclick="${type === 'note' || type === 'project' ? `open${type === 'note' ? 'Note' : 'Project'}('${item.id}')` : `open${type === 'login' ? 'Login' : 'Folder'}('${item.id}')`}">
+                                    <div class="folder-item-icon">
+                                        <i class='bx ${login ? 'bx-lock-alt' : note ? 'bx-note' : 'bx-briefcase'}'></i>
                                     </div>
-                                    <div class="document-title">${item.title || 'Untitled'}</div>
+                                    <div style="flex: 1;">
+                                        <strong>${item.title || item.name || 'Untitled'}</strong>
+                                        <div style="font-size: 0.85rem; color: var(--text-light);">${type}</div>
+                                    </div>
                                 </div>
                             `;
                         }
@@ -1117,26 +1196,43 @@
             }
         };
 
-        // Edit folder
-        window.editFolder = (id) => {
-            const newName = prompt('Enter new folder name:');
-            if (newName) {
-                const folder = vaultData.folders.find(f => f.id === id);
-                if (folder) {
-                    folder.name = newName;
+        // Create new
+        window.createNew = () => {
+            if (currentCategory === 'notes' || currentCategory === 'projects') {
+                sessionStorage.removeItem('currentDocId');
+                sessionStorage.setItem('currentDocType', currentCategory.slice(0, -1));
+                window.location.href = 'doc.html';
+            } else if (currentCategory === 'logins') {
+                const newLogin = {
+                    id: Date.now().toString(),
+                    title: 'New Login',
+                    url: '',
+                    username: '',
+                    password: '',
+                    createdAt: new Date().toISOString()
+                };
+                vaultData.logins.push(newLogin);
+                saveData();
+                renderDocuments();
+                openLogin(newLogin.id);
+            } else if (currentCategory === 'folders') {
+                const name = prompt('Folder name:');
+                if (name) {
+                    vaultData.folders.push({
+                        id: Date.now().toString(),
+                        name: name,
+                        items: []
+                    });
                     saveData();
                     renderDocuments();
                 }
             }
         };
 
-        // Delete folder
-        window.deleteFolder = (id) => {
-            if (confirm('Delete this folder? Items inside will not be deleted.')) {
-                vaultData.folders = vaultData.folders.filter(f => f.id !== id);
-                saveData();
-                renderDocuments();
-            }
+        // Delete item
+        window.deleteItem = (id, type) => {
+            itemToDelete = { id, type };
+            deleteModal.classList.add('active');
         };
 
         // Event listeners
@@ -1160,7 +1256,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `boveda-export-${new Date().toISOString()}.json`;
+            a.download = `boveda-${new Date().toISOString()}.json`;
             a.click();
         });
 
@@ -1168,9 +1264,41 @@
             window.location.href = 'index.html';
         });
 
-        // Modal close
-        closeFolderModal.addEventListener('click', () => {
-            folderModal.classList.remove('active');
+        // Login modal close
+        closeLoginModal.addEventListener('click', () => loginModal.classList.remove('active'));
+        closeLoginBtn.addEventListener('click', () => loginModal.classList.remove('active'));
+        
+        editLoginBtn.addEventListener('click', () => {
+            if (currentLogin) {
+                const newTitle = prompt('Edit title:', currentLogin.title);
+                if (newTitle) {
+                    currentLogin.title = newTitle;
+                    saveData();
+                    renderDocuments();
+                }
+            }
+        });
+
+        loginModal.addEventListener('click', (e) => {
+            if (e.target === loginModal) {
+                loginModal.classList.remove('active');
+            }
+        });
+
+        // Folder modal close
+        closeFolderModal.addEventListener('click', () => folderModal.classList.remove('active'));
+        closeFolderBtn.addEventListener('click', () => folderModal.classList.remove('active'));
+        
+        editFolderBtn.addEventListener('click', () => {
+            if (currentFolder) {
+                const newName = prompt('Rename folder:', currentFolder.name);
+                if (newName) {
+                    currentFolder.name = newName;
+                    saveData();
+                    renderDocuments();
+                    folderModalTitle.textContent = newName;
+                }
+            }
         });
 
         folderModal.addEventListener('click', (e) => {
@@ -1179,14 +1307,29 @@
             }
         });
 
-        closeDeleteModal.addEventListener('click', () => {
-            deleteModal.classList.remove('active');
-            itemToDelete = null;
-        });
+        // Delete modal
+        closeDeleteModal.addEventListener('click', () => deleteModal.classList.remove('active'));
+        cancelDelete.addEventListener('click', () => deleteModal.classList.remove('active'));
 
-        cancelDelete.addEventListener('click', () => {
-            deleteModal.classList.remove('active');
-            itemToDelete = null;
+        confirmDelete.addEventListener('click', () => {
+            if (itemToDelete) {
+                vaultData[itemToDelete.type] = vaultData[itemToDelete.type].filter(item => 
+                    (item.id || item.name) !== itemToDelete.id
+                );
+                
+                // Remove from folders
+                vaultData.folders.forEach(folder => {
+                    if (folder.items) {
+                        folder.items = folder.items.filter(id => id !== itemToDelete.id);
+                    }
+                });
+                
+                saveData();
+                renderDocuments();
+                deleteModal.classList.remove('active');
+                itemToDelete = null;
+                showNotification('✨ Poof! It\'s gone');
+            }
         });
 
         deleteModal.addEventListener('click', (e) => {
@@ -1195,6 +1338,23 @@
                 itemToDelete = null;
             }
         });
+
+        // Make functions global
+        window.copyToClipboard = copyToClipboard;
+        window.openLogin = openLogin;
+        window.openNote = openNote;
+        window.openProject = openProject;
+        window.openFolder = openFolder;
+
+        // Add fadeOut animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(10px); }
+            }
+        `;
+        document.head.appendChild(style);
 
         // Initialize
         renderDocuments();
