@@ -19,44 +19,63 @@
 
         body {
             font-family: "Inter", sans-serif;
-            background: #f5f5f7;
-            color: #1d1d1f;
+            background: #f8f5f2;
+            color: #2c3e50;
             min-height: 100vh;
-            line-height: 1.5;
+            line-height: 1.6;
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Warm, welcoming color palette */
         :root {
-            --primary: #0066CC;
-            --primary-light: #E3F0FF;
-            --secondary: #86868b;
-            --background: #f5f5f7;
+            --primary: #6b4f8b;
+            --primary-light: #f0e9f5;
+            --primary-soft: #a58bc1;
+            --secondary: #e8b4b8;
+            --secondary-light: #fde9ea;
+            --accent: #7fb7be;
+            --background: #f8f5f2;
             --surface: #ffffff;
-            --border: #d2d2d7;
-            --text: #1d1d1f;
-            --text-light: #86868b;
-            --shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
+            --surface-soft: #fefcf9;
+            --border: #e2d9d1;
+            --text: #2c3e50;
+            --text-light: #7f8c8d;
+            --shadow-sm: 0 4px 12px rgba(107, 79, 139, 0.08);
+            --shadow-md: 0 8px 24px rgba(107, 79, 139, 0.12);
+            --radius: 16px;
+            --radius-sm: 12px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(-20px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
 
         .app {
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            animation: fadeIn 0.5s ease;
         }
 
         /* Top Bar */
         .top-bar {
-            background: rgba(255,255,255,0.8);
+            background: rgba(255, 255, 255, 0.85);
             backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 0.75rem 2rem;
+            padding: 1rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             position: sticky;
             top: 0;
             z-index: 100;
+            box-shadow: var(--shadow-sm);
         }
 
         .top-bar-left {
@@ -68,22 +87,22 @@
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
             font-weight: 600;
-            font-size: 1.25rem;
-            color: var(--text);
+            font-size: 1.4rem;
+            color: var(--primary);
             cursor: pointer;
         }
 
         .logo-icon {
-            font-size: 1.5rem;
-            color: var(--primary);
+            font-size: 1.8rem;
         }
 
         .doc-type-badge {
-            padding: 0.5rem 1rem;
+            padding: 0.5rem 1.5rem;
             background: var(--primary-light);
-            border: 1px solid var(--primary);
+            border: 1px solid var(--primary-soft);
+            border-radius: 30px;
             color: var(--primary);
             font-weight: 500;
         }
@@ -91,36 +110,38 @@
         .top-bar-right {
             display: flex;
             align-items: center;
-            gap: 1.5rem;
         }
 
         .user-menu {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
-            padding: 0.25rem 0.5rem;
-            cursor: pointer;
+            gap: 1rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
         }
 
         .user-avatar {
             width: 32px;
             height: 32px;
-            background: var(--primary-light);
-            border: 1px solid var(--border);
+            background: linear-gradient(135deg, var(--primary), var(--primary-soft));
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 600;
-            color: var(--primary);
+            color: white;
         }
 
         /* Main content */
         .main-content {
             flex: 1;
             padding: 2rem;
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
             width: 100%;
+            animation: slideIn 0.5s ease;
         }
 
         /* Editor header */
@@ -131,48 +152,58 @@
             margin-bottom: 2rem;
             flex-wrap: wrap;
             gap: 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
         }
 
         .editor-header-left {
             display: flex;
             align-items: center;
             gap: 1rem;
+            flex: 1;
         }
 
         .back-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border: 1px solid var(--border);
             background: white;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.25rem;
-            color: var(--text);
+            font-size: 1.3rem;
+            color: var(--primary);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .back-btn:hover {
             background: var(--primary-light);
             border-color: var(--primary);
-            color: var(--primary);
+            transform: translateX(-3px);
         }
 
         .title-input {
             font-size: 1.5rem;
             font-weight: 600;
-            padding: 0.5rem 1rem;
+            padding: 0.75rem 1rem;
             border: 1px solid var(--border);
-            background: white;
+            border-radius: var(--radius-sm);
+            background: var(--surface-soft);
             color: var(--text);
-            width: 400px;
+            width: 100%;
+            max-width: 400px;
+            transition: all 0.2s ease;
         }
 
         .title-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+            box-shadow: 0 0 0 4px rgba(107, 79, 139, 0.1);
         }
 
         .editor-actions {
@@ -181,14 +212,15 @@
         }
 
         .doc-btn {
-            padding: 0.6rem 1.2rem;
+            padding: 0.7rem 1.5rem;
             border: 1px solid var(--border);
             background: white;
+            border-radius: var(--radius-sm);
             font-size: 0.95rem;
             font-weight: 500;
             color: var(--text);
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -198,6 +230,7 @@
             background: var(--primary-light);
             border-color: var(--primary);
             color: var(--primary);
+            transform: translateY(-2px);
         }
 
         .doc-btn.primary {
@@ -207,15 +240,17 @@
         }
 
         .doc-btn.primary:hover {
-            background: #0052a3;
+            background: #5a4275;
         }
 
         /* Type-specific fields */
         .type-fields {
             background: white;
             border: 1px solid var(--border);
+            border-radius: var(--radius);
             margin-bottom: 2rem;
             padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
         }
 
         .fields-grid {
@@ -239,81 +274,95 @@
             gap: 0.5rem;
         }
 
-        .field-input, .field-select, .field-textarea {
+        .field-input, .field-select {
             padding: 0.75rem;
             border: 1px solid var(--border);
-            background: white;
+            border-radius: var(--radius-sm);
+            background: var(--surface-soft);
             font-size: 1rem;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
-        .field-input:focus, .field-select:focus, .field-textarea:focus {
+        .field-input:focus, .field-select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+            box-shadow: 0 0 0 4px rgba(107, 79, 139, 0.1);
         }
 
         .image-preview {
-            max-width: 300px;
-            max-height: 200px;
+            max-width: 200px;
+            max-height: 150px;
             object-fit: cover;
+            border-radius: var(--radius-sm);
             border: 1px solid var(--border);
             margin-top: 0.5rem;
         }
 
         /* Collaborators section */
         .collaborators-section {
-            margin-top: 1rem;
-            padding: 1rem;
+            margin-top: 1.5rem;
+            padding: 1.5rem;
             background: var(--primary-light);
-            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
         }
 
         .collaborator-row {
             display: flex;
             gap: 0.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             align-items: center;
         }
 
         .collaborator-row input {
             flex: 1;
-            padding: 0.5rem;
+            padding: 0.6rem;
             border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
         }
 
         .remove-collab {
-            width: 30px;
-            height: 30px;
+            width: 36px;
+            height: 36px;
             border: 1px solid var(--border);
             background: white;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
+            transition: all 0.2s ease;
         }
 
         .remove-collab:hover {
-            background: #fee2e2;
-            border-color: #dc2626;
-            color: #dc2626;
+            background: #fde9ea;
+            border-color: #c45d65;
+            color: #c45d65;
         }
 
         .add-collab {
             margin-top: 0.5rem;
-            padding: 0.5rem;
-            border: 1px dashed var(--border);
+            padding: 0.75rem;
+            border: 1px dashed var(--primary-soft);
             background: transparent;
+            border-radius: var(--radius-sm);
             width: 100%;
             cursor: pointer;
             color: var(--primary);
+            transition: all 0.2s ease;
+        }
+
+        .add-collab:hover {
+            background: white;
+            border-style: solid;
         }
 
         /* Editor container */
         .editor-container {
             background: white;
             border: 1px solid var(--border);
-            min-height: 500px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
         }
 
         .ck-editor__editable {
@@ -326,15 +375,16 @@
         }
 
         .dots-btn {
-            width: 40px;
-            height: 40px;
+            width: 44px;
+            height: 44px;
             border: 1px solid var(--border);
             background: white;
+            border-radius: var(--radius-sm);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .dots-btn:hover {
@@ -349,7 +399,8 @@
             margin-top: 0.5rem;
             background: white;
             border: 1px solid var(--border);
-            box-shadow: var(--shadow);
+            border-radius: var(--radius-sm);
+            box-shadow: var(--shadow-md);
             min-width: 200px;
             display: none;
             z-index: 1000;
@@ -357,6 +408,7 @@
 
         .dots-dropdown.show {
             display: block;
+            animation: fadeIn 0.2s ease;
         }
 
         .dropdown-item {
@@ -365,7 +417,7 @@
             align-items: center;
             gap: 0.75rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .dropdown-item:hover {
@@ -373,8 +425,8 @@
         }
 
         .dropdown-item.delete:hover {
-            background: #fee2e2;
-            color: #dc2626;
+            background: #fde9ea;
+            color: #c45d65;
         }
 
         /* Modal */
@@ -384,7 +436,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.5);
+            background: rgba(44, 62, 80, 0.3);
+            backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
@@ -393,13 +446,17 @@
 
         .modal.active {
             display: flex;
+            animation: fadeIn 0.3s ease;
         }
 
         .modal-content {
             background: white;
             border: 1px solid var(--border);
+            border-radius: var(--radius);
             width: 100%;
             max-width: 500px;
+            box-shadow: var(--shadow-md);
+            animation: slideIn 0.3s ease;
         }
 
         .modal-header {
@@ -408,17 +465,26 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            background: linear-gradient(135deg, var(--primary-light), white);
+            border-radius: var(--radius) var(--radius) 0 0;
         }
 
         .modal-title {
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             font-weight: 600;
+            color: var(--primary);
         }
 
         .modal-close {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: var(--text-light);
             cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+            transform: rotate(90deg);
         }
 
         .modal-body {
@@ -437,6 +503,7 @@
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
         }
 
         @media (max-width: 768px) {
@@ -446,15 +513,11 @@
             
             .editor-header {
                 flex-direction: column;
-                align-items: flex-start;
+                align-items: stretch;
             }
             
             .title-input {
-                width: 100%;
-            }
-            
-            .fields-grid {
-                grid-template-columns: 1fr;
+                max-width: 100%;
             }
         }
     </style>
@@ -466,7 +529,7 @@
             <div class="top-bar-left">
                 <div class="logo" onclick="window.location.href='vault.html'">
                     <span class="logo-icon">🔐</span>
-                    <span>BOVEDA</span>
+                    <span>Boveda</span>
                 </div>
                 <span class="doc-type-badge" id="docTypeBadge">Note</span>
             </div>
@@ -486,7 +549,7 @@
                     <button class="back-btn" id="backBtn">
                         <i class='bx bx-arrow-back'></i>
                     </button>
-                    <input type="text" class="title-input" id="docTitle" placeholder="Untitled Document">
+                    <input type="text" class="title-input" id="docTitle" placeholder="Give it a lovely title...">
                 </div>
                 <div class="editor-actions">
                     <button class="doc-btn" id="saveBtn">
@@ -521,24 +584,6 @@
 
             <!-- Type-specific fields -->
             <div class="type-fields" id="typeFields">
-                <!-- Login fields -->
-                <div id="loginFields" style="display: none;">
-                    <div class="fields-grid">
-                        <div class="field-group">
-                            <label class="field-label"><i class='bx bx-globe'></i> Website URL</label>
-                            <input type="url" class="field-input" id="loginUrl" placeholder="https://example.com">
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class='bx bx-user'></i> Username / Email</label>
-                            <input type="text" class="field-input" id="loginUsername" placeholder="username@example.com">
-                        </div>
-                        <div class="field-group">
-                            <label class="field-label"><i class='bx bx-lock-alt'></i> Password</label>
-                            <input type="password" class="field-input" id="loginPassword" placeholder="••••••••">
-                        </div>
-                    </div>
-                </div>
-
                 <!-- Project fields -->
                 <div id="projectFields" style="display: none;">
                     <div class="fields-grid">
@@ -555,20 +600,20 @@
                         <div class="field-group">
                             <label class="field-label"><i class='bx bx-status'></i> Status</label>
                             <select class="field-select" id="projectStatus">
-                                <option value="starting">Starting</option>
-                                <option value="in-progress">In Progress</option>
-                                <option value="completed">Completed</option>
-                                <option value="on-hold">On Hold</option>
+                                <option value="starting">Starting fresh ✨</option>
+                                <option value="in-progress">Making progress 🌱</option>
+                                <option value="completed">All done! 🎉</option>
+                                <option value="on-hold">Taking a break 💫</option>
                             </select>
                         </div>
                     </div>
 
                     <!-- Collaborators -->
                     <div class="collaborators-section">
-                        <label class="field-label"><i class='bx bx-group'></i> Collaborators</label>
+                        <label class="field-label"><i class='bx bx-group'></i> Lovely collaborators</label>
                         <div id="collaboratorsList"></div>
                         <button class="add-collab" id="addCollaborator">
-                            <i class='bx bx-plus'></i> Add Collaborator
+                            <i class='bx bx-plus'></i> Add a teammate
                         </button>
                     </div>
                 </div>
@@ -576,7 +621,7 @@
 
             <!-- CKEditor container -->
             <div class="editor-container">
-                <textarea id="editor"></textarea>
+                <textarea id="editor" placeholder="Write something wonderful..."></textarea>
             </div>
         </div>
     </div>
@@ -585,14 +630,14 @@
     <div class="modal" id="moveModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Move to Folder</h2>
+                <h2 class="modal-title">Move to folder</h2>
                 <i class='bx bx-x modal-close' id="closeMoveModal"></i>
             </div>
             <div class="modal-body">
                 <div class="field-group">
-                    <label class="field-label">Select Folder</label>
+                    <label class="field-label">Choose a cozy home</label>
                     <select class="folder-select" id="folderSelect">
-                        <option value="">Root (No Folder)</option>
+                        <option value="">Root (no folder)</option>
                     </select>
                 </div>
             </div>
@@ -607,15 +652,15 @@
     <div class="modal" id="deleteModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2 class="modal-title">Delete Document</h2>
+                <h2 class="modal-title">Delete this?</h2>
                 <i class='bx bx-x modal-close' id="closeDeleteModal"></i>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete this document? This action cannot be undone.</p>
+                <p style="text-align: center; color: var(--text-light);">This will be gone forever, like tears in rain 🌧️</p>
             </div>
             <div class="modal-footer">
-                <button class="doc-btn" id="cancelDelete">Cancel</button>
-                <button class="doc-btn primary" style="background: #dc2626;" id="confirmDelete">Delete</button>
+                <button class="doc-btn" id="cancelDelete">Keep it</button>
+                <button class="doc-btn primary" style="background: #c45d65;" id="confirmDelete">Delete</button>
             </div>
         </div>
     </div>
@@ -631,11 +676,7 @@
         // DOM elements
         const docTypeBadge = document.getElementById('docTypeBadge');
         const docTitle = document.getElementById('docTitle');
-        const loginFields = document.getElementById('loginFields');
         const projectFields = document.getElementById('projectFields');
-        const loginUrl = document.getElementById('loginUrl');
-        const loginUsername = document.getElementById('loginUsername');
-        const loginPassword = document.getElementById('loginPassword');
         const projectProgress = document.getElementById('projectProgress');
         const progressValue = document.getElementById('progressValue');
         const projectImage = document.getElementById('projectImage');
@@ -659,15 +700,14 @@
         const confirmDelete = document.getElementById('confirmDelete');
 
         // Set user info
-        const userEmail = sessionStorage.getItem('userEmail') || 'john.doe@example.com';
+        const userEmail = sessionStorage.getItem('userEmail') || 'guest@boveda.com';
         userName.textContent = userEmail.split('@')[0];
         userAvatar.textContent = userEmail.charAt(0).toUpperCase();
 
         // Set document type
-        docTypeBadge.textContent = docType.charAt(0).toUpperCase() + docType.slice(1);
+        docTypeBadge.textContent = docType === 'note' ? '📝 Note' : '🎯 Project';
         
         // Show appropriate fields
-        loginFields.style.display = docType === 'login' ? 'block' : 'none';
         projectFields.style.display = docType === 'project' ? 'block' : 'none';
 
         // Load data from localStorage
@@ -686,11 +726,7 @@
             if (currentDoc) {
                 docTitle.value = currentDoc.title || '';
                 
-                if (docType === 'login') {
-                    loginUrl.value = currentDoc.url || '';
-                    loginUsername.value = currentDoc.username || '';
-                    loginPassword.value = currentDoc.password || '';
-                } else if (docType === 'project') {
+                if (docType === 'project') {
                     projectProgress.value = currentDoc.progress || 0;
                     progressValue.textContent = currentDoc.progress + '%';
                     projectImage.value = currentDoc.image || '';
@@ -724,7 +760,8 @@
                         { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
                         { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
                     ]
-                }
+                },
+                placeholder: 'Write something wonderful...'
             })
             .then(ckeditor => {
                 editor = ckeditor;
@@ -795,11 +832,7 @@
                 folder: currentDoc?.folder || null
             };
 
-            if (docType === 'login') {
-                docData.url = loginUrl.value;
-                docData.username = loginUsername.value;
-                docData.password = loginPassword.value;
-            } else if (docType === 'project') {
+            if (docType === 'project') {
                 docData.progress = projectProgress.value;
                 docData.image = projectImage.value;
                 docData.status = projectStatus.value;
@@ -825,7 +858,7 @@
             }
 
             localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
-            showNotification('Document saved successfully');
+            showNotification('✨ Saved!');
         }
 
         // Show notification
@@ -837,17 +870,19 @@
                 right: 2rem;
                 background: white;
                 border: 1px solid var(--border);
+                border-radius: var(--radius-sm);
                 padding: 1rem 1.5rem;
-                box-shadow: var(--shadow);
+                box-shadow: var(--shadow-md);
                 z-index: 3000;
                 animation: slideIn 0.3s ease;
+                color: var(--primary);
             `;
             notification.textContent = message;
             document.body.appendChild(notification);
             
             setTimeout(() => {
                 notification.remove();
-            }, 3000);
+            }, 2000);
         }
 
         // Event listeners
@@ -873,7 +908,7 @@
             dotsDropdown.classList.remove('show');
             
             // Populate folder select
-            folderSelect.innerHTML = '<option value="">Root (No Folder)</option>';
+            folderSelect.innerHTML = '<option value="">Root (no folder)</option>';
             vaultData.folders.forEach(folder => {
                 const option = document.createElement('option');
                 option.value = folder.id;
@@ -915,13 +950,13 @@
             
             localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
             moveModal.classList.remove('active');
-            showNotification('Document moved');
+            showNotification('📦 Moved!');
         });
 
         // Duplicate
         document.getElementById('duplicateDoc').addEventListener('click', () => {
             const collection = docType + 's';
-            const newDoc = { ...currentDoc, id: Date.now().toString(), title: (currentDoc?.title || 'Untitled') + ' (Copy)' };
+            const newDoc = { ...currentDoc, id: Date.now().toString(), title: (currentDoc?.title || 'Untitled') + ' (copy)' };
             vaultData[collection].push(newDoc);
             localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
             
@@ -965,16 +1000,6 @@
                 window.location.href = 'vault.html';
             }
         });
-
-        // Add animation styles
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideIn {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
