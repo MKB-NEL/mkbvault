@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boveda · professional document studio</title>
+    <title>Boveda · document editor</title>
     <!-- Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <!-- Boxicons -->
@@ -26,7 +26,6 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* 2026 design system - subtle rounded corners (4px) */
         :root {
             --primary: #0066CC;
             --primary-light: #E3F0FF;
@@ -37,10 +36,8 @@
             --text: #1d1d1f;
             --text-light: #86868b;
             --shadow: 0 4px 6px -2px rgba(0,0,0,0.05), 0 10px 15px -3px rgba(0,0,0,0.1);
-            --radius: 4px;
         }
 
-        /* Layout */
         .app {
             min-height: 100vh;
             display: flex;
@@ -75,6 +72,7 @@
             font-weight: 600;
             font-size: 1.25rem;
             color: var(--text);
+            cursor: pointer;
         }
 
         .logo-icon {
@@ -82,36 +80,18 @@
             color: var(--primary);
         }
 
-        .search-container {
-            position: relative;
-            width: 280px;
+        .doc-type-badge {
+            padding: 0.5rem 1rem;
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            font-weight: 500;
         }
 
-        .search-icon {
-            position: absolute;
-            left: 0.75rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.6rem 1rem 0.6rem 2.5rem;
-            background: rgba(0,0,0,0.02);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.95rem;
-            color: var(--text);
-            transition: all 0.2s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
         }
 
         .user-menu {
@@ -127,7 +107,6 @@
             height: 32px;
             background: var(--primary-light);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -135,176 +114,79 @@
             color: var(--primary);
         }
 
-        /* Main container - split view */
-        .main-container {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 61px);
-            overflow: hidden;
-        }
-
-        /* Left Navigation */
-        .left-nav {
-            width: 280px;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            overflow-y: auto;
-        }
-
-        .nav-section {
-            padding: 1.5rem 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .nav-section-title {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--text-light);
-            margin-bottom: 1rem;
-            font-weight: 600;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: var(--text);
-            cursor: pointer;
-            border-radius: var(--radius);
-            transition: all 0.2s;
-            margin-bottom: 0.25rem;
-        }
-
-        .nav-item i {
-            font-size: 1.25rem;
-            color: var(--text-light);
-        }
-
-        .nav-item:hover {
-            background: var(--primary-light);
-        }
-
-        .nav-item.active {
-            background: var(--primary-light);
-            color: var(--primary);
-            font-weight: 500;
-        }
-
-        .nav-item.active i {
-            color: var(--primary);
-        }
-
-        .nav-item-count {
-            margin-left: auto;
-            font-size: 0.85rem;
-            color: var(--text-light);
-            background: var(--background);
-            padding: 0.2rem 0.6rem;
-            border-radius: var(--radius);
-        }
-
-        /* Folders list */
-        .folders-list {
-            margin-top: 0.5rem;
-        }
-
-        .folder-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.6rem 1rem;
-            cursor: pointer;
-            border-radius: var(--radius);
-            transition: all 0.2s;
-        }
-
-        .folder-item:hover {
-            background: var(--primary-light);
-        }
-
-        .folder-item i {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
-        .folder-item .folder-name {
-            flex: 1;
-            font-size: 0.95rem;
-        }
-
-        .folder-item .folder-count {
-            font-size: 0.8rem;
-            color: var(--text-light);
-        }
-
-        /* Main content area */
+        /* Main content */
         .main-content {
             flex: 1;
-            background: var(--background);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
         }
 
-        /* Document info bar */
-        .document-info {
-            padding: 1rem 1.5rem;
-            background: var(--surface);
-            border-bottom: 1px solid var(--border);
+        /* Editor header */
+        .editor-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
-        .document-title {
+        .editor-header-left {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 1rem;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid var(--border);
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: var(--text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .back-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .title-input {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             font-weight: 600;
-            padding: 0.5rem;
-            border: 1px solid transparent;
-            border-radius: var(--radius);
-            background: transparent;
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border);
+            background: white;
             color: var(--text);
-            width: 300px;
+            width: 400px;
         }
 
         .title-input:focus {
             outline: none;
             border-color: var(--primary);
-            background: white;
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
         }
 
-        .document-type-badge {
-            padding: 0.25rem 0.75rem;
-            background: var(--primary-light);
-            border: 1px solid var(--primary);
-            border-radius: var(--radius);
-            color: var(--primary);
-            font-size: 0.85rem;
-            font-weight: 500;
-        }
-
-        .document-actions {
+        .editor-actions {
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
 
-        .doc-action {
-            padding: 0.5rem 1rem;
+        .doc-btn {
+            padding: 0.6rem 1.2rem;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
             background: white;
-            color: var(--text);
             font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text);
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -312,20 +194,130 @@
             gap: 0.5rem;
         }
 
-        .doc-action:hover {
+        .doc-btn:hover {
             background: var(--primary-light);
             border-color: var(--primary);
             color: var(--primary);
         }
 
-        .doc-action.primary {
+        .doc-btn.primary {
             background: var(--primary);
             border-color: var(--primary);
             color: white;
         }
 
-        .doc-action.primary:hover {
+        .doc-btn.primary:hover {
             background: #0052a3;
+        }
+
+        /* Type-specific fields */
+        .type-fields {
+            background: white;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+        }
+
+        .fields-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .field-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-light);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .field-input, .field-select, .field-textarea {
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            background: white;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .field-input:focus, .field-select:focus, .field-textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
+        }
+
+        .image-preview {
+            max-width: 300px;
+            max-height: 200px;
+            object-fit: cover;
+            border: 1px solid var(--border);
+            margin-top: 0.5rem;
+        }
+
+        /* Collaborators section */
+        .collaborators-section {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--primary-light);
+            border: 1px solid var(--border);
+        }
+
+        .collaborator-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            align-items: center;
+        }
+
+        .collaborator-row input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .remove-collab {
+            width: 30px;
+            height: 30px;
+            border: 1px solid var(--border);
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-collab:hover {
+            background: #fee2e2;
+            border-color: #dc2626;
+            color: #dc2626;
+        }
+
+        .add-collab {
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+            border: 1px dashed var(--border);
+            background: transparent;
+            width: 100%;
+            cursor: pointer;
+            color: var(--primary);
+        }
+
+        /* Editor container */
+        .editor-container {
+            background: white;
+            border: 1px solid var(--border);
+            min-height: 500px;
+        }
+
+        .ck-editor__editable {
+            min-height: 400px;
         }
 
         /* Three dots menu */
@@ -334,10 +326,9 @@
         }
 
         .dots-btn {
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
             background: white;
             display: flex;
             align-items: center;
@@ -358,7 +349,6 @@
             margin-top: 0.5rem;
             background: white;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
             box-shadow: var(--shadow);
             min-width: 200px;
             display: none;
@@ -382,124 +372,9 @@
             background: var(--primary-light);
         }
 
-        .dropdown-item i {
-            color: var(--text-light);
-            font-size: 1.1rem;
-        }
-
         .dropdown-item.delete:hover {
             background: #fee2e2;
             color: #dc2626;
-        }
-
-        .dropdown-item.delete:hover i {
-            color: #dc2626;
-        }
-
-        /* Document editor */
-        .document-editor {
-            flex: 1;
-            padding: 2rem;
-            overflow-y: auto;
-            background: var(--background);
-        }
-
-        .editor-container {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: white;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            min-height: 600px;
-        }
-
-        /* Login specific fields */
-        .login-fields {
-            background: var(--primary-light);
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1rem;
-        }
-
-        .login-field {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .login-field i {
-            color: var(--primary);
-            font-size: 1.2rem;
-        }
-
-        .login-field input {
-            flex: 1;
-            padding: 0.6rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 0.95rem;
-        }
-
-        .login-field input:focus {
-            outline: none;
-            border-color: var(--primary);
-        }
-
-        /* Project specific fields */
-        .project-fields {
-            background: var(--primary-light);
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .progress-control {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .progress-slider {
-            flex: 1;
-            height: 4px;
-            -webkit-appearance: none;
-            background: var(--border);
-            border-radius: var(--radius);
-        }
-
-        .progress-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            background: var(--primary);
-            border-radius: var(--radius);
-            cursor: pointer;
-        }
-
-        .progress-value {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        /* CKEditor customization */
-        .ck-editor__editable {
-            min-height: 400px;
-            max-height: 600px;
-        }
-
-        .ck.ck-editor {
-            border: none !important;
-        }
-
-        .ck.ck-toolbar {
-            border: none !important;
-            border-bottom: 1px solid var(--border) !important;
-            border-radius: var(--radius) var(--radius) 0 0 !important;
-        }
-
-        .ck.ck-content {
-            border: none !important;
         }
 
         /* Modal */
@@ -523,10 +398,8 @@
         .modal-content {
             background: white;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
             width: 100%;
             max-width: 500px;
-            box-shadow: var(--shadow);
         }
 
         .modal-header {
@@ -546,7 +419,6 @@
             font-size: 1.5rem;
             color: var(--text-light);
             cursor: pointer;
-            transition: color 0.2s;
         }
 
         .modal-body {
@@ -561,67 +433,19 @@
             gap: 1rem;
         }
 
-        /* Form elements */
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 0.9rem;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            font-size: 1rem;
-            transition: all 0.2s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(0,102,204,0.1);
-        }
-
         .folder-select {
             width: 100%;
             padding: 0.75rem;
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            background: white;
-            font-size: 1rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .left-nav {
-                width: 240px;
-            }
-            
-            .search-container {
-                width: 200px;
-            }
         }
 
         @media (max-width: 768px) {
-            .main-container {
-                flex-direction: column;
+            .main-content {
+                padding: 1rem;
             }
             
-            .left-nav {
-                width: 100%;
-                height: auto;
-                max-height: 300px;
-            }
-            
-            .document-info {
+            .editor-header {
                 flex-direction: column;
-                gap: 1rem;
                 align-items: flex-start;
             }
             
@@ -629,7 +453,7 @@
                 width: 100%;
             }
             
-            .login-fields {
+            .fields-grid {
                 grid-template-columns: 1fr;
             }
         }
@@ -640,157 +464,119 @@
         <!-- Top Bar -->
         <div class="top-bar">
             <div class="top-bar-left">
-                <div class="logo">
+                <div class="logo" onclick="window.location.href='vault.html'">
                     <span class="logo-icon">🔐</span>
                     <span>BOVEDA</span>
                 </div>
-                <div class="search-container">
-                    <i class='bx bx-search search-icon'></i>
-                    <input type="text" class="search-input" id="globalSearch" placeholder="Search documents...">
-                </div>
+                <span class="doc-type-badge" id="docTypeBadge">Note</span>
             </div>
-            <div class="user-menu">
-                <div class="user-avatar" id="userAvatar">JD</div>
-                <span class="user-name" id="userName">John</span>
+            <div class="top-bar-right">
+                <div class="user-menu">
+                    <div class="user-avatar" id="userAvatar">JD</div>
+                    <span class="user-name" id="userName">John</span>
+                </div>
             </div>
         </div>
 
-        <!-- Main Container -->
-        <div class="main-container">
-            <!-- Left Navigation -->
-            <div class="left-nav">
-                <div class="nav-section">
-                    <div class="nav-section-title">Workspace</div>
-                    <div class="nav-item active" data-type="logins" id="navLogins">
-                        <i class='bx bx-lock-alt'></i>
-                        <span>Logins</span>
-                        <span class="nav-item-count" id="loginCount">0</span>
-                    </div>
-                    <div class="nav-item" data-type="notes" id="navNotes">
-                        <i class='bx bx-note'></i>
-                        <span>Notes</span>
-                        <span class="nav-item-count" id="noteCount">0</span>
-                    </div>
-                    <div class="nav-item" data-type="projects" id="navProjects">
-                        <i class='bx bx-briefcase'></i>
-                        <span>Projects</span>
-                        <span class="nav-item-count" id="projectCount">0</span>
-                    </div>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Editor Header -->
+            <div class="editor-header">
+                <div class="editor-header-left">
+                    <button class="back-btn" id="backBtn">
+                        <i class='bx bx-arrow-back'></i>
+                    </button>
+                    <input type="text" class="title-input" id="docTitle" placeholder="Untitled Document">
                 </div>
-
-                <div class="nav-section">
-                    <div class="nav-section-title">Folders</div>
-                    <div class="folders-list" id="foldersList"></div>
-                    <div class="nav-item" id="addFolderBtn">
-                        <i class='bx bx-folder-plus'></i>
-                        <span>New Folder</span>
-                    </div>
-                </div>
-
-                <div class="nav-section">
-                    <div class="nav-item" id="newDocumentBtn">
-                        <i class='bx bx-plus-circle'></i>
-                        <span>New Document</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Main Content Area -->
-            <div class="main-content">
-                <!-- Document Info Bar -->
-                <div class="document-info">
-                    <div class="document-title">
-                        <input type="text" class="title-input" id="docTitle" placeholder="Untitled Document">
-                        <span class="document-type-badge" id="docTypeBadge">Note</span>
-                    </div>
-                    <div class="document-actions">
-                        <button class="doc-action" id="saveDocBtn">
-                            <i class='bx bx-save'></i>
-                            Save
+                <div class="editor-actions">
+                    <button class="doc-btn" id="saveBtn">
+                        <i class='bx bx-save'></i>
+                        Save
+                    </button>
+                    <div class="three-dots-menu">
+                        <button class="dots-btn" id="threeDotsBtn">
+                            <i class='bx bx-dots-vertical-rounded'></i>
                         </button>
-                        <div class="three-dots-menu">
-                            <button class="dots-btn" id="threeDotsBtn">
-                                <i class='bx bx-dots-vertical-rounded'></i>
-                            </button>
-                            <div class="dots-dropdown" id="dotsDropdown">
-                                <div class="dropdown-item" id="moveToFolder">
-                                    <i class='bx bx-folder'></i>
-                                    Move to folder
-                                </div>
-                                <div class="dropdown-item" id="duplicateDoc">
-                                    <i class='bx bx-copy'></i>
-                                    Duplicate
-                                </div>
-                                <div class="dropdown-item" id="exportDoc">
-                                    <i class='bx bx-export'></i>
-                                    Export
-                                </div>
-                                <div class="dropdown-item delete" id="deleteDoc">
-                                    <i class='bx bx-trash'></i>
-                                    Delete
-                                </div>
+                        <div class="dots-dropdown" id="dotsDropdown">
+                            <div class="dropdown-item" id="moveToFolder">
+                                <i class='bx bx-folder'></i>
+                                Move to folder
+                            </div>
+                            <div class="dropdown-item" id="duplicateDoc">
+                                <i class='bx bx-copy'></i>
+                                Duplicate
+                            </div>
+                            <div class="dropdown-item" id="exportDoc">
+                                <i class='bx bx-export'></i>
+                                Export
+                            </div>
+                            <div class="dropdown-item delete" id="deleteDoc">
+                                <i class='bx bx-trash'></i>
+                                Delete
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- Document Editor -->
-                <div class="document-editor">
-                    <div class="editor-container">
-                        <!-- Login specific fields -->
-                        <div id="loginFields" style="display: none;">
-                            <div class="login-fields">
-                                <div class="login-field">
-                                    <i class='bx bx-globe'></i>
-                                    <input type="url" id="loginUrl" placeholder="Website URL (e.g., https://example.com)">
-                                </div>
-                                <div class="login-field">
-                                    <i class='bx bx-user'></i>
-                                    <input type="text" id="loginUsername" placeholder="Username / Email">
-                                </div>
-                                <div class="login-field">
-                                    <i class='bx bx-lock-alt'></i>
-                                    <input type="password" id="loginPassword" placeholder="Password">
-                                </div>
-                            </div>
+            <!-- Type-specific fields -->
+            <div class="type-fields" id="typeFields">
+                <!-- Login fields -->
+                <div id="loginFields" style="display: none;">
+                    <div class="fields-grid">
+                        <div class="field-group">
+                            <label class="field-label"><i class='bx bx-globe'></i> Website URL</label>
+                            <input type="url" class="field-input" id="loginUrl" placeholder="https://example.com">
                         </div>
-
-                        <!-- Project specific fields -->
-                        <div id="projectFields" style="display: none;">
-                            <div class="project-fields">
-                                <div class="progress-control">
-                                    <i class='bx bx-trending-up'></i>
-                                    <span>Progress:</span>
-                                    <input type="range" class="progress-slider" id="progressSlider" min="0" max="100" value="0">
-                                    <span class="progress-value" id="progressValue">0%</span>
-                                </div>
-                            </div>
+                        <div class="field-group">
+                            <label class="field-label"><i class='bx bx-user'></i> Username / Email</label>
+                            <input type="text" class="field-input" id="loginUsername" placeholder="username@example.com">
                         </div>
+                        <div class="field-group">
+                            <label class="field-label"><i class='bx bx-lock-alt'></i> Password</label>
+                            <input type="password" class="field-input" id="loginPassword" placeholder="••••••••">
+                        </div>
+                    </div>
+                </div>
 
-                        <!-- CKEditor container -->
-                        <textarea id="editor"></textarea>
+                <!-- Project fields -->
+                <div id="projectFields" style="display: none;">
+                    <div class="fields-grid">
+                        <div class="field-group">
+                            <label class="field-label"><i class='bx bx-trending-up'></i> Progress</label>
+                            <input type="range" class="field-input" id="projectProgress" min="0" max="100" value="0">
+                            <span id="progressValue">0%</span>
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label"><i class='bx bx-image'></i> Image URL</label>
+                            <input type="url" class="field-input" id="projectImage" placeholder="https://...">
+                            <img id="imagePreview" class="image-preview" style="display: none;">
+                        </div>
+                        <div class="field-group">
+                            <label class="field-label"><i class='bx bx-status'></i> Status</label>
+                            <select class="field-select" id="projectStatus">
+                                <option value="starting">Starting</option>
+                                <option value="in-progress">In Progress</option>
+                                <option value="completed">Completed</option>
+                                <option value="on-hold">On Hold</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Collaborators -->
+                    <div class="collaborators-section">
+                        <label class="field-label"><i class='bx bx-group'></i> Collaborators</label>
+                        <div id="collaboratorsList"></div>
+                        <button class="add-collab" id="addCollaborator">
+                            <i class='bx bx-plus'></i> Add Collaborator
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- New Folder Modal -->
-    <div class="modal" id="folderModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Create New Folder</h2>
-                <i class='bx bx-x modal-close' id="closeFolderModal"></i>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Folder Name</label>
-                    <input type="text" class="form-input" id="folderName" placeholder="Enter folder name">
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="doc-action" id="cancelFolder">Cancel</button>
-                <button class="doc-action primary" id="createFolder">Create Folder</button>
+            <!-- CKEditor container -->
+            <div class="editor-container">
+                <textarea id="editor"></textarea>
             </div>
         </div>
     </div>
@@ -803,16 +589,16 @@
                 <i class='bx bx-x modal-close' id="closeMoveModal"></i>
             </div>
             <div class="modal-body">
-                <div class="form-group">
-                    <label class="form-label">Select Folder</label>
+                <div class="field-group">
+                    <label class="field-label">Select Folder</label>
                     <select class="folder-select" id="folderSelect">
                         <option value="">Root (No Folder)</option>
                     </select>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="doc-action" id="cancelMove">Cancel</button>
-                <button class="doc-action primary" id="moveDocument">Move</button>
+                <button class="doc-btn" id="cancelMove">Cancel</button>
+                <button class="doc-btn primary" id="confirmMove">Move</button>
             </div>
         </div>
     </div>
@@ -828,72 +614,100 @@
                 <p>Are you sure you want to delete this document? This action cannot be undone.</p>
             </div>
             <div class="modal-footer">
-                <button class="doc-action" id="cancelDelete">Cancel</button>
-                <button class="doc-action primary" style="background: #dc2626;" id="confirmDelete">Delete</button>
+                <button class="doc-btn" id="cancelDelete">Cancel</button>
+                <button class="doc-btn primary" style="background: #dc2626;" id="confirmDelete">Delete</button>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-        import { getFirestore, collection, doc, getDocs, addDoc, updateDoc, deleteDoc, query, where } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyCW0qgIGKko96RCyqVMWFWc8P-sp7LzuRo",
-            authDomain: "onvault-d261b.firebaseapp.com",
-            projectId: "onvault-d261b",
-            storageBucket: "onvault-d261b.firebasestorage.app",
-            messagingSenderId: "924974842099",
-            appId: "1:924974842099:web:e9b04ffbea0318ce99f786",
-            measurementId: "G-EFKXX58XL6"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const auth = getAuth(app);
-
-        // State
-        let currentUser = null;
-        let currentDocId = null;
-        let currentType = 'notes';
-        let currentFolder = null;
+    <script>
+        // Get document info from session
+        const docId = sessionStorage.getItem('currentDocId');
+        const docType = sessionStorage.getItem('currentDocType') || 'note';
         let editor = null;
-        let documents = {
+        let currentDoc = null;
+        let collaborators = [];
+
+        // DOM elements
+        const docTypeBadge = document.getElementById('docTypeBadge');
+        const docTitle = document.getElementById('docTitle');
+        const loginFields = document.getElementById('loginFields');
+        const projectFields = document.getElementById('projectFields');
+        const loginUrl = document.getElementById('loginUrl');
+        const loginUsername = document.getElementById('loginUsername');
+        const loginPassword = document.getElementById('loginPassword');
+        const projectProgress = document.getElementById('projectProgress');
+        const progressValue = document.getElementById('progressValue');
+        const projectImage = document.getElementById('projectImage');
+        const imagePreview = document.getElementById('imagePreview');
+        const projectStatus = document.getElementById('projectStatus');
+        const collaboratorsList = document.getElementById('collaboratorsList');
+        const userName = document.getElementById('userName');
+        const userAvatar = document.getElementById('userAvatar');
+        const backBtn = document.getElementById('backBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const threeDotsBtn = document.getElementById('threeDotsBtn');
+        const dotsDropdown = document.getElementById('dotsDropdown');
+        const moveModal = document.getElementById('moveModal');
+        const closeMoveModal = document.getElementById('closeMoveModal');
+        const cancelMove = document.getElementById('cancelMove');
+        const confirmMove = document.getElementById('confirmMove');
+        const folderSelect = document.getElementById('folderSelect');
+        const deleteModal = document.getElementById('deleteModal');
+        const closeDeleteModal = document.getElementById('closeDeleteModal');
+        const cancelDelete = document.getElementById('cancelDelete');
+        const confirmDelete = document.getElementById('confirmDelete');
+
+        // Set user info
+        const userEmail = sessionStorage.getItem('userEmail') || 'john.doe@example.com';
+        userName.textContent = userEmail.split('@')[0];
+        userAvatar.textContent = userEmail.charAt(0).toUpperCase();
+
+        // Set document type
+        docTypeBadge.textContent = docType.charAt(0).toUpperCase() + docType.slice(1);
+        
+        // Show appropriate fields
+        loginFields.style.display = docType === 'login' ? 'block' : 'none';
+        projectFields.style.display = docType === 'project' ? 'block' : 'none';
+
+        // Load data from localStorage
+        const vaultData = JSON.parse(localStorage.getItem('boveda_vault')) || {
             logins: [],
             notes: [],
             projects: [],
             folders: []
         };
 
-        // DOM elements
-        const editorElement = document.getElementById('editor');
-        const docTitle = document.getElementById('docTitle');
-        const docTypeBadge = document.getElementById('docTypeBadge');
-        const loginFields = document.getElementById('loginFields');
-        const projectFields = document.getElementById('projectFields');
-        const loginUrl = document.getElementById('loginUrl');
-        const loginUsername = document.getElementById('loginUsername');
-        const loginPassword = document.getElementById('loginPassword');
-        const progressSlider = document.getElementById('progressSlider');
-        const progressValue = document.getElementById('progressValue');
-        const foldersList = document.getElementById('foldersList');
-        const loginCount = document.getElementById('loginCount');
-        const noteCount = document.getElementById('noteCount');
-        const projectCount = document.getElementById('projectCount');
-        const threeDotsBtn = document.getElementById('threeDotsBtn');
-        const dotsDropdown = document.getElementById('dotsDropdown');
-        const folderSelect = document.getElementById('folderSelect');
-        const userName = document.getElementById('userName');
-        const userAvatar = document.getElementById('userAvatar');
-        const globalSearch = document.getElementById('globalSearch');
+        // Load document if editing
+        if (docId) {
+            const collection = docType + 's';
+            currentDoc = vaultData[collection].find(d => d.id === docId);
+            
+            if (currentDoc) {
+                docTitle.value = currentDoc.title || '';
+                
+                if (docType === 'login') {
+                    loginUrl.value = currentDoc.url || '';
+                    loginUsername.value = currentDoc.username || '';
+                    loginPassword.value = currentDoc.password || '';
+                } else if (docType === 'project') {
+                    projectProgress.value = currentDoc.progress || 0;
+                    progressValue.textContent = currentDoc.progress + '%';
+                    projectImage.value = currentDoc.image || '';
+                    if (currentDoc.image) {
+                        imagePreview.src = currentDoc.image;
+                        imagePreview.style.display = 'block';
+                    }
+                    projectStatus.value = currentDoc.status || 'starting';
+                    collaborators = currentDoc.collaborators || [];
+                    renderCollaborators();
+                }
+            }
+        }
 
         // Initialize CKEditor
         ClassicEditor
-            .create(editorElement, {
+            .create(document.querySelector('#editor'), {
                 toolbar: [
                     'heading', '|',
                     'bold', 'italic', 'underline', 'strikethrough', '|',
@@ -910,298 +724,108 @@
                         { model: 'heading2', view: 'h2', title: 'Heading 2', class: 'ck-heading_heading2' },
                         { model: 'heading3', view: 'h3', title: 'Heading 3', class: 'ck-heading_heading3' }
                     ]
-                },
-                fontSize: {
-                    options: [10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 36, 48]
-                },
-                fontFamily: {
-                    options: [
-                        'Inter, sans-serif',
-                        'Arial, sans-serif',
-                        'Times New Roman, serif',
-                        'Courier New, monospace'
-                    ]
                 }
             })
             .then(ckeditor => {
                 editor = ckeditor;
-                console.log('CKEditor initialized');
+                if (currentDoc && currentDoc.content) {
+                    editor.setData(currentDoc.content);
+                }
             })
             .catch(error => {
                 console.error('CKEditor error:', error);
             });
 
-        // Load user data
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                currentUser = user;
-                userName.textContent = user.email.split('@')[0];
-                userAvatar.textContent = user.email.charAt(0).toUpperCase();
-                await loadUserData();
+        // Render collaborators
+        function renderCollaborators() {
+            collaboratorsList.innerHTML = '';
+            collaborators.forEach((collab, index) => {
+                const row = document.createElement('div');
+                row.className = 'collaborator-row';
+                row.innerHTML = `
+                    <input type="text" class="collab-name" placeholder="Name" value="${collab.name || ''}">
+                    <input type="url" class="collab-instagram" placeholder="Instagram URL" value="${collab.instagram || ''}">
+                    <button class="remove-collab" onclick="removeCollaborator(${index})">
+                        <i class='bx bx-x'></i>
+                    </button>
+                `;
+                collaboratorsList.appendChild(row);
+            });
+        }
+
+        // Add collaborator
+        window.addCollaborator = function() {
+            collaborators.push({ name: '', instagram: '' });
+            renderCollaborators();
+        };
+
+        // Remove collaborator
+        window.removeCollaborator = function(index) {
+            collaborators.splice(index, 1);
+            renderCollaborators();
+        };
+
+        document.getElementById('addCollaborator')?.addEventListener('click', addCollaborator);
+
+        // Image preview
+        projectImage?.addEventListener('input', (e) => {
+            if (e.target.value) {
+                imagePreview.src = e.target.value;
+                imagePreview.style.display = 'block';
             } else {
-                window.location.href = 'index.html';
+                imagePreview.style.display = 'none';
             }
         });
 
-        // Load user data from Firestore
-        async function loadUserData() {
-            try {
-                // Load logins
-                const loginsQuery = query(collection(db, 'logins'), where('userId', '==', currentUser.uid));
-                const loginsSnapshot = await getDocs(loginsQuery);
-                documents.logins = loginsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Progress slider
+        projectProgress?.addEventListener('input', (e) => {
+            progressValue.textContent = e.target.value + '%';
+        });
 
-                // Load notes
-                const notesQuery = query(collection(db, 'notes'), where('userId', '==', currentUser.uid));
-                const notesSnapshot = await getDocs(notesQuery);
-                documents.notes = notesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                // Load projects
-                const projectsQuery = query(collection(db, 'projects'), where('userId', '==', currentUser.uid));
-                const projectsSnapshot = await getDocs(projectsQuery);
-                documents.projects = projectsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                // Load folders
-                const foldersQuery = query(collection(db, 'folders'), where('userId', '==', currentUser.uid));
-                const foldersSnapshot = await getDocs(foldersQuery);
-                documents.folders = foldersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-                updateCounts();
-                renderFolders();
-                renderDocuments();
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
-        }
-
-        // Update counts
-        function updateCounts() {
-            loginCount.textContent = documents.logins.length;
-            noteCount.textContent = documents.notes.length;
-            projectCount.textContent = documents.projects.length;
-        }
-
-        // Render folders
-        function renderFolders() {
-            foldersList.innerHTML = '';
-            documents.folders.forEach(folder => {
-                const folderElement = document.createElement('div');
-                folderElement.className = 'folder-item';
-                folderElement.innerHTML = `
-                    <i class='bx bx-folder'></i>
-                    <span class="folder-name">${folder.name}</span>
-                    <span class="folder-count">${folder.items?.length || 0}</span>
-                `;
-                folderElement.addEventListener('click', () => openFolder(folder.id));
-                foldersList.appendChild(folderElement);
-            });
-
-            // Update folder select in move modal
-            folderSelect.innerHTML = '<option value="">Root (No Folder)</option>';
-            documents.folders.forEach(folder => {
-                const option = document.createElement('option');
-                option.value = folder.id;
-                option.textContent = folder.name;
-                folderSelect.appendChild(option);
-            });
-        }
-
-        // Render documents in grid (for left nav)
-        function renderDocuments() {
-            // This would update the grid view if we had one
-            // For now, we'll just update counts
-            updateCounts();
-        }
-
-        // Save current document
-        async function saveDocument() {
-            if (!currentUser) return;
-
+        // Save document
+        function saveDocument() {
+            const collection = docType + 's';
             const content = editor ? editor.getData() : '';
-            const title = docTitle.value || 'Untitled';
             
             const docData = {
-                title: title,
+                id: docId || Date.now().toString(),
+                title: docTitle.value || 'Untitled',
                 content: content,
-                lastModified: new Date().toISOString(),
-                folderId: currentFolder,
-                userId: currentUser.uid
+                createdAt: currentDoc?.createdAt || new Date().toISOString(),
+                folder: currentDoc?.folder || null
             };
 
-            // Add type-specific fields
-            if (currentType === 'logins') {
+            if (docType === 'login') {
                 docData.url = loginUrl.value;
                 docData.username = loginUsername.value;
                 docData.password = loginPassword.value;
+            } else if (docType === 'project') {
+                docData.progress = projectProgress.value;
+                docData.image = projectImage.value;
+                docData.status = projectStatus.value;
                 
-                if (currentDocId) {
-                    await updateDoc(doc(db, 'logins', currentDocId), docData);
-                } else {
-                    const docRef = await addDoc(collection(db, 'logins'), docData);
-                    currentDocId = docRef.id;
-                }
-            } else if (currentType === 'notes') {
-                if (currentDocId) {
-                    await updateDoc(doc(db, 'notes', currentDocId), docData);
-                } else {
-                    const docRef = await addDoc(collection(db, 'notes'), docData);
-                    currentDocId = docRef.id;
-                }
-            } else if (currentType === 'projects') {
-                docData.progress = progressSlider.value;
-                
-                if (currentDocId) {
-                    await updateDoc(doc(db, 'projects', currentDocId), docData);
-                } else {
-                    const docRef = await addDoc(collection(db, 'projects'), docData);
-                    currentDocId = docRef.id;
-                }
+                // Get updated collaborator data
+                const rows = document.querySelectorAll('.collaborator-row');
+                docData.collaborators = Array.from(rows).map(row => ({
+                    name: row.querySelector('.collab-name')?.value || '',
+                    instagram: row.querySelector('.collab-instagram')?.value || ''
+                })).filter(c => c.name || c.instagram);
             }
 
-            await loadUserData();
+            if (docId) {
+                // Update existing
+                const index = vaultData[collection].findIndex(d => d.id === docId);
+                if (index !== -1) {
+                    vaultData[collection][index] = docData;
+                }
+            } else {
+                // Create new
+                vaultData[collection].push(docData);
+                sessionStorage.setItem('currentDocId', docData.id);
+            }
+
+            localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
             showNotification('Document saved successfully');
-        }
-
-        // Load document into editor
-        async function loadDocument(docId, type) {
-            currentType = type;
-            currentDocId = docId;
-            docTypeBadge.textContent = type.charAt(0).toUpperCase() + type.slice(1);
-            
-            // Show/hide type-specific fields
-            loginFields.style.display = type === 'logins' ? 'block' : 'none';
-            projectFields.style.display = type === 'projects' ? 'block' : 'none';
-
-            const doc = documents[type].find(d => d.id === docId);
-            if (doc) {
-                docTitle.value = doc.title || '';
-                if (editor) {
-                    editor.setData(doc.content || '');
-                }
-                
-                if (type === 'logins') {
-                    loginUrl.value = doc.url || '';
-                    loginUsername.value = doc.username || '';
-                    loginPassword.value = doc.password || '';
-                } else if (type === 'projects') {
-                    progressSlider.value = doc.progress || 0;
-                    progressValue.textContent = doc.progress + '%';
-                }
-                
-                currentFolder = doc.folderId || null;
-            }
-        }
-
-        // Open folder
-        async function openFolder(folderId) {
-            const folder = documents.folders.find(f => f.id === folderId);
-            if (folder) {
-                // Load all items in folder
-                const items = [];
-                if (folder.items) {
-                    for (const itemId of folder.items) {
-                        const login = documents.logins.find(l => l.id === itemId);
-                        const note = documents.notes.find(n => n.id === itemId);
-                        const project = documents.projects.find(p => p.id === itemId);
-                        if (login) items.push({ ...login, type: 'login' });
-                        if (note) items.push({ ...note, type: 'note' });
-                        if (project) items.push({ ...project, type: 'project' });
-                    }
-                }
-                
-                // Display folder contents in editor
-                if (editor) {
-                    let html = '<div style="padding: 2rem;">';
-                    html += `<h2>📁 ${folder.name}</h2>`;
-                    html += '<div style="display: grid; gap: 1rem; margin-top: 1rem;">';
-                    
-                    items.forEach(item => {
-                        html += `
-                            <div style="padding: 1rem; border: 1px solid var(--border); cursor: pointer;" onclick="window.loadDocument('${item.id}', '${item.type}s')">
-                                <strong>${item.title || 'Untitled'}</strong>
-                                <span style="color: var(--text-light); margin-left: 1rem;">${item.type}</span>
-                            </div>
-                        `;
-                    });
-                    
-                    if (items.length === 0) {
-                        html += '<p style="color: var(--text-light);">Folder is empty</p>';
-                    }
-                    
-                    html += '</div></div>';
-                    editor.setData(html);
-                }
-            }
-        }
-
-        // Delete document
-        async function deleteDocument() {
-            if (!currentDocId || !currentUser) return;
-
-            try {
-                if (currentType === 'logins') {
-                    await deleteDoc(doc(db, 'logins', currentDocId));
-                } else if (currentType === 'notes') {
-                    await deleteDoc(doc(db, 'notes', currentDocId));
-                } else if (currentType === 'projects') {
-                    await deleteDoc(doc(db, 'projects', currentDocId));
-                }
-
-                // Remove from folders
-                for (const folder of documents.folders) {
-                    if (folder.items && folder.items.includes(currentDocId)) {
-                        folder.items = folder.items.filter(id => id !== currentDocId);
-                        await updateDoc(doc(db, 'folders', folder.id), { items: folder.items });
-                    }
-                }
-
-                await loadUserData();
-                
-                // Clear editor
-                currentDocId = null;
-                docTitle.value = '';
-                editor.setData('');
-                loginUrl.value = '';
-                loginUsername.value = '';
-                loginPassword.value = '';
-                progressSlider.value = 0;
-                progressValue.textContent = '0%';
-                
-                deleteModal.classList.remove('active');
-                showNotification('Document deleted');
-            } catch (error) {
-                console.error('Error deleting:', error);
-            }
-        }
-
-        // Move document to folder
-        async function moveDocument() {
-            if (!currentDocId) return;
-
-            const targetFolderId = folderSelect.value;
-            
-            // Remove from old folder
-            for (const folder of documents.folders) {
-                if (folder.items && folder.items.includes(currentDocId)) {
-                    folder.items = folder.items.filter(id => id !== currentDocId);
-                    await updateDoc(doc(db, 'folders', folder.id), { items: folder.items });
-                }
-            }
-            
-            // Add to new folder
-            if (targetFolderId) {
-                const targetFolder = documents.folders.find(f => f.id === targetFolderId);
-                if (targetFolder) {
-                    targetFolder.items = targetFolder.items || [];
-                    targetFolder.items.push(currentDocId);
-                    await updateDoc(doc(db, 'folders', targetFolder.id), { items: targetFolder.items });
-                }
-            }
-            
-            currentFolder = targetFolderId || null;
-            await loadUserData();
-            moveModal.classList.remove('active');
-            showNotification('Document moved');
         }
 
         // Show notification
@@ -1211,9 +835,8 @@
                 position: fixed;
                 bottom: 2rem;
                 right: 2rem;
-                background: var(--surface);
+                background: white;
                 border: 1px solid var(--border);
-                border-radius: var(--radius);
                 padding: 1rem 1.5rem;
                 box-shadow: var(--shadow);
                 z-index: 3000;
@@ -1223,57 +846,15 @@
             document.body.appendChild(notification);
             
             setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => notification.remove(), 300);
+                notification.remove();
             }, 3000);
         }
 
-        // Event Listeners
-        document.querySelectorAll('.nav-item[data-type]').forEach(item => {
-            item.addEventListener('click', () => {
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
-                currentType = item.dataset.type;
-                docTypeBadge.textContent = currentType.charAt(0).toUpperCase() + currentType.slice(1);
-                
-                // Clear for new document
-                currentDocId = null;
-                docTitle.value = '';
-                editor.setData('');
-                
-                // Show/hide fields
-                loginFields.style.display = currentType === 'logins' ? 'block' : 'none';
-                projectFields.style.display = currentType === 'projects' ? 'block' : 'none';
-                
-                if (currentType === 'logins') {
-                    loginUrl.value = '';
-                    loginUsername.value = '';
-                    loginPassword.value = '';
-                } else if (currentType === 'projects') {
-                    progressSlider.value = 0;
-                    progressValue.textContent = '0%';
-                }
-            });
-        });
+        // Event listeners
+        saveBtn.addEventListener('click', saveDocument);
 
-        // New document
-        document.getElementById('newDocumentBtn').addEventListener('click', () => {
-            currentDocId = null;
-            docTitle.value = '';
-            editor.setData('');
-            loginUrl.value = '';
-            loginUsername.value = '';
-            loginPassword.value = '';
-            progressSlider.value = 0;
-            progressValue.textContent = '0%';
-        });
-
-        // Save button
-        document.getElementById('saveDocBtn').addEventListener('click', saveDocument);
-
-        // Progress slider
-        progressSlider.addEventListener('input', (e) => {
-            progressValue.textContent = e.target.value + '%';
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'vault.html';
         });
 
         // Three dots menu
@@ -1287,158 +868,103 @@
             }
         });
 
-        // Delete
-        const deleteModal = document.getElementById('deleteModal');
-        const closeDeleteModal = document.getElementById('closeDeleteModal');
-        const cancelDelete = document.getElementById('cancelDelete');
-        const confirmDelete = document.getElementById('confirmDelete');
-
-        document.getElementById('deleteDoc').addEventListener('click', () => {
-            dotsDropdown.classList.remove('show');
-            if (currentDocId) {
-                deleteModal.classList.add('active');
-            }
-        });
-
-        closeDeleteModal.addEventListener('click', () => deleteModal.classList.remove('active'));
-        cancelDelete.addEventListener('click', () => deleteModal.classList.remove('active'));
-        confirmDelete.addEventListener('click', deleteDocument);
-
         // Move to folder
-        const moveModal = document.getElementById('moveModal');
-        const closeMoveModal = document.getElementById('closeMoveModal');
-        const cancelMove = document.getElementById('cancelMove');
-
         document.getElementById('moveToFolder').addEventListener('click', () => {
             dotsDropdown.classList.remove('show');
-            if (currentDocId) {
-                moveModal.classList.add('active');
-            }
+            
+            // Populate folder select
+            folderSelect.innerHTML = '<option value="">Root (No Folder)</option>';
+            vaultData.folders.forEach(folder => {
+                const option = document.createElement('option');
+                option.value = folder.id;
+                option.textContent = folder.name;
+                if (currentDoc?.folder === folder.id) option.selected = true;
+                folderSelect.appendChild(option);
+            });
+            
+            moveModal.classList.add('active');
         });
 
         closeMoveModal.addEventListener('click', () => moveModal.classList.remove('active'));
         cancelMove.addEventListener('click', () => moveModal.classList.remove('active'));
-        document.getElementById('moveDocument').addEventListener('click', moveDocument);
+
+        confirmMove.addEventListener('click', () => {
+            const targetFolder = folderSelect.value;
+            
+            // Remove from old folder
+            vaultData.folders.forEach(folder => {
+                if (folder.items && docId) {
+                    folder.items = folder.items.filter(id => id !== docId);
+                }
+            });
+            
+            // Add to new folder
+            if (targetFolder && docId) {
+                const folder = vaultData.folders.find(f => f.id === targetFolder);
+                if (folder) {
+                    folder.items = folder.items || [];
+                    if (!folder.items.includes(docId)) {
+                        folder.items.push(docId);
+                    }
+                }
+            }
+            
+            if (currentDoc) {
+                currentDoc.folder = targetFolder || null;
+            }
+            
+            localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
+            moveModal.classList.remove('active');
+            showNotification('Document moved');
+        });
 
         // Duplicate
-        document.getElementById('duplicateDoc').addEventListener('click', async () => {
-            if (!currentDocId || !currentUser) return;
+        document.getElementById('duplicateDoc').addEventListener('click', () => {
+            const collection = docType + 's';
+            const newDoc = { ...currentDoc, id: Date.now().toString(), title: (currentDoc?.title || 'Untitled') + ' (Copy)' };
+            vaultData[collection].push(newDoc);
+            localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
             
-            const doc = documents[currentType].find(d => d.id === currentDocId);
-            if (doc) {
-                const newDoc = { ...doc, id: undefined, title: doc.title + ' (Copy)' };
-                delete newDoc.id;
-                
-                if (currentType === 'logins') {
-                    await addDoc(collection(db, 'logins'), newDoc);
-                } else if (currentType === 'notes') {
-                    await addDoc(collection(db, 'notes'), newDoc);
-                } else if (currentType === 'projects') {
-                    await addDoc(collection(db, 'projects'), newDoc);
-                }
-                
-                await loadUserData();
-                showNotification('Document duplicated');
-            }
+            sessionStorage.setItem('currentDocId', newDoc.id);
+            window.location.reload();
         });
 
         // Export
         document.getElementById('exportDoc').addEventListener('click', () => {
-            if (!currentDocId) return;
-            
-            const doc = documents[currentType].find(d => d.id === currentDocId);
-            if (doc) {
-                const data = JSON.stringify(doc, null, 2);
-                const blob = new Blob([data], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${doc.title || 'document'}.json`;
-                a.click();
-            }
+            const data = JSON.stringify(currentDoc, null, 2);
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${currentDoc?.title || 'document'}.json`;
+            a.click();
         });
 
-        // Folder modal
-        const folderModal = document.getElementById('folderModal');
-        const closeFolderModal = document.getElementById('closeFolderModal');
-        const cancelFolder = document.getElementById('cancelFolder');
-        const createFolder = document.getElementById('createFolder');
-        const folderName = document.getElementById('folderName');
-
-        document.getElementById('addFolderBtn').addEventListener('click', () => {
-            folderModal.classList.add('active');
+        // Delete
+        document.getElementById('deleteDoc').addEventListener('click', () => {
+            dotsDropdown.classList.remove('show');
+            deleteModal.classList.add('active');
         });
 
-        closeFolderModal.addEventListener('click', () => folderModal.classList.remove('active'));
-        cancelFolder.addEventListener('click', () => folderModal.classList.remove('active'));
+        closeDeleteModal.addEventListener('click', () => deleteModal.classList.remove('active'));
+        cancelDelete.addEventListener('click', () => deleteModal.classList.remove('active'));
 
-        createFolder.addEventListener('click', async () => {
-            if (folderName.value.trim() && currentUser) {
-                await addDoc(collection(db, 'folders'), {
-                    name: folderName.value,
-                    items: [],
-                    userId: currentUser.uid,
-                    createdAt: new Date().toISOString()
+        confirmDelete.addEventListener('click', () => {
+            if (docId) {
+                const collection = docType + 's';
+                vaultData[collection] = vaultData[collection].filter(d => d.id !== docId);
+                
+                // Remove from folders
+                vaultData.folders.forEach(folder => {
+                    if (folder.items) {
+                        folder.items = folder.items.filter(id => id !== docId);
+                    }
                 });
-                await loadUserData();
-                folderModal.classList.remove('active');
-                folderName.value = '';
-                showNotification('Folder created');
+                
+                localStorage.setItem('boveda_vault', JSON.stringify(vaultData));
+                window.location.href = 'vault.html';
             }
         });
-
-        // Global search
-        globalSearch.addEventListener('input', async (e) => {
-            const term = e.target.value.toLowerCase();
-            if (!term) {
-                await loadUserData();
-                return;
-            }
-
-            // Search in all document types
-            const allDocs = [
-                ...documents.logins.map(d => ({ ...d, type: 'login' })),
-                ...documents.notes.map(d => ({ ...d, type: 'note' })),
-                ...documents.projects.map(d => ({ ...d, type: 'project' }))
-            ];
-
-            const results = allDocs.filter(doc => 
-                doc.title?.toLowerCase().includes(term) ||
-                doc.content?.toLowerCase().includes(term) ||
-                doc.username?.toLowerCase().includes(term) ||
-                doc.url?.toLowerCase().includes(term)
-            );
-
-            // Display results in editor
-            if (editor) {
-                let html = '<div style="padding: 2rem;">';
-                html += '<h2>🔍 Search Results</h2>';
-                
-                if (results.length === 0) {
-                    html += '<p style="color: var(--text-light);">No results found</p>';
-                } else {
-                    html += '<div style="display: grid; gap: 1rem; margin-top: 1rem;">';
-                    results.forEach(doc => {
-                        html += `
-                            <div style="padding: 1rem; border: 1px solid var(--border); cursor: pointer;" onclick="window.loadDocument('${doc.id}', '${doc.type}s')">
-                                <strong>${doc.title || 'Untitled'}</strong>
-                                <span style="color: var(--text-light); margin-left: 1rem;">${doc.type}</span>
-                                <div style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">
-                                    ${doc.content?.substring(0, 100) || ''}...
-                                </div>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                }
-                
-                html += '</div>';
-                editor.setData(html);
-            }
-        });
-
-        // Make loadDocument global for onclick handlers
-        window.loadDocument = loadDocument;
 
         // Add animation styles
         const style = document.createElement('style');
@@ -1446,10 +972,6 @@
             @keyframes slideIn {
                 from { transform: translateX(100%); opacity: 0; }
                 to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes slideOut {
-                from { transform: translateX(0); opacity: 1; }
-                to { transform: translateX(100%); opacity: 0; }
             }
         `;
         document.head.appendChild(style);
