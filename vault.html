@@ -1,67 +1,659 @@
-<!-- vault.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>vault · secure</title>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
     }
+
     body {
-      background: black;
-      color: #7ab7ef;
-      font-family: 'SFMono', monospace;
+      background: #0a0c0f;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 0;
+      color: #eef4ff;
+    }
+
+    /* main vault container — fills screen, no margins */
+    .vault {
+      width: 100%;
+      max-width: 480px;  /* phone-optimized width, but auto-adjusts */
+      height: 100vh;
+      background: #0f1318;
+      display: flex;
       flex-direction: column;
-      gap: 2rem;
+      position: relative;
+      box-shadow: 0 0 30px rgba(0,0,0,0.8);
+      overflow: hidden;
     }
-    .container {
-      text-align: center;
-      border: 1px solid #1f3447;
-      padding: 3rem;
-      border-radius: 12px;
-      max-width: 600px;
+
+    /* header with session / new button */
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.2rem 1.2rem 0.6rem 1.2rem;
+      background: #0f1318;
+      border-bottom: 1px solid #1f2a33;
     }
-    h1 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
+
+    .session {
+      font-size: 0.9rem;
+      color: #7ab7ef;
+      letter-spacing: 0.3px;
       font-weight: 400;
+      text-transform: uppercase;
+      opacity: 0.9;
     }
-    .accent {
+
+    .new-btn {
+      background: transparent;
+      border: 1.5px solid #7ab7ef;
+      color: #7ab7ef;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.4rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+
+    .new-btn:hover {
+      background: #7ab7ef20;
+    }
+
+    /* search bar */
+    .search-container {
+      padding: 0.8rem 1.2rem;
+    }
+
+    .search-bar {
+      width: 100%;
+      background: #1a222b;
+      border: none;
+      border-radius: 40px;
+      padding: 0.8rem 1.4rem;
+      color: white;
+      font-size: 1rem;
+      outline: none;
+      border: 1px solid #2e3b48;
+    }
+
+    .search-bar:focus {
+      border-color: #7ab7ef;
+    }
+
+    /* main scrollable content */
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem 1.2rem 2rem;
+      scrollbar-width: thin;
+      scrollbar-color: #3a4a5a #0f1318;
+    }
+
+    /* section titles */
+    .section-title {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      color: #9ab3d1;
+      margin: 1.2rem 0 0.6rem 0;
+      letter-spacing: 0.5px;
+    }
+
+    /* favorites row */
+    .favorites {
+      display: flex;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .fav-item {
+      background: #1c2530;
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      font-size: 0.9rem;
+      color: #cde1ff;
+      border: 1px solid #2f3f50;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .fav-item::before {
+      content: "★";
+      color: #7ab7ef;
+      font-size: 0.9rem;
+      margin-right: 4px;
+    }
+
+    /* category tabs (all items / folders) */
+    .tabs {
+      display: flex;
+      gap: 1.2rem;
+      border-bottom: 1px solid #1f2a33;
+      margin-bottom: 1.2rem;
+    }
+
+    .tab {
+      padding: 0.5rem 0;
+      color: #7b94b0;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab.active {
       color: #7ab7ef;
       border-bottom: 2px solid #7ab7ef;
+    }
+
+    /* item list */
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+    }
+
+    .item-card {
+      background: #161e27;
+      border-radius: 18px;
+      padding: 1rem;
+      border: 1px solid #26333f;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+
+    .item-card:active {
+      background: #1f2a36;
+    }
+
+    .item-info h4 {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 0.2rem;
+      color: #e3f0ff;
+    }
+
+    .item-info p {
+      font-size: 0.8rem;
+      color: #96aec9;
+    }
+
+    .item-icon {
+      font-size: 1.3rem;
+      opacity: 0.8;
+    }
+
+    /* right slide panel (blur background) */
+    .panel-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: none;
+      justify-content: flex-end;
+      z-index: 20;
+    }
+
+    .panel-overlay.active {
+      display: flex;
+    }
+
+    .detail-panel {
+      width: 100%;
+      max-width: 480px;
+      background: #0f151c;
+      height: 100%;
+      padding: 1.5rem 1.2rem;
+      overflow-y: auto;
+      border-left: 1px solid #2e4053;
+      box-shadow: -10px 0 30px rgba(0,0,0,0.7);
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateX(30px); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    .panel-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .back-btn {
+      background: transparent;
+      border: none;
+      color: #7ab7ef;
+      font-size: 1.8rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .panel-title {
+      font-size: 1.5rem;
+      font-weight: 450;
+    }
+
+    /* form styles */
+    .field-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .field-label {
+      font-size: 0.8rem;
+      color: #a0bada;
+      margin-bottom: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .field-input, .field-textarea {
+      width: 100%;
+      background: #1e2a36;
+      border: none;
+      border-radius: 16px;
+      padding: 0.9rem 1rem;
+      color: white;
+      font-size: 1rem;
+      border: 1px solid #33495f;
+    }
+
+    .field-textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .row-2col {
+      display: flex;
+      gap: 0.8rem;
+    }
+
+    .row-2col > * {
+      flex: 1;
+    }
+
+    .btn {
+      background: #1f3447;
+      border: none;
+      border-radius: 40px;
+      padding: 0.8rem 1.5rem;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid #3f5a70;
+    }
+
+    .btn-primary {
+      background: #7ab7ef;
+      color: #0f151c;
+      border: none;
+      font-weight: 600;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+
+    .copy-icon {
+      margin-left: 8px;
+      cursor: pointer;
+      color: #7ab7ef;
+      font-size: 1.2rem;
+    }
+
+    /* small folder chips */
+    .folder-badge {
+      background: #1f2f3d;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
       display: inline-block;
-      padding-bottom: 0.3rem;
+      margin: 0.2rem;
+      font-size: 0.9rem;
     }
-    p {
-      color: #b8cdf5;
-      line-height: 1.6;
-      font-size: 1.1rem;
+
+    /* extra field container */
+    .custom-fields {
+      margin-top: 1.5rem;
+      border-top: 1px dashed #3b5065;
+      padding-top: 1.5rem;
     }
-    .glow {
-      text-shadow: 0 0 10px rgba(122, 183, 239, 0.3);
+
+    /* new type chooser (small box) */
+    .type-chooser {
+      position: absolute;
+      top: 70px;
+      right: 20px;
+      background: #18222d;
+      border-radius: 24px;
+      padding: 0.8rem;
+      border: 1px solid #7ab7ef;
+      display: none;
+      flex-direction: column;
+      z-index: 25;
+      box-shadow: 0 10px 30px black;
     }
-    .blink {
-      animation: blink 2s step-end infinite;
+
+    .type-chooser.show {
+      display: flex;
     }
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
+
+    .type-option {
+      padding: 0.8rem 2rem 0.8rem 1.2rem;
+      cursor: pointer;
+      border-radius: 40px;
+      color: #c3dcff;
+    }
+
+    .type-option:hover {
+      background: #253546;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="glow">🔐 <span class="accent">vault</span> access</h1>
-    <p>authentication successful · secure channel established</p>
-    <p style="margin-top: 2rem; font-size: 0.9rem;" class="blink">▌ session active</p>
+<div class="vault">
+
+  <!-- header -->
+  <div class="header">
+    <span class="session">◉ session started</span>
+    <button class="new-btn" id="newMainBtn">+ New</button>
   </div>
+
+  <!-- new type chooser popup -->
+  <div class="type-chooser" id="typeChooser">
+    <div class="type-option" data-type="login">🔐 Login</div>
+    <div class="type-option" data-type="note">📝 Note</div>
+    <div class="type-option" data-type="project">📁 Project</div>
+    <div class="type-option" data-type="folder">📂 Folder</div>
+  </div>
+
+  <!-- search -->
+  <div class="search-container">
+    <input type="text" class="search-bar" id="searchInput" placeholder="🔍 search vault ...">
+  </div>
+
+  <!-- main scrollable -->
+  <div class="content" id="mainContent">
+    <!-- favorites section -->
+    <div class="section-title">★ Favorites</div>
+    <div class="favorites" id="favoritesContainer"></div>
+
+    <!-- tabs -->
+    <div class="tabs">
+      <span class="tab active" data-view="all">All items</span>
+      <span class="tab" data-view="folders">Folders</span>
+    </div>
+
+    <!-- dynamic item list -->
+    <div class="item-list" id="itemListContainer"></div>
+  </div>
+
+  <!-- right slide panel (overlay) -->
+  <div class="panel-overlay" id="panelOverlay">
+    <div class="detail-panel" id="detailPanel">
+      <!-- panel content injected via js -->
+    </div>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ---------- data store (simulated) ----------
+    let items = [
+      { id: '1', type: 'login', title: 'affiliate.pocketoption.com', username: 'mkbertrand123@gmail.com', password: '•••••••', url: 'https://affiliate.pocketoption.com', favorite: true, folder: 'work' },
+      { id: '2', type: 'login', title: 'app.flutterwave.com', username: 'mkbertrand123@gmail.com', password: '•••••••', url: 'https://app.flutterwave.com', favorite: true, folder: 'finance' },
+      { id: '3', type: 'login', title: 'beta.publishers.adsterra.com', username: 'MKB-NEL', password: '•••••••', url: 'https://beta.publishers.adsterra.com', favorite: false, folder: 'ad' },
+      { id: '4', type: 'login', title: 'brs.rdb.rw', username: 'mkbertrand123@gmail.com', password: '•••••••', url: 'https://brs.rdb.rw', favorite: false, folder: 'gov' },
+      { id: '5', type: 'login', title: 'bytescale.com', username: 'mkbertrand123@gmail.com', password: '•••••••', url: 'https://bytescale.com', favorite: true },
+      { id: '6', type: 'note', title: 'API keys', content: 'sk_test_...\nVISA secret ...', favorite: false },
+      { id: '7', type: 'project', title: 'Dashboard redesign', content: 'Figma links, milestones', favorite: true },
+      { id: '8', type: 'folder', title: 'work', items: [] },   // folder itself
+      { id: '9', type: 'folder', title: 'personal', items: [] },
+    ];
+
+    let folders = items.filter(i => i.type === 'folder').map(f => f.title);
+    // favorites computed
+    let currentView = 'all';  // 'all' or 'folders'
+    let searchTerm = '';
+
+    // ---------- render helpers ----------
+    function renderFavorites() {
+      const favItems = items.filter(i => i.favorite && i.type !== 'folder');
+      const container = document.getElementById('favoritesContainer');
+      container.innerHTML = '';
+      favItems.slice(0, 5).forEach(item => {
+        const chip = document.createElement('span');
+        chip.className = 'fav-item';
+        chip.textContent = item.title.length > 18 ? item.title.slice(0,16)+'…' : item.title;
+        chip.addEventListener('click', (e) => { e.stopPropagation(); openDetailPanel(item.id); });
+        container.appendChild(chip);
+      });
+      if (favItems.length === 0) container.innerHTML = '<span style="color:#456" >no favorites</span>';
+    }
+
+    function filterItems() {
+      let filtered = items.filter(i => i.type !== 'folder' || currentView === 'folders'); 
+      if (currentView === 'folders') {
+        filtered = items.filter(i => i.type === 'folder');
+      }
+      if (searchTerm.trim() !== '') {
+        const term = searchTerm.toLowerCase();
+        filtered = filtered.filter(i => 
+          (i.title && i.title.toLowerCase().includes(term)) ||
+          (i.username && i.username.toLowerCase().includes(term)) ||
+          (i.content && i.content.toLowerCase().includes(term)) ||
+          (i.url && i.url.toLowerCase().includes(term)) ||
+          (i.folder && i.folder.toLowerCase().includes(term))
+        );
+      }
+      return filtered;
+    }
+
+    function renderList() {
+      const filtered = filterItems();
+      const container = document.getElementById('itemListContainer');
+      container.innerHTML = '';
+      if (filtered.length === 0) {
+        container.innerHTML = '<div style="color:#567; text-align:center; margin-top:2rem;">∅ no items</div>';
+        return;
+      }
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'item-card';
+        card.setAttribute('data-id', item.id);
+        let subtitle = '';
+        if (item.type === 'login') subtitle = item.username || 'login';
+        else if (item.type === 'note') subtitle = 'note';
+        else if (item.type === 'project') subtitle = 'project';
+        else if (item.type === 'folder') subtitle = 'folder';
+        card.innerHTML = `
+          <div class="item-info">
+            <h4>${item.title} ${item.favorite ? '★' : ''}</h4>
+            <p>${subtitle}</p>
+          </div>
+          <div class="item-icon">${item.type==='login'?'🔐':item.type==='note'?'📝':item.type==='project'?'📁':'📂'}</div>
+        `;
+        card.addEventListener('click', () => openDetailPanel(item.id));
+        container.appendChild(card);
+      });
+    }
+
+    function fullRender() {
+      renderFavorites();
+      renderList();
+    }
+
+    // ---------- search debounce (300ms) ----------
+    let searchTimeout;
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        searchTerm = e.target.value;
+        renderList();
+      }, 300);
+    });
+
+    // ---------- tabs ----------
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentView = tab.dataset.view;
+        renderList();
+      });
+    });
+
+    // ---------- new button & chooser ----------
+    const newBtn = document.getElementById('newMainBtn');
+    const chooser = document.getElementById('typeChooser');
+    newBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      chooser.classList.toggle('show');
+    });
+    document.addEventListener('click', (e) => {
+      if (!chooser.contains(e.target) && e.target !== newBtn) chooser.classList.remove('show');
+    });
+
+    document.querySelectorAll('.type-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        const type = opt.dataset.type;
+        chooser.classList.remove('show');
+        openCreatePanel(type);
+      });
+    });
+
+    // ---------- open detail / create panel (right slide)----------
+    const overlay = document.getElementById('panelOverlay');
+    const panel = document.getElementById('detailPanel');
+
+    function closePanel() {
+      overlay.classList.remove('active');
+    }
+
+    function openDetailPanel(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      let html = `
+        <div class="panel-header">
+          <button class="back-btn" id="backFromDetail">←</button>
+          <span class="panel-title">${item.title}</span>
+        </div>
+      `;
+      if (item.type === 'login') {
+        html += `
+          <div class="field-group"><div class="field-label">username</div><input class="field-input" value="${item.username || ''}" placeholder="username" id="detailUsername"></div>
+          <div class="field-group"><div class="field-label">password</div><input class="field-input" type="password" value="${item.password || ''}" id="detailPassword"><span class="copy-icon" data-copy="password">📋</span></div>
+          <div class="field-group"><div class="field-label">website url</div><input class="field-input" value="${item.url || ''}" id="detailUrl"></div>
+        `;
+      } else if (item.type === 'note' || item.type === 'project') {
+        html += `<div class="field-group"><div class="field-label">content</div><textarea class="field-textarea" id="detailContent">${item.content || ''}</textarea></div>`;
+      } else if (item.type === 'folder') {
+        html += `<div class="field-group"><div class="field-label">folder name</div><input class="field-input" value="${item.title}" id="detailFolderName"></div>`;
+        html += `<div>contained items: ${items.filter(i => i.folder === item.title).length}</div>`;
+      }
+      html += `<div class="action-buttons"><button class="btn btn-primary" id="saveItemBtn">save</button><button class="btn" id="cancelPanelBtn">cancel</button></div>`;
+      html += `<div class="custom-fields"><button class="btn" id="addCustomField">+ add own field</button><div id="customFieldsArea"></div></div>`;
+
+      panel.innerHTML = html;
+      overlay.classList.add('active');
+
+      document.getElementById('backFromDetail').addEventListener('click', closePanel);
+      document.getElementById('cancelPanelBtn')?.addEventListener('click', closePanel);
+      if (document.getElementById('saveItemBtn')) {
+        document.getElementById('saveItemBtn').addEventListener('click', () => {
+          alert('saved (demo)');
+          closePanel();
+          fullRender();
+        });
+      }
+      // copy functionality
+      document.querySelectorAll('.copy-icon').forEach(icon => {
+        icon.addEventListener('click', (e) => {
+          const target = e.target.dataset.copy === 'password' ? document.getElementById('detailPassword') : null;
+          if (target) {
+            navigator.clipboard.writeText(target.value);
+            alert('copied!');
+          }
+        });
+      });
+      // add custom field demo
+      document.getElementById('addCustomField')?.addEventListener('click', () => {
+        const area = document.getElementById('customFieldsArea');
+        const div = document.createElement('div');
+        div.className = 'field-group';
+        div.innerHTML = `<input class="field-input" placeholder="field name" style="width:40%"> <input class="field-input" placeholder="value" style="width:55%">`;
+        area.appendChild(div);
+      });
+    }
+
+    function openCreatePanel(type) {
+      let title = '';
+      if (type === 'login') title = 'new login';
+      else if (type === 'note') title = 'new note';
+      else if (type === 'project') title = 'new project';
+      else if (type === 'folder') title = 'new folder';
+
+      let html = `
+        <div class="panel-header">
+          <button class="back-btn" id="backFromDetail">←</button>
+          <span class="panel-title">${title}</span>
+        </div>
+      `;
+      if (type === 'folder') {
+        html += `<div class="field-group"><div class="field-label">folder name</div><input class="field-input" id="folderName" placeholder="e.g. work"></div>`;
+      } else {
+        html += `<div class="field-group"><div class="field-label">title</div><input class="field-input" id="itemTitle" placeholder="title"></div>`;
+        html += `<div class="field-group"><div class="field-label">choose folder</div><select class="field-input" id="itemFolder">${folders.map(f => `<option>${f}</option>`).join('')}<option>+ new folder</option></select></div>`;
+        if (type === 'login') {
+          html += `<div class="field-group"><div class="field-label">username</div><input class="field-input" id="loginUser"></div>`;
+          html += `<div class="field-group"><div class="field-label">password</div><input class="field-input" type="password" id="loginPass"></div>`;
+          html += `<div class="field-group"><div class="field-label">website url</div><input class="field-input" id="loginUrl"></div>`;
+        } else {
+          html += `<div class="field-group"><div class="field-label">content</div><textarea class="field-textarea" id="noteContent"></textarea></div>`;
+        }
+      }
+      html += `<div class="action-buttons"><button class="btn btn-primary" id="createItemBtn">create</button><button class="btn" id="cancelPanelBtn">cancel</button></div>`;
+
+      panel.innerHTML = html;
+      overlay.classList.add('active');
+
+      document.getElementById('backFromDetail').addEventListener('click', closePanel);
+      document.getElementById('cancelPanelBtn')?.addEventListener('click', closePanel);
+      document.getElementById('createItemBtn')?.addEventListener('click', () => {
+        alert('created (demo)');
+        closePanel();
+        // in real app would push to items
+        fullRender();
+      });
+    }
+
+    // back on overlay click (click outside panel? we only have blur overlay, clicking on overlay closes if click on overlay itself (not panel))
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) closePanel();
+    });
+
+    // initial render
+    fullRender();
+  })();
+</script>
 </body>
 </html>
