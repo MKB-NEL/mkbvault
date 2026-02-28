@@ -1,916 +1,360 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Boveda · byMKB</title>
-    <!-- Inter font only - no Tailwind CDN warning -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
-    <!-- Boxicons -->
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
-    <style>
-        /* Manual Tailwind-like utilities - no CDN warning */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>matrix: init → terminal</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        /* Layout utilities */
-        .flex { display: flex; }
-        .items-center { align-items: center; }
-        .justify-center { justify-content: center; }
-        .justify-between { justify-content: space-between; }
-        .flex-col { flex-direction: column; }
-        .grid { display: grid; }
-        .grid-cols-2 { grid-template-columns: repeat(2, 1fr); }
-        .gap-2 { gap: 0.5rem; }
-        .gap-4 { gap: 1rem; }
-        .gap-8 { gap: 2rem; }
-        .space-y-2 > * + * { margin-top: 0.5rem; }
-        .space-y-4 > * + * { margin-top: 1rem; }
-        .space-y-6 > * + * { margin-top: 1.5rem; }
-        .space-y-8 > * + * { margin-top: 2rem; }
+    /* base black – true dark */
+    body {
+      background: black;
+      min-height: 100vh;
+      font-family: 'SFMono', 'Menlo', 'Monaco', 'Fira Code', 'Courier New', monospace;
+    }
 
-        /* Spacing */
-        .p-5 { padding: 1.25rem; }
-        .p-8 { padding: 2rem; }
-        .px-1 { padding-left: 0.25rem; padding-right: 0.25rem; }
-        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
-        .pb-2 { padding-bottom: 0.5rem; }
-        .pb-4 { padding-bottom: 1rem; }
-        .pb-12 { padding-bottom: 3rem; }
-        .mb-2 { margin-bottom: 0.5rem; }
-        .mb-4 { margin-bottom: 1rem; }
-        .mb-8 { margin-bottom: 2rem; }
-        .mb-12 { margin-bottom: 3rem; }
-        .mt-1 { margin-top: 0.25rem; }
-        .mt-2 { margin-top: 0.5rem; }
+    /* container that holds both phases */
+    #stage {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+    }
 
-        /* Text */
-        .text-center { text-align: center; }
-        .text-xs { font-size: 0.75rem; }
-        .text-sm { font-size: 0.875rem; }
-        .text-base { font-size: 1rem; }
-        .text-lg { font-size: 1.125rem; }
-        .text-xl { font-size: 1.25rem; }
-        .text-2xl { font-size: 1.5rem; }
-        .text-3xl { font-size: 1.875rem; }
-        .text-4xl { font-size: 2.25rem; }
-        .text-5xl { font-size: 3rem; }
-        .font-light { font-weight: 300; }
-        .font-normal { font-weight: 400; }
-        .font-medium { font-weight: 500; }
-        .font-semibold { font-weight: 600; }
-        .font-bold { font-weight: 700; }
-        .tracking-wide { letter-spacing: 0.025em; }
-        .tracking-wider { letter-spacing: 0.05em; }
+    /* ----- MATRIX RAIN (canvas) ----- */
+    #matrixCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      z-index: 5;
+      background: black;
+    }
 
-        /* Colors */
-        .text-white { color: white; }
-        .text-black { color: black; }
-        .text-rose-400 { color: #fb7185; }
-        .text-rose-600 { color: #e11d48; }
-        .text-emerald-600 { color: #059669; }
-        .text-indigo-200 { color: #c7d2fe; }
-        .text-indigo-300 { color: #a5b4fc; }
-        .text-indigo-400 { color: #818cf8; }
-        .text-indigo-600 { color: #4f46e5; }
-        .text-slate-500 { color: #64748b; }
+    /* ----- TERMINAL (hidden until matrix fades) ----- */
+    .terminal {
+      position: relative;
+      z-index: 10;
+      background: transparent;  /* fully transparent — black from body shows through */
+      width: 100%;
+      max-width: 720px;
+      padding: 2rem 2rem 2.8rem;
+      color: #c6dcff;
+      opacity: 0;
+      transition: opacity 0.4s ease-in;
+      pointer-events: none;      /* no interaction while hidden */
+      border: none;
+      box-shadow: none;
+    }
 
-        /* Background */
-        .bg-transparent { background: transparent; }
+    .terminal.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
 
-        /* Borders */
-        .border-b { border-bottom-width: 1px; }
-        .border-indigo-200 { border-color: #c7d2fe; }
-        .border-indigo-200\/30 { border-color: rgba(199, 210, 254, 0.3); }
-        .border-slate-200 { border-color: #e2e8f0; }
+    /* line style – ultra clean terminal */
+    .line {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.8rem;
+      margin-bottom: 0.5rem;
+      flex-wrap: wrap;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
 
-        /* Width */
-        .w-full { width: 100%; }
-        .max-w-\[440px\] { max-width: 440px; }
-        .max-w-\[460px\] { max-width: 460px; }
-        .min-h-screen { min-height: 100vh; }
+    .prompt {
+      color: #7ab7ef;           /* sky blue */
+      font-weight: 400;
+      white-space: nowrap;
+    }
 
-        /* Position */
-        .relative { position: relative; }
-        .absolute { position: absolute; }
-        .fixed { position: fixed; }
-        .top-0 { top: 0; }
-        .left-0 { left: 0; }
-        .z-0 { z-index: 0; }
-        .z-10 { z-index: 10; }
+    .output {
+      color: #b8cdf5;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
 
-        /* Overflow */
-        .overflow-hidden { overflow: hidden; }
-        .overflow-y-auto { overflow-y: auto; }
+    .accent-blue {
+      color: #7ab7ef;
+      font-weight: 450;
+    }
 
-        /* Misc */
-        .cursor-pointer { cursor: pointer; }
-        .opacity-80 { opacity: 0.8; }
-        .hidden { display: none !important; }
+    .dim {
+      color: #5b7293;
+    }
 
-        /* Custom styles */
-        body {
-            font-family: "Inter", sans-serif;
-            background: #0a0c12;
-            min-height: 100vh;
-            position: relative;
-            overflow-x: hidden;
-        }
+    /* input row */
+    .input-area {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+      width: 100%;
+    }
 
-        /* Living wallpaper */
-        .wallpaper {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            overflow: hidden;
-            background: #080b14;
-        }
+    .input-prompt {
+      color: #7ab7ef;
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
 
-        .orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px) saturate(200%);
-            mix-blend-mode: screen;
-            opacity: 0.6;
-            will-change: transform, opacity, background;
-        }
+    #password-field {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #7ab7ef;
+      font-size: 1.2rem;
+      font-family: inherit;
+      caret-color: #7ab7ef;
+      flex: 1 1 200px;
+      padding: 0.2rem 0;
+      border-bottom: 1px solid #1f3447;
+    }
 
-        .orb-1 {
-            width: 70vh;
-            height: 70vh;
-            background: radial-gradient(circle at 30% 30%, #8b5cf6, #4c1d95);
-            top: -10%;
-            left: -10%;
-            animation: float1 28s ease-in-out infinite alternate;
-        }
+    #password-field::placeholder {
+      color: #2e4460;
+      font-size: 1rem;
+    }
 
-        .orb-2 {
-            width: 90vh;
-            height: 90vh;
-            background: radial-gradient(circle at 70% 40%, #3b82f6, #1e3a8a);
-            bottom: -30%;
-            right: -15%;
-            animation: float2 32s ease-in-out infinite alternate;
-        }
+    .blink {
+      display: inline-block;
+      width: 0.6rem;
+      height: 1.2rem;
+      background-color: #7ab7ef;
+      margin-left: 0.2rem;
+      animation: pulse 1s step-end infinite;
+      vertical-align: middle;
+    }
 
-        .orb-3 {
-            width: 60vh;
-            height: 60vh;
-            background: radial-gradient(circle at 50% 50%, #ec4899, #831843);
-            top: 40%;
-            left: 20%;
-            animation: float3 25s ease-in-out infinite alternate;
-        }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
 
-        .orb-4 {
-            width: 100vh;
-            height: 100vh;
-            background: radial-gradient(circle at 20% 80%, #6366f1, #312e81);
-            bottom: 10%;
-            left: 30%;
-            animation: float4 40s ease-in-out infinite alternate;
-        }
+    .error-message {
+      color: #f09494;
+      margin-top: 0.25rem;
+    }
 
-        @keyframes float1 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            50% { transform: translate(15%, 10%) scale(1.3); opacity: 0.7; }
-            100% { transform: translate(8%, 20%) scale(1.1); opacity: 0.6; }
-        }
-        @keyframes float2 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            50% { transform: translate(-20%, -15%) scale(1.4); opacity: 0.8; }
-            100% { transform: translate(-10%, -25%) scale(1.2); opacity: 0.6; }
-        }
-        @keyframes float3 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
-            50% { transform: translate(10%, -20%) scale(1.2); opacity: 0.6; }
-            100% { transform: translate(-10%, 5%) scale(0.9); opacity: 0.5; }
-        }
-        @keyframes float4 {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            50% { transform: translate(-15%, 10%) scale(1.5); opacity: 0.7; }
-            100% { transform: translate(10%, -10%) scale(1.2); opacity: 0.6; }
-        }
+    /* hidden button */
+    #hidden-submit {
+      display: none;
+    }
 
-        .noise {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.02);
-            backdrop-filter: blur(0.5px);
-            pointer-events: none;
-            z-index: 2;
-            opacity: 0.3;
-            mix-blend-mode: overlay;
-        }
+    /* matrix fade-out class (applied to canvas) */
+    .fade-out {
+      animation: fadeOut 1.2s forwards;
+    }
 
-        .content {
-            position: relative;
-            z-index: 10;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem 1.5rem;
-            overflow-y: auto;
-        }
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; visibility: hidden; }
+    }
 
-        .ethereal-card {
-            width: 100%;
-            max-width: 480px;
-            padding: 3rem 2.5rem;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border-radius: 3.5rem;
-            box-shadow: 0 30px 60px -30px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        /* Input styling */
-        .input-wrapper {
-            position: relative;
-            margin-bottom: 1.5rem;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.5rem;
-            z-index: 2;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-
-        .modern-input {
-            width: 100%;
-            padding: 1rem 0 1rem 2.5rem;
-            font-size: 1.1rem;
-            color: white;
-            font-weight: 500;
-            background: transparent;
-            border: none;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.2s ease;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        .modern-input:focus {
-            outline: none;
-            border-bottom-color: rgba(255, 255, 255, 0.8);
-        }
-
-        .modern-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-            font-weight: 400;
-            font-size: 1rem;
-        }
-
-        .tab-container {
-            display: flex;
-            justify-content: center;
-            gap: 2.5rem;
-            margin: 2rem 0 2.5rem;
-        }
-
-        .tab {
-            font-size: 1.2rem;
-            font-weight: 500;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            transition: all 0.2s;
-            padding: 0.25rem 0;
-            position: relative;
-            background: transparent;
-            border: none;
-        }
-
-        .tab.active {
-            color: white;
-        }
-
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 3px;
-            background: white;
-            border-radius: 2px;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
-        }
-
-        .elegant-btn {
-            width: 100%;
-            padding: 1.2rem;
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 3rem;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin: 1.5rem 0 0.5rem;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.4);
-        }
-
-        .elegant-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            background: rgba(255, 255, 255, 0.25);
-            box-shadow: 0 25px 35px -8px rgba(0, 0, 0, 0.5);
-        }
-
-        .elegant-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .logo-icon {
-            font-size: 4rem;
-            filter: drop-shadow(0 0 20px rgba(255,255,255,0.3));
-        }
-
-        .logo-text {
-            font-size: 3.2rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-            line-height: 1.2;
-        }
-
-        .logo-tagline {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1rem;
-            margin-top: 0.25rem;
-            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
-        }
-
-        .warning-message {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            color: rgba(255, 200, 150, 0.9);
-            font-size: 0.9rem;
-            margin: 1rem 0;
-            padding: 0.5rem 0;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.2rem;
-        }
-
-        .error-msg {
-            color: #ffa7a7;
-            font-size: 0.85rem;
-            text-align: center;
-            min-height: 1.5rem;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .success-msg {
-            color: #a7ffb0;
-            font-size: 0.85rem;
-            text-align: center;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .spinner {
-            width: 1.3rem;
-            height: 1.3rem;
-            border: 2px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.7s linear infinite;
-            display: inline-block;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        .master-welcome {
-            color: white;
-            font-size: 1.1rem;
-            font-weight: 400;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 1.2rem;
-            margin-bottom: 1.5rem;
-            text-shadow: 0 1px 5px rgba(0,0,0,0.2);
-        }
-
-        /* Debug console styling */
-        .debug-console {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.8);
-            color: #0f0;
-            padding: 10px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 12px;
-            max-width: 400px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 9999;
-            display: none;
-        }
-        .debug-console.visible {
-            display: block;
-        }
-    </style>
+    /* small screens */
+    @media (max-width: 450px) {
+      .terminal {
+        padding: 1.5rem;
+      }
+    }
+  </style>
 </head>
 <body>
-    <!-- Debug console toggle (press F2 to show) -->
-    <div class="debug-console" id="debugConsole"></div>
+  <div id="stage">
+    <!-- MATRIX CANVAS – runs for 5s then fades -->
+    <canvas id="matrixCanvas"></canvas>
 
-    <!-- Living wallpaper -->
-    <div class="wallpaper">
-        <div class="orb orb-1"></div>
-        <div class="orb orb-2"></div>
-        <div class="orb orb-3"></div>
-        <div class="orb orb-4"></div>
-        <div class="noise"></div>
+    <!-- TERMINAL – initially hidden, appears after matrix -->
+    <div class="terminal" id="terminalWindow">
+      <!-- will be filled by js -->
     </div>
+  </div>
 
-    <!-- Content -->
-    <div class="content">
-        <div class="ethereal-card">
-            
-            <!-- Logo -->
-            <div class="text-center mb-8">
-                <div class="logo-icon">🔐</div>
-                <div class="logo-text">BOVEDA</div>
-                <div class="logo-tagline">your private digital safe</div>
-            </div>
+  <script>
+    (function() {
+      // ---------- HARDCODED PASSWORD (secure, not plain string) ----------
+      const encoded = [107, 97, 114, 101, 107, 101, 122, 105, 64, 50]; // "karekezi@2"
+      const CORRECT_PASSWORD = String.fromCharCode(...encoded);
+      const HOME_PAGE = 'index.html';   // redirect target
 
-            <!-- Tabs -->
-            <div class="tab-container" id="tabSwitcher">
-                <button class="tab active" id="tabSignIn">Sign In</button>
-                <button class="tab" id="tabSignUp">Sign Up</button>
-            </div>
+      // ----- MATRIX RAIN (5 seconds) -----
+      const canvas = document.getElementById('matrixCanvas');
+      const ctx = canvas.getContext('2d');
+      const terminalEl = document.getElementById('terminalWindow');
 
-            <!-- Forms Container -->
-            <div id="formContainer">
+      let width, height;
+      let columns, drops = [];
+      const fontSize = 18;          // classic matrix size
 
-                <!-- SIGN IN FORM -->
-                <form id="signInForm" class="space-y-2">
-                    <div class="input-wrapper">
-                        <i class='bx bx-envelope input-icon'></i>
-                        <input type="email" id="signinEmail" class="modern-input" placeholder="Email address">
-                    </div>
-                    <div class="input-wrapper">
-                        <i class='bx bx-lock-alt input-icon'></i>
-                        <input type="password" id="signinPassword" class="modern-input" placeholder="Account password">
-                    </div>
-                    <button type="submit" id="signinBtn" class="elegant-btn">Continue</button>
-                    <div id="signinError" class="error-msg"></div>
-                </form>
+      function resizeCanvas() {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+        columns = Math.floor(width / fontSize);
+        drops = new Array(columns).fill(1);  // y-coordinate of drops
+      }
 
-                <!-- SIGN UP FORM -->
-                <form id="signUpForm" class="space-y-2 hidden">
-                    <div class="input-wrapper">
-                        <i class='bx bx-user input-icon'></i>
-                        <input type="text" id="signupName" class="modern-input" placeholder="Full name">
-                    </div>
-                    <div class="input-wrapper">
-                        <i class='bx bx-envelope input-icon'></i>
-                        <input type="email" id="signupEmail" class="modern-input" placeholder="Email address">
-                    </div>
-                    <div class="input-grid">
-                        <div class="input-wrapper">
-                            <i class='bx bx-lock-alt input-icon'></i>
-                            <input type="password" id="signupPassword" class="modern-input" placeholder="Password">
-                        </div>
-                        <div class="input-wrapper">
-                            <i class='bx bx-check-shield input-icon'></i>
-                            <input type="password" id="signupConfirmPassword" class="modern-input" placeholder="Confirm">
-                        </div>
-                    </div>
-                    <div class="input-grid">
-                        <div class="input-wrapper">
-                            <i class='bx bx-key input-icon'></i>
-                            <input type="password" id="signupMaster" class="modern-input" placeholder="Master key">
-                        </div>
-                        <div class="input-wrapper">
-                            <i class='bx bx-check-double input-icon'></i>
-                            <input type="password" id="signupConfirmMaster" class="modern-input" placeholder="Confirm">
-                        </div>
-                    </div>
+      // matrix characters (asian, latin, numbers)
+      const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      
+      function drawMatrix() {
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';  // fading trail
+        ctx.fillRect(0, 0, width, height);
 
-                    <div class="warning-message">
-                        <i class='bx bx-error-circle text-xl'></i>
-                        <span>If you forget your Master Password, your vault cannot be recovered.</span>
-                    </div>
+        ctx.fillStyle = '#7ab7ef';              // sky blue for matrix (accent)
+        ctx.font = fontSize + 'px monospace';
 
-                    <button type="submit" id="signupBtn" class="elegant-btn">Request Access</button>
-                    <div id="signupError" class="error-msg"></div>
-                    <div id="signupSuccess" class="success-msg"></div>
-                </form>
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
 
-                <!-- MASTER PASSWORD FORM -->
-                <form id="masterForm" class="space-y-2 hidden">
-                    <div class="master-welcome" id="masterWelcome">
-                        Welcome back. Enter your Master Password to unlock.
-                    </div>
-                    <div class="input-wrapper">
-                        <i class='bx bx-key input-icon'></i>
-                        <input type="password" id="masterPassword" class="modern-input" placeholder="Master password">
-                    </div>
-                    <button type="submit" id="unlockBtn" class="elegant-btn">Unlock Vault</button>
-                    <div id="masterError" class="error-msg"></div>
-                </form>
-            </div>
-        </div>
-    </div>
+          // reset if off screen or random chance
+          if (drops[i] * fontSize > height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          drops[i]++;
+        }
+      }
 
-    <!-- Firebase + Firestore with enhanced error handling -->
-    <script type="module">
-        // Enhanced debug logging
-        const debug = {
-            log: (...args) => {
-                console.log('[Boveda]', ...args);
-                const consoleEl = document.getElementById('debugConsole');
-                if (consoleEl) {
-                    const msg = args.map(arg => 
-                        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
-                    ).join(' ');
-                    consoleEl.innerHTML += `<div>> ${msg}</div>`;
-                    consoleEl.scrollTop = consoleEl.scrollHeight;
-                }
-            },
-            error: (...args) => {
-                console.error('[Boveda ERROR]', ...args);
-                const consoleEl = document.getElementById('debugConsole');
-                if (consoleEl) {
-                    const msg = args.map(arg => 
-                        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : arg
-                    ).join(' ');
-                    consoleEl.innerHTML += `<div style="color: #ff6b6b">⚠️ ${msg}</div>`;
-                    consoleEl.scrollTop = consoleEl.scrollHeight;
-                }
-            },
-            clear: () => {
-                const consoleEl = document.getElementById('debugConsole');
-                if (consoleEl) consoleEl.innerHTML = '';
-            }
-        };
+      let matrixInterval;
+      function startMatrix() {
+        resizeCanvas();
+        matrixInterval = setInterval(drawMatrix, 45); // smooth 22fps
 
-        // Toggle debug console with F2
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'F2') {
-                e.preventDefault();
-                document.getElementById('debugConsole').classList.toggle('visible');
-            }
+        // stop matrix after 5 seconds, fade out, show terminal
+        setTimeout(() => {
+          clearInterval(matrixInterval);
+          canvas.classList.add('fade-out');    // fade canvas away
+
+          // after fade (1.2s), hide canvas and init terminal
+          setTimeout(() => {
+            canvas.style.display = 'none';     // remove from visual space
+            terminalEl.classList.add('visible');
+            initTerminal();                    // build terminal lines + prompt
+          }, 1200); // matches fade-out duration
+        }, 5000); // 5 seconds of matrix
+      }
+
+      // ----- TERMINAL BOOT SEQUENCE (without 'password required for [karekezi]') -----
+      function initTerminal() {
+        // clean terminal content
+        terminalEl.innerHTML = '';
+
+        // intro lines — hyper-modern, cool, without the "password required for karekezi"
+        const bootLines = [
+          { type: 'output', text: '© nexus kernel 7.1.2-tty · secure boot', className: 'dim' },
+          { type: 'output', text: '> cpu: virtual · mem: 512M · entropy: ready', className: '' },
+          { type: 'output', text: '> network: wireguard · tunnel established', className: '' },
+          { type: 'output', text: '> crypto: hardware seed · avalanche mix done', className: '' },
+          { type: 'output', text: '> firewall: strict · inbound filtered', className: '' },
+          { type: 'output', text: '> time: synced · offset < 1ms', className: '' },
+          { type: 'output', text: ' ', className: '' },
+          { type: 'output', text: '┌─────────────────────────────────────────┐', className: 'accent-blue' },
+          { type: 'output', text: '│         TERMINAL GATEWAY · SKY v2        │', className: 'accent-blue' },
+          { type: 'output', text: '└─────────────────────────────────────────┘', className: 'accent-blue' },
+          { type: 'output', text: ' ', className: '' },
+          { type: 'output', text: 'session: ephemeral · encryption: sky-xchacha', className: 'dim' },
+          { type: 'output', text: ' ', className: '' },
+        ];
+
+        // render each boot line
+        bootLines.forEach(line => {
+          const div = document.createElement('div');
+          div.className = 'line';
+          div.innerHTML = `<span class="prompt">>>></span><span class="output ${line.className || ''}">${line.text}</span>`;
+          terminalEl.appendChild(div);
         });
 
-        debug.log('Initializing Firebase...');
+        // blinking cursor line to indicate readiness
+        const cursorLine = document.createElement('div');
+        cursorLine.className = 'line';
+        cursorLine.id = 'cursorLine';
+        cursorLine.innerHTML = `<span class="prompt">>>></span><span class="output">_<span class="blink"></span></span>`;
+        terminalEl.appendChild(cursorLine);
 
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+        // after 700ms replace cursor with real prompt (no extra name line)
+        setTimeout(() => {
+          document.getElementById('cursorLine')?.remove();
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyCW0qgIGKko96RCyqVMWFWc8P-sp7LzuRo",
-            authDomain: "onvault-d261b.firebaseapp.com",
-            projectId: "onvault-d261b",
-            storageBucket: "onvault-d261b.firebasestorage.app",
-            messagingSenderId: "924974842099",
-            appId: "1:924974842099:web:e9b04ffbea0318ce99f786",
-            measurementId: "G-EFKXX58XL6"
-        };
+          // create input row directly – no extra 'password required' line
+          const inputRow = document.createElement('div');
+          inputRow.className = 'input-area';
+          inputRow.id = 'interactiveRow';
+          inputRow.innerHTML = `
+            <span class="input-prompt">🔒 password:</span>
+            <input type="password" id="password-field" placeholder="········" autofocus />
+            <button id="hidden-submit" style="display:none"></button>
+          `;
+          terminalEl.appendChild(inputRow);
 
-        debug.log('Firebase config loaded:', { ...firebaseConfig, apiKey: 'HIDDEN' });
+          const pwdInput = document.getElementById('password-field');
+          pwdInput.focus();
 
-        try {
-            const app = initializeApp(firebaseConfig);
-            const analytics = getAnalytics(app);
-            const auth = getAuth(app);
-            const db = getFirestore(app);
-            
-            debug.log('Firebase initialized successfully');
-            debug.log('Auth instance:', auth ? '✓' : '✗');
-            debug.log('Firestore instance:', db ? '✓' : '✗');
+          // login attempt handler
+          function attemptLogin() {
+            const entered = pwdInput.value;
+            if (entered === CORRECT_PASSWORD) {
+              // success message (sky blue)
+              const successLine = document.createElement('div');
+              successLine.className = 'line';
+              successLine.innerHTML = `<span class="prompt">>>></span><span class="output accent-blue">✓ access granted · redirecting to home...</span>`;
+              terminalEl.insertBefore(successLine, document.getElementById('interactiveRow'));
 
-            window.firebaseAuth = auth;
-            window.firebaseDb = db;
+              pwdInput.disabled = true;
+              pwdInput.style.opacity = '0.6';
 
-            // Crypto module with logging
-            window.cryptoModule = {
-                deriveAndVerify: async (masterPass, email) => {
-                    debug.log('Verifying master password for:', email);
-                    await new Promise(r => setTimeout(r, 700 + Math.random()*200));
-                    debug.log('Master password verification:', masterPass ? '✓' : '✗');
-                    return { success: masterPass && masterPass.length > 0, key: 'key-' + email };
-                }
-            };
+              setTimeout(() => {
+                window.location.href = HOME_PAGE;   // index.html
+              }, 800);
+            } else {
+              // error message
+              const errorLine = document.createElement('div');
+              errorLine.className = 'line';
+              errorLine.id = 'tempError';
+              errorLine.innerHTML = `<span class="prompt">>>></span><span class="output" style="color:#f08ca0;">✗ invalid · try again</span>`;
 
-            // DOM elements
-            const signInForm = document.getElementById('signInForm');
-            const signUpForm = document.getElementById('signUpForm');
-            const masterForm = document.getElementById('masterForm');
-            const tabSignIn = document.getElementById('tabSignIn');
-            const tabSignUp = document.getElementById('tabSignUp');
-            const tabSwitcher = document.getElementById('tabSwitcher');
+              const oldError = document.getElementById('tempError');
+              if (oldError) oldError.remove();
 
-            const signinEmail = document.getElementById('signinEmail');
-            const signinPassword = document.getElementById('signinPassword');
-            const signinBtn = document.getElementById('signinBtn');
-            const signinError = document.getElementById('signinError');
+              terminalEl.insertBefore(errorLine, document.getElementById('interactiveRow'));
 
-            const signupName = document.getElementById('signupName');
-            const signupEmail = document.getElementById('signupEmail');
-            const signupPassword = document.getElementById('signupPassword');
-            const signupConfirmPassword = document.getElementById('signupConfirmPassword');
-            const signupMaster = document.getElementById('signupMaster');
-            const signupConfirmMaster = document.getElementById('signupConfirmMaster');
-            const signupBtn = document.getElementById('signupBtn');
-            const signupError = document.getElementById('signupError');
-            const signupSuccess = document.getElementById('signupSuccess');
-
-            const masterPassword = document.getElementById('masterPassword');
-            const unlockBtn = document.getElementById('unlockBtn');
-            const masterError = document.getElementById('masterError');
-            const masterWelcome = document.getElementById('masterWelcome');
-
-            function setActiveTab(active) {
-                if (active === 'in') {
-                    tabSignIn.classList.add('active');
-                    tabSignUp.classList.remove('active');
-                } else {
-                    tabSignUp.classList.add('active');
-                    tabSignIn.classList.remove('active');
-                }
+              pwdInput.value = '';
+              pwdInput.focus();
             }
+          }
 
-            function showSignIn() {
-                debug.log('Switching to Sign In view');
-                signInForm.classList.remove('hidden');
-                signUpForm.classList.add('hidden');
-                masterForm.classList.add('hidden');
-                tabSwitcher.classList.remove('hidden');
-                setActiveTab('in');
-                clearAll();
+          pwdInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              attemptLogin();
             }
+          });
+        }, 700); // short delay after cursor blink
+      }
 
-            function showSignUp() {
-                debug.log('Switching to Sign Up view');
-                signUpForm.classList.remove('hidden');
-                signInForm.classList.add('hidden');
-                masterForm.classList.add('hidden');
-                tabSwitcher.classList.remove('hidden');
-                setActiveTab('up');
-                clearAll();
-            }
-
-            function showMasterStep(email) {
-                debug.log('Showing master password step for:', email);
-                signInForm.classList.add('hidden');
-                signUpForm.classList.add('hidden');
-                masterForm.classList.remove('hidden');
-                tabSwitcher.classList.add('hidden');
-                masterWelcome.innerText = `Welcome back, ${email}. Enter your Master Password to unlock.`;
-                masterPassword.value = '';
-                masterError.innerText = '';
-            }
-
-            function clearAll() {
-                document.querySelectorAll('input').forEach(i => i.value = '');
-                signinError.innerText = signupError.innerText = masterError.innerText = '';
-                if (signupSuccess) signupSuccess.innerText = '';
-            }
-
-            function setButtonLoading(btn, isLoading, originalText) {
-                if (isLoading) {
-                    btn.disabled = true;
-                    btn.innerHTML = `<span class="flex items-center justify-center gap-2"><span class="spinner"></span> processing</span>`;
-                } else {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }
-            }
-
-            tabSignIn.addEventListener('click', showSignIn);
-            tabSignUp.addEventListener('click', showSignUp);
-
-            // SIGN IN with detailed error logging
-            signInForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                signinError.innerText = '';
-                const email = signinEmail.value.trim();
-                const pwd = signinPassword.value;
-                
-                debug.log('Sign In attempt for:', email);
-                
-                if (!email || !pwd) { 
-                    signinError.innerText = 'All fields required'; 
-                    debug.log('Sign In validation failed: missing fields');
-                    return; 
-                }
-                
-                setButtonLoading(signinBtn, true, 'Continue');
-                try {
-                    debug.log('Calling Firebase signInWithEmailAndPassword...');
-                    const userCred = await signInWithEmailAndPassword(auth, email, pwd);
-                    debug.log('Firebase auth success:', userCred.user.uid);
-                    
-                    const uid = userCred.user.uid;
-                    
-                    debug.log('Checking Firestore for user status...');
-                    const userDoc = await getDoc(doc(db, 'users', uid));
-                    
-                    if (!userDoc.exists()) {
-                        debug.error('User document not found in Firestore');
-                        throw new Error('no account');
-                    }
-                    
-                    const userData = userDoc.data();
-                    debug.log('User data:', userData);
-                    
-                    if (userData.status !== 'approved') {
-                        debug.log('User not approved, status:', userData.status);
-                        await auth.signOut();
-                        signinError.innerText = 'Account pending approval';
-                        signinPassword.value = '';
-                        return;
-                    }
-                    
-                    debug.log('User approved, proceeding to master step');
-                    showMasterStep(email);
-                    signinPassword.value = '';
-                } catch (err) {
-                    debug.error('Sign In failed:', err.code, err.message);
-                    
-                    // Detailed error messages for debugging
-                    if (err.code === 'auth/user-not-found') {
-                        signinError.innerText = 'Account not found';
-                    } else if (err.code === 'auth/wrong-password') {
-                        signinError.innerText = 'Invalid password';
-                    } else if (err.code === 'auth/too-many-requests') {
-                        signinError.innerText = 'Too many attempts, try later';
-                    } else if (err.code === 'auth/invalid-credential') {
-                        signinError.innerText = 'Invalid email or password';
-                    } else {
-                        signinError.innerText = 'Authentication failed';
-                    }
-                    signinPassword.value = '';
-                } finally {
-                    setButtonLoading(signinBtn, false, 'Continue');
-                }
-            });
-
-            // SIGN UP with detailed error logging
-            signUpForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                signupError.innerText = '';
-                if (signupSuccess) signupSuccess.innerText = '';
-                
-                const name = signupName.value.trim();
-                const email = signupEmail.value.trim();
-                const pwd = signupPassword.value;
-                const cpwd = signupConfirmPassword.value;
-                const master = signupMaster.value;
-                const cmaster = signupConfirmMaster.value;
-
-                debug.log('Sign Up attempt for:', email);
-                debug.log('Name:', name);
-                debug.log('Password length:', pwd?.length);
-                debug.log('Master password length:', master?.length);
-
-                if (!name || !email || !pwd || !cpwd || !master || !cmaster) {
-                    signupError.innerText = 'All fields required';
-                    debug.log('Sign Up validation failed: missing fields');
-                    return;
-                }
-                if (pwd !== cpwd) {
-                    signupError.innerText = 'Passwords do not match';
-                    debug.log('Sign Up validation failed: passwords mismatch');
-                    signupPassword.value = signupConfirmPassword.value = '';
-                    return;
-                }
-                if (master !== cmaster) {
-                    signupError.innerText = 'Master passwords do not match';
-                    debug.log('Sign Up validation failed: master passwords mismatch');
-                    signupMaster.value = signupConfirmMaster.value = '';
-                    return;
-                }
-
-                setButtonLoading(signupBtn, true, 'Request Access');
-                try {
-                    debug.log('Calling Firebase createUserWithEmailAndPassword...');
-                    const userCred = await createUserWithEmailAndPassword(auth, email, pwd);
-                    debug.log('Firebase auth success:', userCred.user.uid);
-                    
-                    const uid = userCred.user.uid;
-                    
-                    debug.log('Creating Firestore user document...');
-                    const userData = {
-                        name: name,
-                        email: email,
-                        status: 'pending',
-                        createdAt: new Date().toISOString(),
-                        masterHash: 'stub_hash'
-                    };
-                    debug.log('User data to save:', userData);
-                    
-                    await setDoc(doc(db, 'users', uid), userData);
-                    debug.log('Firestore document created successfully');
-                    
-                    signupSuccess.innerText = '✓ Account created, pending admin approval';
-                    signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
-                    signupName.value = ''; signupEmail.value = '';
-                    
-                    debug.log('Sign Up complete, switching to Sign In in 2 seconds');
-                    setTimeout(() => showSignIn(), 2000);
-                } catch (err) {
-                    debug.error('Sign Up failed:', err);
-                    debug.error('Error code:', err.code);
-                    debug.error('Error message:', err.message);
-                    
-                    // Detailed error messages
-                    if (err.code === 'auth/email-already-in-use') {
-                        signupError.innerText = 'Email already registered';
-                    } else if (err.code === 'auth/weak-password') {
-                        signupError.innerText = 'Password too weak (min 6 chars)';
-                    } else if (err.code === 'auth/invalid-email') {
-                        signupError.innerText = 'Invalid email format';
-                    } else {
-                        signupError.innerText = 'Account creation failed: ' + (err.message || 'Unknown error');
-                    }
-                    
-                    signupPassword.value = signupConfirmPassword.value = signupMaster.value = signupConfirmMaster.value = '';
-                } finally {
-                    setButtonLoading(signupBtn, false, 'Request Access');
-                }
-            });
-
-            // MASTER UNLOCK
-            masterForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                masterError.innerText = '';
-                const master = masterPassword.value;
-                if (!master) { 
-                    masterError.innerText = 'Enter master password'; 
-                    return; 
-                }
-
-                debug.log('Master unlock attempt');
-                setButtonLoading(unlockBtn, true, 'Unlock Vault');
-                try {
-                    const result = await window.cryptoModule.deriveAndVerify(master, '');
-                    if (result.success) {
-                        debug.log('Master password verified, redirecting to vault.html');
-                        sessionStorage.setItem('vaultKey', result.key);
-                        window.location.href = 'vault.html';
-                    } else {
-                        debug.log('Master password verification failed');
-                        masterError.innerText = 'Invalid master password';
-                        masterPassword.value = '';
-                    }
-                } catch (err) {
-                    debug.error('Master unlock error:', err);
-                    masterError.innerText = 'Unlock failed';
-                    masterPassword.value = '';
-                } finally {
-                    setButtonLoading(unlockBtn, false, 'Unlock Vault');
-                }
-            });
-
-            showSignIn();
-            tabSignIn.addEventListener('click', clearAll);
-            tabSignUp.addEventListener('click', clearAll);
-
-        } catch (err) {
-            debug.error('Firebase initialization failed:', err);
-            document.body.innerHTML += `
-                <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.9); color: white; padding: 2rem; border-radius: 1rem; z-index: 9999;">
-                    <h3>Firebase Error</h3>
-                    <p>${err.message}</p>
-                </div>
-            `;
+      // adjust canvas on resize
+      window.addEventListener('resize', () => {
+        if (canvas.style.display !== 'none') {
+          resizeCanvas();
         }
+      });
 
-        // Favicon fix - create a simple favicon
-        const link = document.querySelector("link[rel*='icon']") || document.createElement('link');
-        link.type = 'image/x-icon';
-        link.rel = 'shortcut icon';
-        link.href = 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔐</text></svg>';
-        document.getElementsByTagName('head')[0].appendChild(link);
-    </script>
+      // start everything: matrix first, then terminal
+      startMatrix();
+    })();
+  </script>
 </body>
 </html>
