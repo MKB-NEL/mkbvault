@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
   <title>vault · minimal</title>
-  <!-- Poppins & boxicons -->
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=stop" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
-  <!-- suppress favicon error (optional but stops 404) -->
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📦</text></svg>">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -37,7 +35,23 @@
       font-size: 0.9rem; font-weight: 400; padding: 0.4rem 0.8rem;
       cursor: pointer; display: flex; align-items: center; gap: 0.2rem;
     }
-    .search-container { padding: 0.8rem 1rem; }
+    .action-bar {
+      display: flex; align-items: center; gap: 1rem; padding: 0.5rem 1rem;
+      background: #0a0a0a; margin: 0 1rem 0.5rem;
+    }
+    .select-all {
+      display: flex; align-items: center; gap: 0.3rem; color: #7ab7ef;
+      cursor: pointer; font-size: 0.9rem;
+    }
+    .bulk-actions {
+      display: flex; gap: 0.8rem; margin-left: auto;
+    }
+    .bulk-btn {
+      background: transparent; border: none; color: #aaa;
+      font-size: 1.2rem; cursor: pointer; padding: 0.2rem;
+    }
+    .bulk-btn:hover { color: #7ab7ef; }
+    .search-container { padding: 0.8rem 1rem 0; }
     .search-bar {
       width: 100%; background: #111; border: none; padding: 0.8rem 1rem;
       color: #fff; font-size: 0.9rem; font-family: 'Poppins', sans-serif;
@@ -52,6 +66,7 @@
     .section-title {
       font-size: 0.7rem; font-weight: 400; text-transform: uppercase;
       color: #666; margin: 1.2rem 0 0.6rem; letter-spacing: 0.3px;
+      display: flex; justify-content: space-between; align-items: center;
     }
     .favorites {
       display: flex; gap: 0.5rem; flex-wrap: wrap;
@@ -70,39 +85,62 @@
       color: #666; cursor: pointer; border-bottom: 1px solid transparent;
     }
     .tab.active { color: #7ab7ef; border-bottom: 1px solid #7ab7ef; }
+    .tab[data-view="trash"] { color: #885e5e; }
+    .tab[data-view="trash"].active { color: #ff7b7b; border-bottom-color: #ff7b7b; }
+    
     .item-list { display: flex; flex-direction: column; gap: 0.5rem; }
     .item-card {
       background: #0a0a0a; padding: 1rem; display: flex;
-      align-items: center; justify-content: space-between; cursor: pointer;
+      align-items: center; gap: 0.8rem; cursor: pointer;
+    }
+    .item-card.select-mode { opacity: 0.8; }
+    .checkbox {
+      width: 1.2rem; height: 1.2rem; background: #111;
+      display: flex; align-items: center; justify-content: center;
+      color: #7ab7ef; font-size: 0.9rem;
+    }
+    .item-info {
+      flex: 1;
     }
     .item-info h4 {
       font-size: 0.95rem; font-weight: 400; margin-bottom: 0.2rem;
       color: #fff; display: flex; align-items: center; gap: 0.5rem;
     }
     .fav-heart {
-      color: #555; cursor: pointer; font-size: 1rem; transition: 0.1s;
+      color: #555; cursor: pointer; font-size: 1rem;
     }
     .fav-heart.active { color: #7ab7ef; }
     .item-info p { font-size: 0.7rem; font-weight: 300; color: #888; }
     .item-icon { font-size: 1.2rem; color: #7ab7ef; }
 
-    /* image gallery grid */
+    /* image groups */
+    .image-group {
+      margin-bottom: 1.5rem;
+    }
+    .group-header {
+      display: flex; align-items: baseline; gap: 0.5rem;
+      margin-bottom: 0.5rem; color: #aaa; font-size: 0.8rem;
+    }
+    .group-header i { color: #7ab7ef; }
     .image-grid {
-      display: grid; grid-template-columns: repeat(2,1fr); gap: 0.5rem;
-      margin-top: 0.5rem;
+      display: grid; grid-template-columns: repeat(3,1fr); gap: 0.3rem;
     }
     .image-item {
-      background: #111; padding: 0.5rem; position: relative;
+      background: #111; padding: 0.3rem; position: relative;
     }
     .image-item img {
       width: 100%; aspect-ratio: 1/1; object-fit: cover;
     }
-    .image-label {
-      font-size: 0.7rem; color: #aaa; margin-top: 0.2rem;
-      display: flex; justify-content: space-between;
+    .image-checkbox {
+      position: absolute; top: 0.3rem; left: 0.3rem;
+      background: rgba(0,0,0,0.7); width: 1.2rem; height: 1.2rem;
+      display: flex; align-items: center; justify-content: center;
+      color: #7ab7ef; font-size: 0.9rem; cursor: pointer;
     }
     .download-btn {
-      color: #7ab7ef; cursor: pointer; font-size: 1rem;
+      position: absolute; bottom: 0.3rem; right: 0.3rem;
+      color: #7ab7ef; background: rgba(0,0,0,0.7); padding: 0.2rem;
+      cursor: pointer;
     }
 
     /* panel */
@@ -142,7 +180,8 @@
       font-family: 'Poppins', sans-serif;
     }
     .btn-primary { background: #7ab7ef; color: #000; font-weight: 400; }
-    .action-buttons { display: flex; gap: 0.8rem; margin: 1.5rem 0; }
+    .btn-danger { background: #441111; color: #ff9999; }
+    .action-buttons { display: flex; gap: 0.8rem; margin: 1.5rem 0; flex-wrap: wrap; }
     .copy-icon { margin-left: 0.5rem; cursor: pointer; color: #7ab7ef; }
     .type-chooser {
       position: absolute; top: 70px; right: 10px; background: #111;
@@ -157,22 +196,20 @@
     .type-option:hover { background: #1a1a1a; }
     .type-option i { color: #7ab7ef; }
 
-    /* custom notification (middle) */
     .notification {
       position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
       background: #111; color: #7ab7ef; padding: 0.8rem 1.5rem;
-      z-index: 100; font-size: 0.9rem; border: none;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.5); display: none;
-      pointer-events: none; text-align: center;
+      z-index: 100; font-size: 0.9rem; display: none;
       white-space: nowrap; max-width: 90%;
     }
     .notification.show { display: block; }
 
-    /* image upload area */
     .upload-area {
       background: #111; padding: 1rem; text-align: center; cursor: pointer;
       margin: 1rem 0;
     }
+
+    .archive-badge { color: #888; font-size: 0.7rem; margin-left: 0.5rem; }
   </style>
 </head>
 <body>
@@ -181,40 +218,60 @@
     <span class="session"><i class='bx bx-circle' style="color:#7ab7ef;"></i> session started</span>
     <button class="new-btn" id="newMainBtn"><i class='bx bx-plus'></i> New</button>
   </div>
+  
+  <!-- Multi-select action bar (hidden by default) -->
+  <div class="action-bar" id="actionBar" style="display: none;">
+    <div class="select-all" id="selectAllBtn">
+      <i class='bx bx-checkbox'></i> select all
+    </div>
+    <div class="bulk-actions">
+      <button class="bulk-btn" id="archiveBulk" title="archive"><i class='bx bx-archive'></i></button>
+      <button class="bulk-btn" id="deleteBulk" title="delete to trash"><i class='bx bx-trash'></i></button>
+      <button class="bulk-btn" id="cancelBulk" title="cancel"><i class='bx bx-x'></i></button>
+    </div>
+  </div>
+
   <div class="type-chooser" id="typeChooser">
     <div class="type-option" data-type="login"><i class='bx bx-lock-alt'></i> Login</div>
     <div class="type-option" data-type="note"><i class='bx bx-note'></i> Note</div>
     <div class="type-option" data-type="project"><i class='bx bx-folder'></i> Project</div>
     <div class="type-option" data-type="folder"><i class='bx bx-folder-open'></i> Folder</div>
-    <div class="type-option" data-type="image"><i class='bx bx-image'></i> Image</div>
+    <div class="type-option" data-type="image"><i class='bx bx-image'></i> Images</div>
   </div>
+  
   <div class="search-container">
     <input type="text" class="search-bar" id="searchInput" placeholder="search vault...">
   </div>
+  
   <div class="content" id="mainContent">
-    <div class="section-title"><i class='bx bx-star' style="color:#7ab7ef;"></i> favorites</div>
+    <div class="section-title">
+      <span><i class='bx bx-star' style="color:#7ab7ef;"></i> favorites</span>
+      <span class="select-mode-btn" id="selectModeBtn" style="color:#7ab7ef; cursor:pointer;"><i class='bx bx-checkbox-checked'></i> select</span>
+    </div>
     <div class="favorites" id="favoritesContainer"></div>
+    
     <div class="tabs">
       <span class="tab active" data-view="all">all items</span>
       <span class="tab" data-view="folders">folders</span>
       <span class="tab" data-view="images">images</span>
+      <span class="tab" data-view="trash">trash</span>
     </div>
+    
     <div class="item-list" id="itemListContainer"></div>
-    <div class="image-grid" id="imageGridContainer" style="display: none;"></div>
+    <div id="imageGroupsContainer"></div>
   </div>
+  
   <div class="panel-overlay" id="panelOverlay">
     <div class="detail-panel" id="detailPanel"></div>
   </div>
 </div>
 <div class="notification" id="notification"></div>
 
-<!-- ImgBB API key -->
 <script>
   const IMGBB_API_KEY = 'ba8023ca74166460c442e8e703d2a1b0';
   window.IMGBB_API_KEY = IMGBB_API_KEY;
 </script>
 
-<!-- Firebase SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
   import { getDatabase, ref, onValue, push, set, update, remove } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js";
@@ -274,33 +331,66 @@
       let currentView = 'all';
       let searchTerm = '';
       let foldersList = [];
-      let currentFolderContext = null; // for folder drilling
+      let currentFolderContext = null;
+      let selectMode = false;
+      let selectedIds = new Set();
+      
+      // Trash management - check for expired items (older than 7 days)
+      function cleanTrash() {
+        const now = Date.now();
+        const week = 7 * 24 * 60 * 60 * 1000;
+        items.forEach(item => {
+          if (item.trash && item.trashedAt && (now - item.trashedAt) > week) {
+            remove(ref(database, 'vault-items/' + item.id));
+            notify('Permanently deleted expired item: ' + item.title);
+          }
+        });
+      }
 
       const favContainer = document.getElementById('favoritesContainer');
       const itemListContainer = document.getElementById('itemListContainer');
-      const imageGridContainer = document.getElementById('imageGridContainer');
+      const imageGroupsContainer = document.getElementById('imageGroupsContainer');
       const searchInput = document.getElementById('searchInput');
       const tabs = document.querySelectorAll('.tab');
       const newBtn = document.getElementById('newMainBtn');
       const chooser = document.getElementById('typeChooser');
       const overlay = document.getElementById('panelOverlay');
       const panel = document.getElementById('detailPanel');
+      const actionBar = document.getElementById('actionBar');
+      const selectModeBtn = document.getElementById('selectModeBtn');
+      const selectAllBtn = document.getElementById('selectAllBtn');
+      const archiveBulk = document.getElementById('archiveBulk');
+      const deleteBulk = document.getElementById('deleteBulk');
+      const cancelBulk = document.getElementById('cancelBulk');
 
       onValue(itemsRef, (snapshot) => {
         const data = snapshot.val();
         items = data ? Object.entries(data).map(([id, value]) => ({ id, ...value })) : [];
+        items = items.map(i => ({ 
+          ...i, 
+          createdAt: i.createdAt || Date.now(),
+          trashedAt: i.trashedAt || null,
+          archived: i.archived || false
+        }));
         foldersList = items.filter(i => i.type === 'folder').map(f => f.title);
+        cleanTrash();
         fullRender();
+        if (selectMode) exitSelectMode();
       });
 
       function fullRender() {
         renderFavorites();
-        if (currentView === 'images') { showImageGrid(); }
-        else { renderList(); }
+        if (currentView === 'images') {
+          renderImageGroups();
+        } else if (currentView === 'trash') {
+          renderTrash();
+        } else {
+          renderList();
+        }
       }
 
       function renderFavorites() {
-        const favItems = items.filter(i => i.favorite && i.type !== 'folder').slice(0,7);
+        const favItems = items.filter(i => i.favorite && i.type !== 'folder' && !i.trash).slice(0,7);
         favContainer.innerHTML = '';
         favItems.forEach(item => {
           const chip = document.createElement('span');
@@ -313,12 +403,13 @@
       }
 
       function filterItems() {
-        let filtered = items;
-        if (currentView === 'folders') filtered = items.filter(i => i.type === 'folder');
-        else if (currentView === 'all') filtered = items.filter(i => i.type !== 'folder' && i.type !== 'image');
-        else if (currentView === 'images') filtered = items.filter(i => i.type === 'image');
+        let filtered = items.filter(i => !i.trash); // hide trash by default
         
-        if (currentFolderContext && currentView !== 'folders' && currentView !== 'images') {
+        if (currentView === 'folders') filtered = filtered.filter(i => i.type === 'folder');
+        else if (currentView === 'all') filtered = filtered.filter(i => i.type !== 'folder' && i.type !== 'image' && !i.trash);
+        else if (currentView === 'trash') filtered = items.filter(i => i.trash);
+        
+        if (currentFolderContext && currentView !== 'folders' && currentView !== 'trash' && currentView !== 'images') {
           filtered = filtered.filter(i => i.folder === currentFolderContext);
         }
         if (searchTerm.trim()) {
@@ -330,12 +421,45 @@
             (i.label && i.label.toLowerCase().includes(term))
           );
         }
-        return filtered;
+        return filtered.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+      }
+
+      function toggleSelect(id) {
+        if (selectedIds.has(id)) selectedIds.delete(id);
+        else selectedIds.add(id);
+        if (currentView === 'images') renderImageGroups();
+        else renderList();
+        updateActionBar();
+      }
+
+      function updateActionBar() {
+        const count = selectedIds.size;
+        if (count > 0) {
+          actionBar.style.display = 'flex';
+          selectAllBtn.innerHTML = `<i class='bx ${count === visibleCount() ? 'bx-checkbox-checked' : 'bx-checkbox'}'></i> select all`;
+        } else {
+          actionBar.style.display = 'none';
+        }
+      }
+
+      function visibleCount() {
+        if (currentView === 'images') {
+          return items.filter(i => i.type === 'image' && !i.trash).length;
+        }
+        return filterItems().length;
+      }
+
+      function exitSelectMode() {
+        selectMode = false;
+        selectedIds.clear();
+        actionBar.style.display = 'none';
+        selectModeBtn.innerHTML = '<i class="bx bx-checkbox-checked"></i> select';
+        fullRender();
       }
 
       function renderList() {
         itemListContainer.style.display = 'block';
-        imageGridContainer.style.display = 'none';
+        imageGroupsContainer.style.display = 'none';
         const filtered = filterItems();
         itemListContainer.innerHTML = '';
         if (!filtered.length) {
@@ -344,63 +468,148 @@
         }
         filtered.forEach(item => {
           const card = document.createElement('div');
-          card.className = 'item-card';
+          card.className = `item-card ${selectMode ? 'select-mode' : ''}`;
           let icon = 'bx-lock-alt';
           if (item.type === 'note') icon = 'bx-note';
           else if (item.type === 'project') icon = 'bx-folder';
           else if (item.type === 'folder') icon = 'bx-folder-open';
-          else if (item.type === 'image') icon = 'bx-image';
           
           let subtitle = item.type;
           if (item.type === 'login' && item.username) subtitle = item.username;
           
           card.innerHTML = `
+            ${selectMode ? `<div class="checkbox"><i class='bx ${selectedIds.has(item.id) ? 'bx-checkbox-checked' : 'bx-checkbox'}'></i></div>` : ''}
             <div class="item-info">
-              <h4>${item.title} 
+              <h4>${item.title} ${item.archived ? '<span class="archive-badge"><i class="bx bx-archive"></i></span>' : ''}
                 <span class="fav-heart ${item.favorite ? 'active' : ''}" data-id="${item.id}"><i class='bx ${item.favorite ? 'bxs-star' : 'bx-star'}'></i></span>
               </h4>
               <p>${subtitle}</p>
             </div>
             <div class="item-icon"><i class='bx ${icon}'></i></div>
           `;
+          
           card.addEventListener('click', (e) => {
-            if (!e.target.closest('.fav-heart')) openDetailPanel(item.id);
+            if (e.target.closest('.checkbox') || e.target.closest('.fav-heart')) return;
+            if (selectMode) {
+              toggleSelect(item.id);
+            } else {
+              openDetailPanel(item.id);
+            }
           });
+          
           card.querySelector('.fav-heart').addEventListener('click', (e) => {
             e.stopPropagation();
             const newFav = !item.favorite;
             update(ref(database, 'vault-items/' + item.id), { favorite: newFav });
             notify(newFav ? 'added to favorites' : 'removed from favorites');
           });
+          
+          if (selectMode) {
+            card.querySelector('.checkbox').addEventListener('click', (e) => {
+              e.stopPropagation();
+              toggleSelect(item.id);
+            });
+          }
+          
           itemListContainer.appendChild(card);
         });
       }
 
-      function showImageGrid() {
+      function renderImageGroups() {
         itemListContainer.style.display = 'none';
-        imageGridContainer.style.display = 'grid';
-        const images = items.filter(i => i.type === 'image');
-        imageGridContainer.innerHTML = '';
-        if (!images.length) {
-          imageGridContainer.innerHTML = '<div style="color:#333;">no images</div>';
-          return;
-        }
+        imageGroupsContainer.style.display = 'block';
+        const images = items.filter(i => i.type === 'image' && !i.trash);
+        
+        // Group by groupId
+        const groups = {};
         images.forEach(img => {
-          const div = document.createElement('div');
-          div.className = 'image-item';
-          div.innerHTML = `
-            <img src="${img.url}" alt="upload" loading="lazy">
-            <div class="image-label">
-              <span>${img.label || 'image'}</span>
-              <span class="download-btn" data-url="${img.url}"><i class='bx bx-download'></i></span>
+          const gid = img.groupId || img.id;
+          if (!groups[gid]) groups[gid] = { label: img.label || 'untitled', createdAt: img.createdAt, images: [] };
+          groups[gid].images.push(img);
+        });
+
+        const sortedGroups = Object.values(groups).sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+        imageGroupsContainer.innerHTML = '';
+        sortedGroups.forEach(group => {
+          const groupDiv = document.createElement('div');
+          groupDiv.className = 'image-group';
+          
+          const sortedImages = group.images.sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
+          
+          groupDiv.innerHTML = `
+            <div class="group-header">
+              <i class='bx bx-image'></i>
+              <span>${group.label}</span>
+              <span style="color:#555;">(${sortedImages.length})</span>
+            </div>
+            <div class="image-grid">
+              ${sortedImages.map(img => `
+                <div class="image-item" data-id="${img.id}">
+                  ${selectMode ? `<div class="image-checkbox"><i class='bx ${selectedIds.has(img.id) ? 'bx-checkbox-checked' : 'bx-checkbox'}'></i></div>` : ''}
+                  <img src="${img.url}" loading="lazy">
+                  <span class="download-btn" data-url="${img.url}"><i class='bx bx-download'></i></span>
+                </div>
+              `).join('')}
             </div>
           `;
-          div.querySelector('.download-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            window.open(img.url, '_blank');
+
+          groupDiv.querySelectorAll('.image-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+              if (e.target.closest('.image-checkbox')) {
+                const id = el.dataset.id;
+                toggleSelect(id);
+              } else if (!e.target.closest('.download-btn')) {
+                if (selectMode) {
+                  toggleSelect(el.dataset.id);
+                } else {
+                  openDetailPanel(el.dataset.id);
+                }
+              }
+            });
           });
-          div.addEventListener('click', () => openDetailPanel(img.id));
-          imageGridContainer.appendChild(div);
+          
+          groupDiv.querySelectorAll('.download-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              window.open(btn.dataset.url, '_blank');
+            });
+          });
+
+          imageGroupsContainer.appendChild(groupDiv);
+        });
+      }
+
+      function renderTrash() {
+        itemListContainer.style.display = 'block';
+        imageGroupsContainer.style.display = 'none';
+        const trashed = items.filter(i => i.trash).sort((a,b) => (b.trashedAt || 0) - (a.trashedAt || 0));
+        itemListContainer.innerHTML = '';
+        if (!trashed.length) {
+          itemListContainer.innerHTML = '<div style="color:#333; text-align:center; padding:2rem;">— trash empty —</div>';
+          return;
+        }
+        trashed.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'item-card';
+          let icon = 'bx-trash';
+          
+          card.innerHTML = `
+            <div class="item-info">
+              <h4>${item.title} <span style="color:#666; font-size:0.7rem;">(deleted)</span></h4>
+              <p>${item.type} · expires ${new Date(item.trashedAt + 7*24*60*60*1000).toLocaleDateString()}</p>
+            </div>
+            <div class="item-icon"><i class='bx bx-trash'></i></div>
+          `;
+          
+          card.addEventListener('click', () => {
+            if (confirm('Restore this item?')) {
+              update(ref(database, 'vault-items/' + item.id), { trash: false, trashedAt: null });
+              notify('restored');
+            }
+          });
+          
+          itemListContainer.appendChild(card);
         });
       }
 
@@ -417,10 +626,70 @@
           tabs.forEach(tab => tab.classList.remove('active'));
           t.classList.add('active');
           currentView = t.dataset.view;
-          currentFolderContext = null; // reset folder drill
+          currentFolderContext = null;
+          exitSelectMode();
           fullRender();
         });
       });
+
+      // select mode toggle
+      selectModeBtn.addEventListener('click', () => {
+        selectMode = !selectMode;
+        selectedIds.clear();
+        if (!selectMode) {
+          actionBar.style.display = 'none';
+          selectModeBtn.innerHTML = '<i class="bx bx-checkbox-checked"></i> select';
+        } else {
+          selectModeBtn.innerHTML = '<i class="bx bx-x"></i> cancel';
+          actionBar.style.display = 'flex';
+          selectAllBtn.innerHTML = '<i class="bx bx-checkbox"></i> select all';
+        }
+        fullRender();
+      });
+
+      selectAllBtn.addEventListener('click', () => {
+        let ids;
+        if (currentView === 'images') {
+          ids = items.filter(i => i.type === 'image' && !i.trash).map(i => i.id);
+        } else {
+          ids = filterItems().map(i => i.id);
+        }
+        if (selectedIds.size === ids.length) {
+          selectedIds.clear();
+        } else {
+          ids.forEach(id => selectedIds.add(id));
+        }
+        fullRender();
+        updateActionBar();
+      });
+
+      archiveBulk.addEventListener('click', () => {
+        if (selectedIds.size === 0) return;
+        const updates = {};
+        selectedIds.forEach(id => {
+          updates[`vault-items/${id}/archived`] = true;
+        });
+        update(ref(database), updates);
+        notify(`${selectedIds.size} items archived`);
+        exitSelectMode();
+      });
+
+      deleteBulk.addEventListener('click', () => {
+        if (selectedIds.size === 0) return;
+        if (confirm(`Move ${selectedIds.size} item(s) to trash?`)) {
+          const updates = {};
+          const now = Date.now();
+          selectedIds.forEach(id => {
+            updates[`vault-items/${id}/trash`] = true;
+            updates[`vault-items/${id}/trashedAt`] = now;
+          });
+          update(ref(database), updates);
+          notify(`${selectedIds.size} items moved to trash`);
+          exitSelectMode();
+        }
+      });
+
+      cancelBulk.addEventListener('click', exitSelectMode);
 
       newBtn.addEventListener('click', (e) => { e.stopPropagation(); chooser.classList.toggle('show'); });
       document.addEventListener('click', (e) => {
@@ -437,7 +706,6 @@
 
       function closePanel() { overlay.classList.remove('active'); }
 
-      // ---------- CREATE PANEL with custom fields pre-added ----------
       function openCreatePanel(type) {
         let title = 'new ' + type;
         let html = `
@@ -446,7 +714,8 @@
         if (type === 'folder') {
           html += `<div class="field-group"><div class="field-label">folder name</div><input class="field-input" id="folderName" placeholder="e.g. work"></div>`;
         } else if (type === 'image') {
-          html += `<div class="field-group"><div class="field-label">label (for search)</div><input class="field-input" id="imageLabel" placeholder="vacation, docs, etc"></div>`;
+          html += `<div class="field-group"><div class="field-label">folder (optional)</div><select class="field-input" id="imageFolder"><option value="">none</option>${foldersList.map(f => `<option>${f}</option>`).join('')}</select></div>`;
+          html += `<div class="field-group"><div class="field-label">label (for group)</div><input class="field-input" id="imageLabel" placeholder="vacation, docs, etc"></div>`;
           html += `<div class="upload-area" id="imageUploadBtn"><i class='bx bx-upload'></i> click to upload (multiple)</div>`;
           html += `<div id="imagePreview"></div>`;
         } else {
@@ -459,7 +728,6 @@
           } else {
             html += `<div class="field-group"><div class="field-label">content</div><textarea class="field-textarea" id="noteContent"></textarea></div>`;
           }
-          // custom fields (pre-added)
           html += `<div class="custom-fields" id="customFieldsArea"><div class="field-group" style="display:flex;gap:0.5rem;"><input class="field-input" placeholder="field name" style="width:40%"><input class="field-input" placeholder="value" style="width:55%"></div></div>`;
           html += `<button class="btn" id="addCustomField"><i class='bx bx-plus'></i> add another</button>`;
         }
@@ -479,18 +747,28 @@
             input.accept = 'image/*';
             input.onchange = async (e) => {
               const files = Array.from(e.target.files);
-              const preview = document.getElementById('imagePreview');
-              preview.innerHTML = 'uploading...';
-              const label = document.getElementById('imageLabel')?.value || 'image';
+              const label = document.getElementById('imageLabel')?.value || 'images';
+              const folder = document.getElementById('imageFolder')?.value || null;
+              const groupId = Date.now().toString();
+              const createdAt = Date.now();
+              
               for (let file of files) {
                 const url = await uploadToImgBB(file);
                 if (url) {
                   const newRef = push(itemsRef);
-                  set(newRef, { type: 'image', url, label, favorite: false, title: file.name.slice(0,20) });
+                  set(newRef, { 
+                    type: 'image', 
+                    url, 
+                    label, 
+                    groupId, 
+                    folder,
+                    createdAt,
+                    favorite: false, 
+                    title: file.name.slice(0,20) 
+                  });
                 }
               }
-              notify('images uploaded');
-              preview.innerHTML = '';
+              notify(`${files.length} images uploaded`);
               closePanel();
             };
             input.click();
@@ -509,12 +787,13 @@
         }
 
         document.getElementById('createItemBtn').addEventListener('click', () => {
+          const createdAt = Date.now();
           if (type === 'folder') {
             const name = document.getElementById('folderName')?.value || 'untitled';
             const newRef = push(itemsRef);
-            set(newRef, { type: 'folder', title: name, favorite: false });
+            set(newRef, { type: 'folder', title: name, favorite: false, createdAt });
           } else if (type !== 'image') {
-            const newItem = { type, favorite: false };
+            const newItem = { type, favorite: false, createdAt };
             newItem.title = document.getElementById('itemTitle')?.value || 'untitled';
             newItem.folder = document.getElementById('itemFolder')?.value || null;
             if (type === 'login') {
@@ -524,7 +803,6 @@
             } else {
               newItem.content = document.getElementById('noteContent')?.value;
             }
-            // collect custom fields
             const customDivs = document.querySelectorAll('#customFieldsArea .field-group');
             const custom = {};
             customDivs.forEach(div => {
@@ -539,7 +817,6 @@
         });
       }
 
-      // open detail (for folders: allow clicking inside contents)
       window.openDetailPanel = function(itemId) {
         const item = items.find(i => i.id === itemId);
         if (!item) return;
@@ -547,11 +824,11 @@
 
         if (item.type === 'folder') {
           html += `<div class="field-group"><div class="field-label">folder name</div><input class="field-input" value="${item.title}" id="detailFolderName"></div>`;
-          const contents = items.filter(i => i.folder === item.title && i.type !== 'folder');
+          const contents = items.filter(i => i.folder === item.title && !i.trash).sort((a,b) => (b.createdAt || 0) - (a.createdAt || 0));
           if (contents.length) {
-            html += '<div style="margin:1rem 0; color:#aaa;">contents:</div>';
+            html += '<div style="margin:1rem 0; color:#aaa;">contents (recent first):</div>';
             contents.forEach(c => {
-              html += `<div class="item-card" style="margin-bottom:0.3rem; padding:0.6rem;" data-content-id="${c.id}">
+              html += `<div class="item-card" style="margin-bottom:0.3rem; padding:0.6rem; background:#0a0a0a;" data-content-id="${c.id}">
                 <div><h4 style="font-size:0.9rem;">${c.title}</h4><p style="font-size:0.7rem;">${c.type}</p></div>
               </div>`;
             });
@@ -559,6 +836,7 @@
         } else if (item.type === 'image') {
           html += `<img src="${item.url}" style="width:100%; margin-bottom:1rem;">`;
           html += `<div class="field-group"><div class="field-label">label</div><input class="field-input" value="${item.label || ''}" id="imageLabel"></div>`;
+          html += `<div class="field-group"><div class="field-label">folder</div><select class="field-input" id="imageFolder"><option value="">none</option>${foldersList.map(f => `<option ${f === item.folder ? 'selected' : ''}>${f}</option>`).join('')}</select></div>`;
         } else {
           if (item.username !== undefined) {
             html += `<div class="field-group"><div class="field-label">username</div><input class="field-input" value="${item.username || ''}" id="detailUsername"></div>`;
@@ -576,17 +854,31 @@
           }
         }
 
-        html += `<div class="action-buttons"><button class="btn btn-primary" id="saveItemBtn">save</button><button class="btn" id="deleteItemBtn">delete</button><button class="btn" id="cancelPanelBtn">cancel</button></div>`;
+        html += `<div class="action-buttons">
+          <button class="btn btn-primary" id="saveItemBtn">save</button>
+          <button class="btn" id="archiveItemBtn"><i class='bx bx-archive'></i> archive</button>
+          <button class="btn btn-danger" id="deleteItemBtn">delete</button>
+          <button class="btn" id="cancelPanelBtn">cancel</button>
+        </div>`;
         panel.innerHTML = html;
         overlay.classList.add('active');
 
         document.getElementById('backFromDetail').addEventListener('click', closePanel);
         document.getElementById('cancelPanelBtn').addEventListener('click', closePanel);
+        
+        document.getElementById('archiveItemBtn').addEventListener('click', () => {
+          update(ref(database, 'vault-items/' + itemId), { archived: !item.archived });
+          notify(item.archived ? 'unarchived' : 'archived');
+          closePanel();
+        });
+        
         document.getElementById('deleteItemBtn').addEventListener('click', () => {
-          if (confirm('delete?')) { remove(ref(database, 'vault-items/' + itemId)); closePanel(); }
+          if (confirm('Move to trash?')) {
+            update(ref(database, 'vault-items/' + itemId), { trash: true, trashedAt: Date.now() });
+            closePanel();
+          }
         });
 
-        // folder content click
         if (item.type === 'folder') {
           document.querySelectorAll('[data-content-id]').forEach(el => {
             el.addEventListener('click', () => {
@@ -597,9 +889,12 @@
         }
 
         document.getElementById('saveItemBtn').addEventListener('click', () => {
-          const updates = {};
+          const updates = { createdAt: Date.now() };
           if (item.type === 'folder') updates.title = document.getElementById('detailFolderName')?.value;
-          else if (item.type === 'image') updates.label = document.getElementById('imageLabel')?.value;
+          else if (item.type === 'image') {
+            updates.label = document.getElementById('imageLabel')?.value;
+            updates.folder = document.getElementById('imageFolder')?.value || null;
+          }
           else if (item.username !== undefined) {
             updates.username = document.getElementById('detailUsername')?.value;
             updates.password = document.getElementById('detailPassword')?.value;
