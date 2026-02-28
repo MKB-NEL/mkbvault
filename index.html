@@ -1,3 +1,4 @@
+<!-- index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -45,14 +46,14 @@
     .terminal {
       position: relative;
       z-index: 10;
-      background: transparent;  /* fully transparent — black from body shows through */
+      background: transparent;
       width: 100%;
       max-width: 720px;
       padding: 2rem 2rem 2.8rem;
       color: #c6dcff;
       opacity: 0;
       transition: opacity 0.4s ease-in;
-      pointer-events: none;      /* no interaction while hidden */
+      pointer-events: none;
       border: none;
       box-shadow: none;
     }
@@ -62,7 +63,7 @@
       pointer-events: auto;
     }
 
-    /* line style – ultra clean terminal */
+    /* line style */
     .line {
       display: flex;
       align-items: flex-start;
@@ -74,7 +75,7 @@
     }
 
     .prompt {
-      color: #7ab7ef;           /* sky blue */
+      color: #7ab7ef;
       font-weight: 400;
       white-space: nowrap;
     }
@@ -148,12 +149,10 @@
       margin-top: 0.25rem;
     }
 
-    /* hidden button */
     #hidden-submit {
       display: none;
     }
 
-    /* matrix fade-out class (applied to canvas) */
     .fade-out {
       animation: fadeOut 1.2s forwards;
     }
@@ -163,7 +162,6 @@
       100% { opacity: 0; visibility: hidden; }
     }
 
-    /* small screens */
     @media (max-width: 450px) {
       .terminal {
         padding: 1.5rem;
@@ -173,188 +171,12 @@
 </head>
 <body>
   <div id="stage">
-    <!-- MATRIX CANVAS – runs for 5s then fades -->
     <canvas id="matrixCanvas"></canvas>
-
-    <!-- TERMINAL – initially hidden, appears after matrix -->
-    <div class="terminal" id="terminalWindow">
-      <!-- will be filled by js -->
-    </div>
+    <div class="terminal" id="terminalWindow"></div>
   </div>
 
-  <script>
-    (function() {
-      // ---------- HARDCODED PASSWORD (secure, not plain string) ----------
-      const encoded = [107, 97, 114, 101, 107, 101, 122, 105, 64, 50]; // "karekezi@2"
-      const CORRECT_PASSWORD = String.fromCharCode(...encoded);
-      const HOME_PAGE = 'index.html';   // redirect target
-
-      // ----- MATRIX RAIN (5 seconds) -----
-      const canvas = document.getElementById('matrixCanvas');
-      const ctx = canvas.getContext('2d');
-      const terminalEl = document.getElementById('terminalWindow');
-
-      let width, height;
-      let columns, drops = [];
-      const fontSize = 18;          // classic matrix size
-
-      function resizeCanvas() {
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = width;
-        canvas.height = height;
-        columns = Math.floor(width / fontSize);
-        drops = new Array(columns).fill(1);  // y-coordinate of drops
-      }
-
-      // matrix characters (asian, latin, numbers)
-      const chars = "01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-      
-      function drawMatrix() {
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.06)';  // fading trail
-        ctx.fillRect(0, 0, width, height);
-
-        ctx.fillStyle = '#7ab7ef';              // sky blue for matrix (accent)
-        ctx.font = fontSize + 'px monospace';
-
-        for (let i = 0; i < drops.length; i++) {
-          const text = chars[Math.floor(Math.random() * chars.length)];
-          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
-
-          // reset if off screen or random chance
-          if (drops[i] * fontSize > height && Math.random() > 0.975) {
-            drops[i] = 0;
-          }
-          drops[i]++;
-        }
-      }
-
-      let matrixInterval;
-      function startMatrix() {
-        resizeCanvas();
-        matrixInterval = setInterval(drawMatrix, 45); // smooth 22fps
-
-        // stop matrix after 5 seconds, fade out, show terminal
-        setTimeout(() => {
-          clearInterval(matrixInterval);
-          canvas.classList.add('fade-out');    // fade canvas away
-
-          // after fade (1.2s), hide canvas and init terminal
-          setTimeout(() => {
-            canvas.style.display = 'none';     // remove from visual space
-            terminalEl.classList.add('visible');
-            initTerminal();                    // build terminal lines + prompt
-          }, 1200); // matches fade-out duration
-        }, 5000); // 5 seconds of matrix
-      }
-
-      // ----- TERMINAL BOOT SEQUENCE (without 'password required for [karekezi]') -----
-      function initTerminal() {
-        // clean terminal content
-        terminalEl.innerHTML = '';
-
-        // intro lines — hyper-modern, cool, without the "password required for karekezi"
-        const bootLines = [
-          { type: 'output', text: '© nexus kernel 7.1.2-tty · secure boot', className: 'dim' },
-          { type: 'output', text: '> cpu: virtual · mem: 512M · entropy: ready', className: '' },
-          { type: 'output', text: '> network: wireguard · tunnel established', className: '' },
-          { type: 'output', text: '> crypto: hardware seed · avalanche mix done', className: '' },
-          { type: 'output', text: '> firewall: strict · inbound filtered', className: '' },
-          { type: 'output', text: '> time: synced · offset < 1ms', className: '' },
-          { type: 'output', text: ' ', className: '' },
-          { type: 'output', text: '┌─────────────────────────────────────────┐', className: 'accent-blue' },
-          { type: 'output', text: '│         TERMINAL GATEWAY · SKY v2        │', className: 'accent-blue' },
-          { type: 'output', text: '└─────────────────────────────────────────┘', className: 'accent-blue' },
-          { type: 'output', text: ' ', className: '' },
-          { type: 'output', text: 'session: ephemeral · encryption: sky-xchacha', className: 'dim' },
-          { type: 'output', text: ' ', className: '' },
-        ];
-
-        // render each boot line
-        bootLines.forEach(line => {
-          const div = document.createElement('div');
-          div.className = 'line';
-          div.innerHTML = `<span class="prompt">>>></span><span class="output ${line.className || ''}">${line.text}</span>`;
-          terminalEl.appendChild(div);
-        });
-
-        // blinking cursor line to indicate readiness
-        const cursorLine = document.createElement('div');
-        cursorLine.className = 'line';
-        cursorLine.id = 'cursorLine';
-        cursorLine.innerHTML = `<span class="prompt">>>></span><span class="output">_<span class="blink"></span></span>`;
-        terminalEl.appendChild(cursorLine);
-
-        // after 700ms replace cursor with real prompt (no extra name line)
-        setTimeout(() => {
-          document.getElementById('cursorLine')?.remove();
-
-          // create input row directly – no extra 'password required' line
-          const inputRow = document.createElement('div');
-          inputRow.className = 'input-area';
-          inputRow.id = 'interactiveRow';
-          inputRow.innerHTML = `
-            <span class="input-prompt">🔒 password:</span>
-            <input type="password" id="password-field" placeholder="········" autofocus />
-            <button id="hidden-submit" style="display:none"></button>
-          `;
-          terminalEl.appendChild(inputRow);
-
-          const pwdInput = document.getElementById('password-field');
-          pwdInput.focus();
-
-          // login attempt handler
-          function attemptLogin() {
-            const entered = pwdInput.value;
-            if (entered === CORRECT_PASSWORD) {
-              // success message (sky blue)
-              const successLine = document.createElement('div');
-              successLine.className = 'line';
-              successLine.innerHTML = `<span class="prompt">>>></span><span class="output accent-blue">✓ access granted · redirecting to home...</span>`;
-              terminalEl.insertBefore(successLine, document.getElementById('interactiveRow'));
-
-              pwdInput.disabled = true;
-              pwdInput.style.opacity = '0.6';
-
-              setTimeout(() => {
-                window.location.href = HOME_PAGE;   // index.html
-              }, 800);
-            } else {
-              // error message
-              const errorLine = document.createElement('div');
-              errorLine.className = 'line';
-              errorLine.id = 'tempError';
-              errorLine.innerHTML = `<span class="prompt">>>></span><span class="output" style="color:#f08ca0;">✗ invalid · try again</span>`;
-
-              const oldError = document.getElementById('tempError');
-              if (oldError) oldError.remove();
-
-              terminalEl.insertBefore(errorLine, document.getElementById('interactiveRow'));
-
-              pwdInput.value = '';
-              pwdInput.focus();
-            }
-          }
-
-          pwdInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              e.preventDefault();
-              attemptLogin();
-            }
-          });
-        }, 700); // short delay after cursor blink
-      }
-
-      // adjust canvas on resize
-      window.addEventListener('resize', () => {
-        if (canvas.style.display !== 'none') {
-          resizeCanvas();
-        }
-      });
-
-      // start everything: matrix first, then terminal
-      startMatrix();
-    })();
-  </script>
+  <!-- External script containing hardcoded password (more secure) -->
+  <script src="auth.js"></script>
+  <script src="terminal.js"></script>
 </body>
 </html>
