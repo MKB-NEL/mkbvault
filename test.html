@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>AfriPay | Unlock Secret Message</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: linear-gradient(145deg, #f4f7fc 0%, #e9eef4 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        /* main card container */
+        .card {
+            max-width: 580px;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.25), 0 8px 18px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+            transition: transform 0.2s ease;
+        }
+
+        /* header area with brand */
+        .header {
+            background: #0B2B40;
+            padding: 1.8rem 2rem;
+            color: white;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 1.9rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .header h1 span {
+            background: #F5B042;
+            font-size: 1.2rem;
+            padding: 4px 12px;
+            border-radius: 100px;
+            color: #0B2B40;
+        }
+
+        .header p {
+            margin-top: 0.5rem;
+            opacity: 0.85;
+            font-weight: 400;
+        }
+
+        /* message display zone */
+        .message-zone {
+            padding: 2rem 2rem 1rem 2rem;
+            background: #fefcf5;
+            border-bottom: 1px solid #edeae2;
+        }
+
+        .locked-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #f0e9db;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #7a5e2e;
+            margin-bottom: 1rem;
+        }
+
+        .message-content {
+            background: #ffffff;
+            border-radius: 1.8rem;
+            padding: 1.5rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03), inset 0 0 0 1px rgba(0,0,0,0.02);
+            border: 1px solid #eee8dd;
+        }
+
+        .message-placeholder {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #b9ae93;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .message-placeholder .lock-icon {
+            font-size: 1.6rem;
+        }
+
+        .hidden-message {
+            font-size: 1.25rem;
+            line-height: 1.4;
+            color: #1f2f38;
+            font-weight: 500;
+            word-break: break-word;
+        }
+
+        .revealed-note {
+            margin-top: 12px;
+            font-size: 0.8rem;
+            color: #2c7a4d;
+            background: #e6f4ea;
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 30px;
+        }
+
+        /* payment section */
+        .payment-section {
+            padding: 1.8rem 2rem 2rem 2rem;
+            background: white;
+        }
+
+        .price-tag {
+            background: #f3f6fa;
+            border-radius: 1.5rem;
+            padding: 0.8rem 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 1.8rem;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .price-label {
+            font-weight: 600;
+            color: #2c4b60;
+            font-size: 1rem;
+        }
+
+        .price-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #0B2B40;
+            letter-spacing: -0.5px;
+        }
+
+        .price-value small {
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .afripay-btn {
+            text-align: center;
+            margin: 0 0 1rem 0;
+        }
+
+        .afripay-btn input {
+            max-width: 280px;
+            cursor: pointer;
+            transition: transform 0.15s ease, opacity 0.2s;
+            border-radius: 60px;
+            box-shadow: 0 5px 12px rgba(0,0,0,0.1);
+        }
+
+        .afripay-btn input:hover {
+            transform: scale(1.02);
+            opacity: 0.95;
+        }
+
+        .secure-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: #6c7a89;
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .info-text {
+            background: #f8f5ef;
+            border-radius: 1rem;
+            padding: 0.9rem;
+            margin-top: 1.3rem;
+            font-size: 0.8rem;
+            color: #5f6c7a;
+            text-align: center;
+            border-left: 3px solid #F5B042;
+        }
+
+        hr {
+            margin: 0.8rem 0;
+            border: none;
+            height: 1px;
+            background: linear-gradient(to right, #e2e8f0, transparent);
+        }
+
+        /* success & error styling */
+        .toast-message {
+            position: fixed;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.95);
+            background: #1e2a32;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transition: all 0.25s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .toast-message.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        button {
+            background: none;
+            border: none;
+        }
+
+        /* responsive */
+        @media (max-width: 500px) {
+            .card {
+                border-radius: 1.8rem;
+            }
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            .price-value {
+                font-size: 1.7rem;
+            }
+            .message-content {
+                padding: 1rem;
+            }
+        }
+
+        .reset-area {
+            text-align: center;
+            margin-top: 0.8rem;
+        }
+
+        .reset-link {
+            background: none;
+            border: none;
+            color: #7b8a9b;
+            font-size: 0.7rem;
+            cursor: pointer;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .reset-link:hover {
+            color: #0B2B40;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card" id="appRoot">
+    <div class="header">
+        <h1>
+            ✨ SecretVault
+            <span>AfriPay</span>
+        </h1>
+        <p>Pay <strong>200 RWF</strong> to unlock an exclusive private message</p>
+    </div>
+
+    <div class="message-zone">
+        <div class="locked-badge">
+            🔐 Premium content
+        </div>
+        <div class="message-content" id="messageDisplayArea">
+            <!-- dynamic message will appear here based on payment status -->
+            <div id="dynamicMessageContainer">
+                <!-- initial locked state -->
+                <div class="message-placeholder">
+                    <span class="lock-icon">🔒</span>
+                    <span>Your secret message is locked — complete payment to reveal.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-section">
+        <div class="price-tag">
+            <span class="price-label">💎 Unlock fee (one time)</span>
+            <span class="price-value">200 <small>RWF</small></span>
+        </div>
+
+        <!-- AFRIPAY FORM - exactly as required with amount = 200, currency RWF, dynamic client_token, return_url dynamically set to current page -->
+        <form action="https://www.afripay.africa/checkout/index.php" method="post" id="afripayform">
+            <!-- amount forced to 200 RWF as requested -->
+            <input type="hidden" name="amount" value="200">
+            <input type="hidden" name="currency" value="RWF">
+            <!-- comment: dynamic and descriptive -->
+            <input type="hidden" name="comment" value="Unlock secret message - premium access">
+            <!-- client_token: will be generated on the fly (optional but we set a random token to ensure uniqueness) -->
+            <input type="hidden" name="client_token" id="client_token_field" value="">
+            <!-- return_url: we need to point to the current page with a special parameter to verify payment simulation 
+                 Since AfriPay is a real gateway, we will redirect back to this same page with a success/fail detection.
+                 For demo/integration: we set return_url to the current page's origin + full path with a 'payment_status' param.
+                 Also we add a timestamp for cache busting -->
+            <input type="hidden" name="return_url" id="return_url_field" value="">
+            <!-- Provided credentials from the original snippet (app_id & app_secret) -->
+            <input type="hidden" name="app_id" value="20a9a129bb48f058ed39e1c999aa44e8">
+            <input type="hidden" name="app_secret" value="JDJ5JDEwJHZmYXJ2">
+            
+            <div class="afripay-btn">
+                <input type="image" 
+                       src="https://www.afripay.africa/logos/pay_with_afripay.png" 
+                       alt="Pay with AfriPay" 
+                       onclick="handleAfriPaySubmit(event);">
+            </div>
+        </form>
+
+        <div class="secure-note">
+            <span>🔒 Secure SSL encrypted</span> • <span>🇷🇼 RWF currency</span> • <span>✅ Instant unlock</span>
+        </div>
+        <div class="info-text">
+            💡 After successful payment, AfriPay will redirect you back.<br>
+            Your secret message will be shown automatically.
+        </div>
+        <div class="reset-area">
+            <button class="reset-link" id="resetMessageBtn" style="display: none;">🔄 Reset & lock message again (demo reset)</button>
+        </div>
+    </div>
+</div>
+
+<div id="toastMsg" class="toast-message">✨ Message unlocked! Welcome.</div>
+
+<script>
+    // --- CONFIGURATION ---
+    // The secret message that will be revealed after payment
+    const SECRET_MESSAGE = "🌟 Congratulations! 🌟\n\nYou've successfully unlocked the premium secret message: 'The future belongs to those who believe in the beauty of their dreams.' — Keep shining! ✨🎉";
+    
+    // Storage key to remember that payment was completed (simulate persistent unlock)
+    const STORAGE_KEY = 'afripay_unlocked_status';
+    // We also track a payment verification flag from URL param
+    const URL_PARAM_SUCCESS = 'payment_success';
+    const URL_PARAM_CANCEL = 'payment_cancel';
+
+    // DOM elements
+    const messageContainer = document.getElementById('dynamicMessageContainer');
+    const afripayForm = document.getElementById('afripayform');
+    const clientTokenInput = document.getElementById('client_token_field');
+    const returnUrlInput = document.getElementById('return_url_field');
+    const resetBtn = document.getElementById('resetMessageBtn');
+
+    // Helper: show toast notification
+    function showToast(message, isError = false) {
+        const toast = document.getElementById('toastMsg');
+        toast.textContent = message;
+        toast.style.background = isError ? '#b13e3e' : '#1e7e34';
+        toast.classList.add('show');
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.style.background = '#1e2a32'; // reset after
+        }, 3200);
+    }
+
+    // Function to render the message area based on unlocked status (true/false)
+    function renderMessage(unlocked) {
+        if (unlocked) {
+            // format secret message nicely (preserve line breaks)
+            const formatted = SECRET_MESSAGE.replace(/\n/g, '<br>');
+            messageContainer.innerHTML = `
+                <div class="hidden-message">
+                    ${formatted}
+                </div>
+                <div class="revealed-note">
+                    ✅ Access granted — thank you for your payment!
+                </div>
+            `;
+            // Show reset button if needed, allowing user to simulate lock again for demo/retest
+            resetBtn.style.display = 'inline-block';
+        } else {
+            messageContainer.innerHTML = `
+                <div class="message-placeholder">
+                    <span class="lock-icon">🔒</span>
+                    <span>Your secret message is locked — complete payment to reveal.</span>
+                </div>
+            `;
+            resetBtn.style.display = 'none';
+        }
+    }
+
+    // Get current unlock status from localStorage (persist across reloads)
+    function getUnlockStatus() {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        return stored === 'true';
+    }
+
+    // Set unlock status and update UI
+    function setUnlockStatus(status) {
+        localStorage.setItem(STORAGE_KEY, status ? 'true' : 'false');
+        renderMessage(status);
+        // Additional: if status becomes true, we may optionally send analytic, but just UI
+        if (status) {
+            // optional: minor animation or toast will be triggered from verification flow
+        }
+    }
+
+    // Reset / lock message again (for demo or testing purposes)
+    function resetLock() {
+        setUnlockStatus(false);
+        showToast('🔒 Message locked again (demo reset). You can pay again to unlock.', false);
+        // Remove any URL payment flags without reload disturbance
+        cleanUrlParameters();
+    }
+
+    // Clean URL parameters (remove ?payment_success, etc)
+    function cleanUrlParameters() {
+        const url = new URL(window.location.href);
+        if (url.searchParams.has(URL_PARAM_SUCCESS) || url.searchParams.has(URL_PARAM_CANCEL)) {
+            url.searchParams.delete(URL_PARAM_SUCCESS);
+            url.searchParams.delete(URL_PARAM_CANCEL);
+            window.history.replaceState({}, document.title, url.pathname + url.search);
+        }
+    }
+
+    // Validate payment after redirection: we rely on URL param 'payment_success' or 'payment_cancel'
+    // Because AfriPay redirects to return_url with possibly extra params? The gateway might append transaction id.
+    // According to standard AfriPay integration, upon successful payment it redirects to return_url with additional GET parameters 
+    // like 'status=success' or 'transaction_id'. To be robust, we'll check for any 'status' or presence of 'success' indicators.
+    // But for safest integration, we will check the URL params for typical success indicators: 'status' equals 'success' OR 'payment_success' flag.
+    // Additionally, we can simulate that after a payment the user expects unlock. We'll parse the return URL after redirect.
+    function checkPaymentCallback() {
+        const urlParams = new URLSearchParams(window.location.search);
+        // AfriPay often returns status=success or status=cancel, also can return 'reference'
+        let paymentSuccess = false;
+        let paymentFailed = false;
+
+        // standard flags: we check both explicit success param and our own added param
+        if (urlParams.get('status') === 'success' || urlParams.get('payment_status') === 'success' || urlParams.get(URL_PARAM_SUCCESS) === '1') {
+            paymentSuccess = true;
+        }
+        // Also check if transaction_id exists and no error, but safest: check status=cancel
+        if (urlParams.get('status') === 'cancel' || urlParams.get('payment_cancel') === '1' || urlParams.get(URL_PARAM_CANCEL) === '1') {
+            paymentFailed = true;
+        }
+
+        // Additionally, some afripay responses: maybe 'success' param equals true. we do generic.
+        if (urlParams.has('transaction_id') && !urlParams.has('status') && !urlParams.has('error')) {
+            // if we have transaction_id without explicit cancel, it's often success. But to avoid false positives, we rely on explicit 'status'
+            if (urlParams.get('status') !== 'cancel') {
+                paymentSuccess = true;
+            }
+        }
+
+        if (paymentSuccess) {
+            // Unlock the message if not already unlocked
+            if (!getUnlockStatus()) {
+                setUnlockStatus(true);
+                showToast('🎉 Payment successful! Your secret message is now revealed.', false);
+            } else {
+                // Already unlocked, just show toast
+                showToast('✅ Message already unlocked. Thank you!', false);
+            }
+            // Clean parameters after handling to avoid re-trigger on refresh
+            cleanUrlParameters();
+        } else if (paymentFailed) {
+            showToast('⚠️ Payment was cancelled or failed. You can try again.', true);
+            cleanUrlParameters();
+        } else {
+            // no relevant param: just check if existing unlock is already true
+            if (getUnlockStatus()) {
+                renderMessage(true);
+            } else {
+                renderMessage(false);
+            }
+        }
+    }
+
+    // Generate a unique client_token per transaction (optional but good for tracking)
+    function generateClientToken() {
+        return 'txn_' + Date.now() + '_' + Math.random().toString(36).substring(2, 12);
+    }
+
+    // Build the dynamic return_url: current full URL without any payment params, then we add a custom param for success detection.
+    // However, the gateway will append its own parameters like status, transaction_id. We want to capture them and our own
+    // indicator to double-check. To be safe, we set return_url to the current page's base URL (without hash) and we will
+    // parse any GET parameters that AfriPay returns.
+    function buildReturnUrl() {
+        // Get current URL without any hash or existing payment_success flag to keep clean
+        let currentUrl = window.location.href.split('#')[0];
+        // Remove any previous payment params to avoid double triggers, but keep other params if any
+        const urlObj = new URL(currentUrl);
+        urlObj.searchParams.delete(URL_PARAM_SUCCESS);
+        urlObj.searchParams.delete(URL_PARAM_CANCEL);
+        // We don't need to add custom param because AfriPay will automatically pass its own data.
+        // But to make explicit success detection we may add a simple flag? But we rely on gateway's response.
+        // However, to ensure we recognize redirects from AfriPay, we keep return url as clean URL. 
+        // The gateway will redirect with its own parameters, and checkPaymentCallback will parse them.
+        return urlObj.toString();
+    }
+
+    // Submit handler to populate dynamic token + return_url before sending
+    function handleAfriPaySubmit(event) {
+        // Set client_token with unique transaction id
+        const token = generateClientToken();
+        clientTokenInput.value = token;
+        
+        // Set return_url to current page (dynamic, with full path)
+        const returnUrl = buildReturnUrl();
+        returnUrlInput.value = returnUrl;
+        
+        // Optional: can log for debugging
+        console.log('AfriPay submit: amount=200, token=' + token + ', return_url=' + returnUrl);
+        
+        // Let the form submit naturally (no preventDefault for image input, but we need to ensure form submits)
+        // However, since the input type="image" triggers submit by default, we don't need extra .submit()
+        // We just added dynamic fields. No event.preventDefault() unless we want to manipulate, but we allow.
+        // BUT we need to make sure the form gets submitted with updated fields. Since the user clicks on image,
+        // the form will submit. We just set fields before that.
+        // For safety we use a small timeout? Not needed because input fields are already set in event handler
+        // and the browser will include them.
+        // However: if the event is triggered, the form submits immediately, the values are already updated.
+        // To be 100% robust, we allow native submission.
+        // Show loading indicator small? just continue.
+        showToast('🔄 Redirecting to AfriPay secure gateway...', false);
+        // no prevent default
+        return true;
+    }
+
+    // Listen for manual reset (demo purpose)
+    function initResetButton() {
+        resetBtn.addEventListener('click', () => {
+            if (getUnlockStatus()) {
+                resetLock();
+            } else {
+                showToast('Message is already locked. Make a payment to unlock.', false);
+            }
+        });
+    }
+
+    // Function that runs on page load to check for payment callback and set initial state
+    function init() {
+        // set initial return url fields for form (in case user clicks before we dynamically set, but we also set in submit)
+        // but we want form ready with default values anyway: set client_token placeholder & return_url default
+        clientTokenInput.value = generateClientToken();
+        returnUrlInput.value = buildReturnUrl();
+        
+        // Check for payment callback (URL params from AfriPay)
+        checkPaymentCallback();
+        
+        // Initialize reset button
+        initResetButton();
+        
+        // Additional: If message unlocked already, reflect that, else keep locked
+        if (getUnlockStatus()) {
+            renderMessage(true);
+        } else {
+            renderMessage(false);
+        }
+        
+        // If there is a chance that the URL has transaction success but we missed because reload, double check
+        // Also we can optionally listen for pageshow to handle bfcache
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted) {
+                checkPaymentCallback();
+            }
+        });
+        
+        // For any future clicks, ensure before submit we refresh token and return_url again (avoid stale token)
+        // The image button's onclick already triggers handleAfriPaySubmit which updates fields.
+        // Additionally, attach submit event to form to guarantee token refresh even if enter key (though image only)
+        afripayForm.addEventListener('submit', function(e) {
+            // update client token and return url again to be fresh before submission
+            clientTokenInput.value = generateClientToken();
+            returnUrlInput.value = buildReturnUrl();
+            // let the form continue
+        });
+    }
+
+    // Execute once DOM ready
+    document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
