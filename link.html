@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>mkbvault · flat | sky + black</title>
+  <!-- Iconify -->
+  <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* flat design: sky blue + black + white, no curves on buttons */
+    :root {
+      --bg-body: #0a0a0a;
+      --bg-surface: #111111;
+      --bg-elevated: #1a1a1a;
+      --text-primary: #ffffff;
+      --text-secondary: #b3b3b3;
+      --border-grid: #2a2a2a;
+      --accent: #38bdf8;
+      --accent-hover: #7dd3fc;
+      --accent-soft: #0f2a3a;
+      --row-hover: #1a1f2a;
+      --star-active: #f5b042;
+      --modal-overlay: rgba(0, 0, 0, 0.85);
+      --header-bg: #000000;
+      --toast-bg: #1e1e1e;
+    }
+
+    body {
+      background: var(--bg-body);
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      padding: 1rem;
+      color: var(--text-primary);
+      min-height: 100vh;
+    }
+
+    .vault-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    /* NO BORDERS, NO SHADOWS, NO ROUNDED CORNERS (except cards minimal) */
+    .card {
+      background: var(--bg-surface);
+      overflow: hidden;
+    }
+
+    .header {
+      padding: 1rem 1.5rem;
+      background: var(--header-bg);
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-grid);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .logo h1 {
+      font-weight: 650;
+      font-size: 1.4rem;
+      letter-spacing: -0.3px;
+      color: var(--accent);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* flat buttons — no rounding, pure edges */
+    .btn {
+      background: transparent;
+      border: none;
+      padding: 0.45rem 1rem;
+      font-family: inherit;
+      font-size: 0.75rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.1s ease;
+      color: var(--text-primary);
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #000000;
+      font-weight: 600;
+    }
+    .btn-primary:hover {
+      background: var(--accent-hover);
+    }
+    .btn-outline {
+      border: 1px solid var(--border-grid);
+      background: transparent;
+      color: var(--text-secondary);
+    }
+    .btn-outline:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .btn-ghost {
+      color: var(--text-secondary);
+    }
+    .btn-ghost:hover {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+
+    .user-badge {
+      background: var(--accent-soft);
+      padding: 0.35rem 1rem;
+      font-size: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--accent);
+    }
+
+    /* search + stats */
+    .search-section {
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      border-bottom: 1px solid var(--border-grid);
+    }
+    .search-box {
+      flex: 2;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      background: #000000;
+      border: 1px solid var(--border-grid);
+      padding: 0.5rem 1.2rem;
+      gap: 10px;
+    }
+    .search-box input {
+      border: none;
+      flex: 1;
+      outline: none;
+      background: transparent;
+      font-size: 0.85rem;
+      color: var(--text-primary);
+    }
+    .stats-badge {
+      font-size: 0.75rem;
+      background: #000000;
+      padding: 0.4rem 1.2rem;
+      color: var(--accent);
+      font-weight: 500;
+      border: 1px solid var(--border-grid);
+    }
+
+    /* TABLE — NO BORDERS, no shadows, clean */
+    .table-wrapper {
+      overflow-x: auto;
+      padding: 0;
+      margin: 0;
+    }
+    .link-table {
+      width: 100%;
+      min-width: 680px;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    .link-table th {
+      text-align: left;
+      padding: 1rem 1rem;
+      background: #000000;
+      font-weight: 600;
+      color: var(--accent);
+      font-size: 0.7rem;
+      letter-spacing: 0.3px;
+      border-bottom: 1px solid var(--border-grid);
+    }
+    .link-table td {
+      padding: 1rem 1rem;
+      border-bottom: 1px solid var(--border-grid);
+      vertical-align: middle;
+      background-color: var(--bg-surface);
+    }
+    .link-table tbody tr:hover td {
+      background-color: #0f0f0f;
+    }
+    .title-cell {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--accent);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .url-cell a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: 0.8rem;
+    }
+    .rating-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1a1a1a;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.7rem;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-secondary);
+    }
+
+    /* Pagination */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 1.2rem 1rem;
+      border-top: 1px solid var(--border-grid);
+      background: var(--bg-surface);
+    }
+    .page-btn {
+      background: #000000;
+      border: 1px solid var(--border-grid);
+      padding: 0.4rem 0.9rem;
+      cursor: pointer;
+      font-size: 0.75rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: var(--text-secondary);
+    }
+    .page-btn:hover:not(:disabled) {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .page-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+    .page-number {
+      background: #000000;
+      border: 1px solid var(--border-grid);
+      padding: 0.4rem 0.9rem;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+    .page-number.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--toast-bg);
+      border-left: 3px solid var(--accent);
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      z-index: 2000;
+      transform: translateX(120%);
+      transition: transform 0.2s ease;
+      font-size: 0.8rem;
+      max-width: 320px;
+      border: 1px solid var(--border-grid);
+    }
+    .toast.show {
+      transform: translateX(0);
+    }
+    .toast.error {
+      border-left-color: #f87171;
+    }
+    .toast.success {
+      border-left-color: var(--accent);
+    }
+
+    /* modals flat */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-overlay);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: 0.1s;
+    }
+    .modal-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .modal-card {
+      background: var(--bg-elevated);
+      padding: 1.8rem;
+      max-width: 420px;
+      width: 90%;
+      border: 1px solid var(--border-grid);
+    }
+    .modal-card input {
+      width: 100%;
+      padding: 0.75rem;
+      margin: 0.5rem 0;
+      border: 1px solid var(--border-grid);
+      background: #000000;
+      color: var(--text-primary);
+      font-family: inherit;
+    }
+    .detail-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-overlay);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1001;
+      visibility: hidden;
+      opacity: 0;
+    }
+    .detail-modal.active {
+      visibility: visible;
+      opacity: 1;
+    }
+    .detail-card {
+      background: var(--bg-elevated);
+      max-width: 560px;
+      width: 90%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 1.8rem;
+      border: 1px solid var(--border-grid);
+    }
+    .star-rating {
+      display: flex;
+      gap: 10px;
+      margin: 16px 0;
+    }
+    .star {
+      cursor: pointer;
+      font-size: 1.8rem;
+    }
+    .comment-list {
+      margin-top: 20px;
+      border-top: 1px solid var(--border-grid);
+      padding-top: 16px;
+    }
+    .comment-item {
+      background: #000000;
+      padding: 10px 14px;
+      margin-bottom: 10px;
+      font-size: 0.75rem;
+      border: 1px solid var(--border-grid);
+    }
+    .comment-input-group {
+      display: flex;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .comment-input-group input {
+      flex: 1;
+      border: 1px solid var(--border-grid);
+      padding: 10px 16px;
+      background: #000000;
+      color: var(--text-primary);
+    }
+    @media (max-width: 760px) {
+      body { padding: 0.5rem; }
+      .link-table { min-width: 700px; }
+      .header { padding: 0.8rem 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="vault-container">
+  <div class="card">
+    <div class="header">
+      <div class="logo"><span class="iconify" data-icon="mdi:database-outline" data-width="28"></span><h1>mkbvault</h1></div>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="headerAddBtn">➕ Add link</button>
+        <div id="userArea"></div>
+      </div>
+    </div>
+    <div class="search-section">
+      <div class="search-box"><span class="iconify" data-icon="mdi:magnify" data-width="18"></span><input type="text" id="searchInput" placeholder="Search..."></div>
+      <div class="stats-badge" id="totalCount">0 links</div>
+    </div>
+    <div class="table-wrapper"><table class="link-table" id="linksTable"><thead><tr><th>Title</th><th>Description</th><th>URL</th><th>Rating</th></tr></thead><tbody id="tableBody"><tr><td colspan="4" class="empty-state">⟳ loading...</td></tr></tbody></table></div>
+    <div class="pagination" id="paginationContainer"></div>
+  </div>
+</div>
+
+<div id="toast" class="toast"><span id="toastMsg"></span></div>
+
+<!-- MODALS -->
+<div id="authModal" class="modal-overlay"><div class="modal-card"><h3><span class="iconify" data-icon="mdi:key" data-width="24"></span> access</h3><input type="text" id="modalName" placeholder="name"><input type="email" id="modalEmail" placeholder="email"><input type="password" id="modalPassword" placeholder="password"><input type="text" id="modalCountry" placeholder="country"><button class="btn btn-primary" id="confirmAuthBtn" style="width:100%;">Continue</button></div></div>
+<div id="addLinkModal" class="modal-overlay"><div class="modal-card"><h3><span class="iconify" data-icon="mdi:link-plus" data-width="24"></span> new link</h3><input type="text" id="addTitle" placeholder="Title *"><input type="text" id="addDesc" placeholder="Description"><input type="text" id="addUrl" placeholder="https://... *"><button class="btn btn-primary" id="confirmAddBtn" style="width:100%;">Create</button></div></div>
+<div id="detailModal" class="detail-modal"><div class="detail-card"><div class="flex-between" style="display:flex;justify-content:space-between;"><h3 id="detailTitle"></h3><div id="detailActions"></div></div><p id="detailDesc" style="margin:12px 0;"></p><p><a id="detailUrl" target="_blank" style="color:var(--accent);"></a></p><div><strong>⭐ avg: <span id="detailAvgRate">0</span></strong></div><div class="star-rating" id="detailStars"></div><div><strong>💬 comments</strong></div><div id="detailComments" class="comment-list"></div><div class="comment-input-group"><input type="text" id="newCommentText" placeholder="comment..."><button class="btn btn-primary" id="addCommentBtn">post</button></div></div></div>
+
+<script>
+  const firebaseConfig = { apiKey: "AIzaSyBbrRHlakmOdKwuDGwYAx5qf-e6DOHW7s0", authDomain: "joefootball-15e7a.firebaseapp.com", databaseURL: "https://joefootball-15e7a-default-rtdb.firebaseio.com", projectId: "joefootball-15e7a", storageBucket: "joefootball-15e7a.firebasestorage.app" };
+  firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+  const auth = firebase.auth();
+
+  let currentUser = null;
+  let allLinks = [];
+  let searchQuery = "";
+  let currentDetailLink = null;
+  // pagination
+  let currentPage = 1;
+  const rowsPerPage = 25;
+
+  // Toast system
+  function showToast(msg, type = "success") {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    toastMsg.innerText = msg;
+    toast.classList.add('show');
+    if (type === 'error') toast.classList.add('error');
+    else toast.classList.remove('error');
+    setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  function escapeHtml(str) { if(!str) return ''; return String(str).replace(/[&<>]/g, m => m==='&'? '&amp;' : m==='<'? '&lt;' : '&gt;'); }
+
+  // check duplicate URL
+  function isDuplicateUrl(url, excludeId = null) {
+    return allLinks.some(link => link.url === url && link.id !== excludeId);
+  }
+
+  // render with pagination
+  function renderTable() {
+    let filtered = allLinks.filter(l => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return l.title?.toLowerCase().includes(q) || l.description?.toLowerCase().includes(q) || l.ownerName?.toLowerCase().includes(q);
+    });
+    document.getElementById('totalCount').innerText = `${filtered.length} link${filtered.length !== 1 ? 's' : ''}`;
+    const totalPages = Math.ceil(filtered.length / rowsPerPage);
+    if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+    const start = (currentPage - 1) * rowsPerPage;
+    const paginated = filtered.slice(start, start + rowsPerPage);
+    const tbody = document.getElementById('tableBody');
+    if (paginated.length === 0) { tbody.innerHTML = '<tr><td colspan="4" class="empty-state">📭 no links</td></tr>'; renderPagination(0,0); return; }
+    let html = '';
+    paginated.forEach(link => {
+      const avg = (link.avgRating || 0).toFixed(1);
+      html += `<tr><td><span class="title-cell" data-id="${link.id}"><span class="iconify" data-icon="mdi:link-variant" data-width="16"></span> ${escapeHtml(link.title)}</span></td><td>${escapeHtml(link.description?.substring(0,80) || '—')}</td><td class="url-cell"><a href="${escapeHtml(link.url)}" target="_blank">${escapeHtml(link.url.length>45 ? link.url.slice(0,42)+'…' : link.url)}</a></td><td><span class="rating-badge"><span class="iconify" data-icon="mdi:star" data-width="14"></span> ${avg}</span></td></tr>`;
+    });
+    tbody.innerHTML = html;
+    document.querySelectorAll('.title-cell').forEach(el => { el.removeEventListener('click', titleClickHandler); el.addEventListener('click', titleClickHandler); });
+    if (window.Iconify) window.Iconify.scan(tbody);
+    renderPagination(currentPage, totalPages);
+  }
+
+  function renderPagination(current, total) {
+    const container = document.getElementById('paginationContainer');
+    if (total <= 1) { container.innerHTML = ''; return; }
+    container.innerHTML = `
+      <button class="page-btn" id="firstPage" ${current===1 ? 'disabled' : ''}><span class="iconify" data-icon="mdi:chevron-double-left" data-width="16"></span> First</button>
+      <button class="page-btn" id="prevPage" ${current===1 ? 'disabled' : ''}><span class="iconify" data-icon="mdi:chevron-left" data-width="16"></span> Prev</button>
+      <span class="page-number active">${current}</span><span class="page-number">/ ${total}</span>
+      <button class="page-btn" id="nextPage" ${current===total ? 'disabled' : ''}>Next <span class="iconify" data-icon="mdi:chevron-right" data-width="16"></span></button>
+      <button class="page-btn" id="lastPage" ${current===total ? 'disabled' : ''}>Last <span class="iconify" data-icon="mdi:chevron-double-right" data-width="16"></span></button>
+    `;
+    document.getElementById('firstPage')?.addEventListener('click', () => { currentPage = 1; renderTable(); });
+    document.getElementById('prevPage')?.addEventListener('click', () => { if(currentPage>1){ currentPage--; renderTable(); } });
+    document.getElementById('nextPage')?.addEventListener('click', () => { if(currentPage<total){ currentPage++; renderTable(); } });
+    document.getElementById('lastPage')?.addEventListener('click', () => { currentPage = total; renderTable(); });
+    if(window.Iconify) window.Iconify.scan(container);
+  }
+
+  async function titleClickHandler(e) {
+    const linkId = e.currentTarget.dataset.id;
+    const link = allLinks.find(l => l.id === linkId);
+    if (link) openDetailModal(link);
+  }
+
+  function openDetailModal(link) {
+    currentDetailLink = link;
+    document.getElementById('detailTitle').innerText = link.title;
+    document.getElementById('detailDesc').innerText = link.description || 'no description';
+    document.getElementById('detailUrl').innerHTML = link.url;
+    document.getElementById('detailUrl').href = link.url;
+    const avg = (link.avgRating || 0).toFixed(1);
+    const votes = Object.keys(link.ratings || {}).length;
+    document.getElementById('detailAvgRate').innerText = `${avg} / 5 (${votes} votes)`;
+    const starContainer = document.getElementById('detailStars');
+    const userRating = (currentUser && link.ratings && link.ratings[currentUser.uid]) ? link.ratings[currentUser.uid] : 0;
+    starContainer.innerHTML = '';
+    for (let i=1;i<=5;i++) {
+      const starSpan = document.createElement('span');
+      starSpan.className = 'star';
+      const iconName = i <= userRating ? 'mdi:star' : 'mdi:star-outline';
+      starSpan.setAttribute('data-icon', iconName);
+      starSpan.setAttribute('data-width', '28');
+      starSpan.style.cursor = currentUser ? 'pointer' : 'default';
+      starSpan.dataset.star = i;
+      if (currentUser) starSpan.addEventListener('click', () => rateLink(link.id, i));
+      starSpan.classList.add('iconify');
+      starContainer.appendChild(starSpan);
+    }
+    if (window.Iconify) window.Iconify.scan(starContainer);
+    const commentsDiv = document.getElementById('detailComments');
+    const comments = link.comments || [];
+    commentsDiv.innerHTML = comments.map(c => `<div class="comment-item"><b>${escapeHtml(c.author)}</b> · ${new Date(c.timestamp).toLocaleString()}<br>${escapeHtml(c.text)}</div>`).join('');
+    if (!currentUser) commentsDiv.innerHTML += `<div style="margin-top:8px;">🔒 sign in to comment</div>`;
+    document.getElementById('newCommentText').value = '';
+    const actionsDiv = document.getElementById('detailActions');
+    actionsDiv.innerHTML = '';
+    if (currentUser && link.ownerId === currentUser.uid) {
+      actionsDiv.innerHTML = `<span class="icon-btn" id="detailEditBtn"><span class="iconify" data-icon="mdi:pencil" data-width="20"></span></span><span class="icon-btn" id="detailDeleteBtn"><span class="iconify" data-icon="mdi:trash-can-outline" data-width="20"></span></span>`;
+      document.getElementById('detailEditBtn')?.addEventListener('click', () => editLink(link.id));
+      document.getElementById('detailDeleteBtn')?.addEventListener('click', () => deleteLink(link.id));
+      if(window.Iconify) window.Iconify.scan(actionsDiv);
+    }
+    document.getElementById('detailModal').classList.add('active');
+  }
+
+  async function rateLink(linkId, stars) {
+    if (!currentUser) { showToast("sign in to rate", "error"); return; }
+    const linkRef = database.ref(`links/${linkId}`);
+    const snap = await linkRef.once('value');
+    const link = snap.val();
+    let ratings = link.ratings || {};
+    ratings[currentUser.uid] = stars;
+    const values = Object.values(ratings);
+    const newAvg = values.reduce((a,b)=>a+b,0)/values.length;
+    await linkRef.update({ ratings, avgRating: newAvg });
+    showToast("rating updated", "success");
+    if (currentDetailLink && currentDetailLink.id === linkId) { currentDetailLink.ratings = ratings; currentDetailLink.avgRating = newAvg; openDetailModal(currentDetailLink); }
+    fetchLinks();
+  }
+
+  async function addCommentToLink(linkId, text) {
+    if (!currentUser) { showToast("sign in to comment", "error"); return; }
+    const linkRef = database.ref(`links/${linkId}`);
+    const snap = await linkRef.once('value');
+    const link = snap.val();
+    const comments = link.comments || [];
+    comments.push({ author: currentUser.name, text: text, timestamp: Date.now() });
+    await linkRef.update({ comments });
+    showToast("comment added", "success");
+    if (currentDetailLink && currentDetailLink.id === linkId) { currentDetailLink.comments = comments; openDetailModal(currentDetailLink); }
+    fetchLinks();
+  }
+
+  async function editLink(linkId) {
+    const link = allLinks.find(l => l.id === linkId);
+    if (!link || link.ownerId !== currentUser?.uid) return;
+    const newTitle = prompt("Edit title:", link.title);
+    if (newTitle !== null) {
+      const newDesc = prompt("Edit description:", link.description || "");
+      await database.ref(`links/${linkId}`).update({ title: newTitle, description: newDesc });
+      fetchLinks();
+      showToast("link updated", "success");
+    }
+  }
+  async function deleteLink(linkId) {
+    if (confirm("delete?")) { await database.ref(`links/${linkId}`).remove(); fetchLinks(); document.getElementById('detailModal').classList.remove('active'); showToast("deleted", "success"); }
+  }
+
+  document.getElementById('addCommentBtn')?.addEventListener('click', () => {
+    if (!currentDetailLink) return;
+    const text = document.getElementById('newCommentText').value.trim();
+    if (!text) return;
+    addCommentToLink(currentDetailLink.id, text);
+  });
+  document.getElementById('detailModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('detailModal')) document.getElementById('detailModal').classList.remove('active'); });
+
+  // ADD LINK with duplicate check
+  async function addNewLink(title, desc, url) {
+    if (!title || !url) { showToast("Title and URL required", "error"); return false; }
+    let finalUrl = url.startsWith('http') ? url : 'https://' + url;
+    if (isDuplicateUrl(finalUrl)) { showToast("duplicate URL already exists", "error"); return false; }
+    let ownerId = "anonymous", ownerName = "anonymous";
+    if (currentUser) { ownerId = currentUser.uid; ownerName = currentUser.name; }
+    else { let anonId = localStorage.getItem('anon_id'); if (!anonId) { anonId = 'anon_' + Date.now() + '_' + Math.random().toString(36).substr(2,6); localStorage.setItem('anon_id', anonId); } ownerId = anonId; ownerName = "anonymous"; }
+    const newLink = { title, description: desc, url: finalUrl, ownerId, ownerName, ownerCountry: currentUser?.country || "", createdAt: Date.now(), ratings: {}, avgRating: 0, comments: [] };
+    await database.ref('links').push(newLink);
+    showToast("link added", "success");
+    return true;
+  }
+
+  function openAddLinkModal() { document.getElementById('addLinkModal').classList.add('active'); }
+  function closeAddLinkModal() { document.getElementById('addLinkModal').classList.remove('active'); }
+  document.getElementById('headerAddBtn')?.addEventListener('click', () => openAddLinkModal());
+  document.getElementById('confirmAddBtn')?.addEventListener('click', async () => {
+    const title = document.getElementById('addTitle').value.trim();
+    const desc = document.getElementById('addDesc').value.trim();
+    const url = document.getElementById('addUrl').value.trim();
+    await addNewLink(title, desc, url);
+    fetchLinks();
+    closeAddLinkModal();
+    document.getElementById('addTitle').value = ''; document.getElementById('addDesc').value = ''; document.getElementById('addUrl').value = '';
+  });
+  document.getElementById('addLinkModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('addLinkModal')) closeAddLinkModal(); });
+
+  function fetchLinks() {
+    database.ref('links').once('value', (snapshot) => {
+      const data = snapshot.val();
+      allLinks = data ? Object.entries(data).map(([id,val]) => ({ id, ...val, ratings: val.ratings || {}, avgRating: val.avgRating || 0, comments: val.comments || [] })) : [];
+      renderTable();
+    });
+  }
+
+  // AUTH
+  async function handleSignIn(name, email, password, country) {
+    if (!name || !password) { showToast("name + password required", "error"); return false; }
+    try {
+      await auth.signInAnonymously();
+      const uid = auth.currentUser.uid;
+      const userRef = database.ref(`users/${uid}`);
+      const snap = await userRef.once('value');
+      const existing = snap.val();
+      if (existing && existing.password === password) { currentUser = { uid, name: existing.name, email: existing.email, country: existing.country }; showToast(`welcome back ${name}`, "success"); }
+      else if (!existing) { await userRef.set({ uid, name, email: email || "", country: country || "", password, createdAt: Date.now() }); currentUser = { uid, name, email, country }; showToast(`account created`, "success"); }
+      else if (existing.password !== password) { showToast("wrong password", "error"); return false; }
+      localStorage.setItem('mkb_user', JSON.stringify({ uid, name: currentUser.name, email: currentUser.email, country: currentUser.country }));
+      renderUserUI(); fetchLinks(); closeAuthModal(); return true;
+    } catch(e) { showToast(e.message, "error"); return false; }
+  }
+
+  function renderUserUI() {
+    const userArea = document.getElementById('userArea');
+    if (currentUser) {
+      userArea.innerHTML = `<div class="user-badge"><span class="iconify" data-icon="mdi:account-circle" data-width="16"></span> ${escapeHtml(currentUser.name)}</div><button class="btn btn-ghost" id="logoutBtn"><span class="iconify" data-icon="mdi:logout" data-width="16"></span></button>`;
+      document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.removeItem('mkb_user'); auth.signOut(); currentUser = null; renderUserUI(); fetchLinks(); showToast("logged out", "success"); });
+    } else {
+      userArea.innerHTML = `<button class="btn btn-ghost" id="showAuthBtn"><span class="iconify" data-icon="mdi:login" data-width="16"></span> sign in</button>`;
+      document.getElementById('showAuthBtn')?.addEventListener('click', () => openAuthModal());
+    }
+    if(window.Iconify) window.Iconify.scan(userArea);
+  }
+
+  function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
+  function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
+  document.getElementById('confirmAuthBtn')?.addEventListener('click', () => { const name=document.getElementById('modalName').value.trim(); const email=document.getElementById('modalEmail').value.trim(); const pwd=document.getElementById('modalPassword').value; const country=document.getElementById('modalCountry').value.trim(); handleSignIn(name,email,pwd,country); });
+  document.getElementById('authModal')?.addEventListener('click', (e) => { if(e.target===document.getElementById('authModal')) closeAuthModal(); });
+  document.getElementById('searchInput')?.addEventListener('input', (e) => { searchQuery = e.target.value; currentPage = 1; renderTable(); });
+
+  async function loadStored() {
+    const stored = localStorage.getItem('mkb_user');
+    if (stored) {
+      const u = JSON.parse(stored);
+      await auth.signInAnonymously();
+      const uid = auth.currentUser.uid;
+      const snap = await database.ref(`users/${uid}`).once('value');
+      if (snap.exists() && snap.val().password) { currentUser = { uid, name: snap.val().name, email: snap.val().email, country: snap.val().country }; }
+      else localStorage.removeItem('mkb_user');
+    }
+    renderUserUI(); fetchLinks();
+  }
+  loadStored();
+</script>
+</body>
+</html>
