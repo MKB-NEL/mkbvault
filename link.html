@@ -6,9 +6,9 @@
   <title>mkbvault · secure link hub</title>
   <!-- Iconify (only source for all icons) -->
   <script src="https://code.iconify.design/3/3.1.0/iconify.min.js"></script>
-  <!-- Firebase SDKs -->
+  <!-- Firebase SDKs (Firestore) -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
   <style>
     * {
@@ -39,9 +39,117 @@
       min-height: 100vh;
     }
     .vault-container {
-      max-width: 1400px;
+      max-width: 1600px;
       margin: 0 auto;
       background: black;
+      display: flex;
+      gap: 1rem;
+      position: relative;
+    }
+    .main-content {
+      flex: 2;
+      min-width: 0;
+      transition: all 0.2s;
+    }
+    /* Right Sidebar - hidden by default, shows when link clicked */
+    .right-sidebar {
+      width: 360px;
+      background: #0d0d0d;
+      border-left: 1px solid var(--border-grid);
+      padding: 1rem;
+      display: none;
+      flex-direction: column;
+      gap: 1rem;
+      height: calc(100vh - 2rem);
+      position: sticky;
+      top: 1rem;
+      overflow-y: auto;
+      border-radius: 0 1rem 1rem 0;
+    }
+    .right-sidebar.active {
+      display: flex;
+    }
+    .sidebar-card {
+      background: #111111;
+      border: 1px solid var(--border-grid);
+      border-radius: 1rem;
+      padding: 1.2rem;
+    }
+    .sidebar-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border-grid);
+      padding-bottom: 0.5rem;
+    }
+    .detail-view {
+      word-break: break-word;
+    }
+    .detail-view h4 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--accent);
+    }
+    .detail-view p {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin: 0.5rem 0;
+    }
+    .detail-view a {
+      color: var(--accent);
+      word-break: break-all;
+    }
+    .sidebar-stars {
+      display: flex;
+      gap: 8px;
+      margin: 12px 0;
+    }
+    .sidebar-star {
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+    .sidebar-comment-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin: 12px 0;
+    }
+    .sidebar-comment-item {
+      background: #1a1a1a;
+      padding: 8px;
+      border-radius: 0.75rem;
+      margin-bottom: 8px;
+      font-size: 0.7rem;
+    }
+    .sidebar-comment-input {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .sidebar-comment-input input {
+      flex: 1;
+      background: #000;
+      border: 1px solid var(--border-grid);
+      padding: 8px 12px;
+      border-radius: 2rem;
+      color: white;
+      font-size: 0.7rem;
+    }
+    .empty-detail {
+      text-align: center;
+      color: var(--text-secondary);
+      padding: 2rem 0;
+    }
+    .close-sidebar {
+      cursor: pointer;
+      margin-left: auto;
+      color: var(--text-secondary);
+    }
+    .close-sidebar:hover {
+      color: var(--accent);
     }
     .header {
       padding: 1rem 1.5rem;
@@ -323,113 +431,59 @@
       color: var(--accent);
       border-bottom: 2px solid var(--accent);
     }
-    .detail-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-overlay);
-      backdrop-filter: blur(5px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1001;
-      visibility: hidden;
-      opacity: 0;
-    }
-    .detail-modal.active {
-      visibility: visible;
-      opacity: 1;
-    }
-    .detail-card {
-      background: var(--bg-elevated);
-      max-width: 560px;
-      width: 90%;
-      max-height: 85vh;
-      overflow-y: auto;
-      padding: 1.8rem;
-      border: 1px solid var(--border-grid);
-      border-radius: 1.5rem;
-    }
-    .star-rating {
-      display: flex;
-      gap: 10px;
-      margin: 16px 0;
-    }
-    .star {
-      cursor: pointer;
-      font-size: 1.8rem;
-    }
-    .comment-list {
-      margin-top: 20px;
-      border-top: 1px solid var(--border-grid);
-      padding-top: 16px;
-    }
-    .comment-item {
-      background: #000000;
-      padding: 10px 14px;
-      margin-bottom: 10px;
-      border-radius: 1rem;
-      border: 1px solid var(--border-grid);
-      font-size: 0.75rem;
-    }
-    .comment-input-group {
-      display: flex;
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .comment-input-group input {
-      flex: 1;
-      border: 1px solid var(--border-grid);
-      background: #000000;
-      color: var(--text-primary);
-      border-radius: 2rem;
-      padding: 10px 16px;
-    }
-    .loader {
-      display: inline-block;
-      width: 16px;
-      height: 16px;
-      border: 2px solid rgba(56,189,248,0.3);
-      border-radius: 50%;
-      border-top-color: var(--accent);
-      animation: spin 0.6s linear infinite;
-      margin-right: 6px;
-    }
-    @keyframes spin { to { transform: rotate(360deg); } }
-    @media (max-width: 760px) {
-      body { padding: 0.5rem; }
-      .link-table { min-width: 650px; }
+    @media (max-width: 900px) {
+      .vault-container { flex-direction: column; }
+      .right-sidebar { width: 100%; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1050; height: 100%; border-left: none; border-radius: 0; }
     }
   </style>
 </head>
 <body>
 <div class="vault-container">
-  <div class="header">
-    <div class="logo">
-      <span class="iconify" data-icon="mdi:cube-outline" data-width="28"></span>
-      <h1>mkbvault</h1>
+  <div class="main-content">
+    <div class="header">
+      <div class="logo">
+        <span class="iconify" data-icon="mdi:cube-outline" data-width="28"></span>
+        <h1>mkbvault</h1>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="headerAddBtn">➕ Add link</button>
+        <div id="userArea"></div>
+      </div>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-primary" id="headerAddBtn">➕ Add link</button>
-      <div id="userArea"></div>
+    <div class="search-section">
+      <div class="search-box">
+        <span class="iconify" data-icon="mdi:magnify" data-width="18"></span>
+        <input type="text" id="searchInput" placeholder="Search title, description or owner...">
+      </div>
+      <div class="stats-badge" id="totalCount">0 links</div>
+    </div>
+    <div class="table-wrapper">
+      <table class="link-table">
+        <thead><tr><th>Title</th><th>Description</th><th>URL</th><th>Rating</th></tr></thead>
+        <tbody id="tableBody"><tr><td colspan="4" class="empty-state">⟳ loading...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="paginationContainer"></div>
+  </div>
+
+  <!-- RIGHT SIDEBAR - appears only when a link title is clicked -->
+  <div id="rightSidebar" class="right-sidebar">
+    <div class="sidebar-card">
+      <div class="sidebar-title">
+        <span class="iconify" data-icon="mdi:information-outline" data-width="18"></span>
+        Link Details
+        <span class="close-sidebar" id="closeSidebarBtn">
+          <span class="iconify" data-icon="mdi:close" data-width="18"></span>
+        </span>
+      </div>
+      <div id="sidebarDetail" class="detail-view">
+        <div class="empty-detail">
+          <span class="iconify" data-icon="mdi:link-variant" data-width="32"></span>
+          <p>Select a link from the table</p>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="search-section">
-    <div class="search-box">
-      <span class="iconify" data-icon="mdi:magnify" data-width="18"></span>
-      <input type="text" id="searchInput" placeholder="Search title, description or owner...">
-    </div>
-    <div class="stats-badge" id="totalCount">0 links</div>
-  </div>
-  <div class="table-wrapper">
-    <table class="link-table">
-      <thead><tr><th>Title</th><th>Description</th><th>URL</th><th>Rating</th></tr></thead>
-      <tbody id="tableBody"><tr><td colspan="4" class="empty-state">⟳ loading...</td></tr></tbody>
-    </table>
-  </div>
-  <div class="pagination" id="paginationContainer"></div>
 </div>
 
 <div id="toast" class="toast"><span id="toastMsg"></span></div>
@@ -471,45 +525,23 @@
   </div>
 </div>
 
-<!-- Detail Modal -->
-<div id="detailModal" class="detail-modal">
-  <div class="detail-card">
-    <div style="display:flex; justify-content:space-between;">
-      <h3 id="detailTitle"></h3>
-      <div id="detailActions"></div>
-    </div>
-    <p id="detailDesc" style="margin:12px 0;"></p>
-    <p><a id="detailUrl" target="_blank" style="color:var(--accent);"></a></p>
-    <div><strong>⭐ avg: <span id="detailAvgRate">0.0</span> / 5 (<span id="detailVotes">0</span> votes)</strong></div>
-    <div style="margin-top:4px;"><strong>👤 contributor: <span id="detailContributor">—</span></strong></div>
-    <div class="star-rating" id="detailStars"></div>
-    <div><strong>💬 comments</strong></div>
-    <div id="detailComments" class="comment-list"></div>
-    <div class="comment-input-group">
-      <input type="text" id="newCommentText" placeholder="write a comment...">
-      <button class="btn btn-primary" id="addCommentBtn">post</button>
-    </div>
-  </div>
-</div>
-
 <script>
   (function() {
-    // ---------- FIREBASE ----------
+    // ---------- FIREBASE (FIRESTORE) ----------
     const firebaseConfig = {
       apiKey: "AIzaSyBbrRHlakmOdKwuDGwYAx5qf-e6DOHW7s0",
       authDomain: "joefootball-15e7a.firebaseapp.com",
-      databaseURL: "https://joefootball-15e7a-default-rtdb.firebaseio.com",
       projectId: "joefootball-15e7a",
       storageBucket: "joefootball-15e7a.firebasestorage.app"
     };
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.firestore();
     const auth = firebase.auth();
 
     let currentUser = null;
     let allLinks = [];
     let searchQuery = "";
-    let currentDetailLink = null;
+    let currentSelectedLink = null;
     let currentPage = 1;
     const rowsPerPage = 25;
 
@@ -525,7 +557,156 @@
     }
     function escapeHtml(str) { if (!str) return ''; return String(str).replace(/[&<>]/g, m => m === '&' ? '&amp;' : m === '<' ? '&lt;' : '&gt;'); }
 
-    // ---------- Render Table with Pagination ----------
+    // ---------- Sidebar Functions ----------
+    function openSidebar() {
+      document.getElementById('rightSidebar').classList.add('active');
+    }
+    function closeSidebar() {
+      document.getElementById('rightSidebar').classList.remove('active');
+      currentSelectedLink = null;
+    }
+    document.getElementById('closeSidebarBtn')?.addEventListener('click', closeSidebar);
+
+    function renderSidebar(link) {
+      const container = document.getElementById('sidebarDetail');
+      if (!link) {
+        container.innerHTML = `<div class="empty-detail">
+          <span class="iconify" data-icon="mdi:link-variant" data-width="32"></span>
+          <p>Select a link from the table</p>
+        </div>`;
+        if(window.Iconify) window.Iconify.scan(container);
+        return;
+      }
+      const avg = (link.avgRating || 0).toFixed(1);
+      const votes = Object.keys(link.ratings || {}).length;
+      const userRating = (currentUser && link.ratings && link.ratings[currentUser.uid]) ? link.ratings[currentUser.uid] : 0;
+      
+      let starsHtml = '';
+      for (let i=1;i<=5;i++) {
+        const active = i <= userRating ? 'mdi:star' : 'mdi:star-outline';
+        starsHtml += `<span class="sidebar-star" data-star="${i}" style="cursor:${currentUser ? 'pointer' : 'default'};"><span class="iconify" data-icon="${active}" data-width="22"></span></span>`;
+      }
+      
+      const commentsHtml = (link.comments || []).map(c => `<div class="sidebar-comment-item"><b>${escapeHtml(c.author)}</b> · ${new Date(c.timestamp).toLocaleString()}<br>${escapeHtml(c.text)}</div>`).join('');
+      
+      container.innerHTML = `
+        <h4>${escapeHtml(link.title)}</h4>
+        <p>${escapeHtml(link.description || 'no description')}</p>
+        <p><a href="${escapeHtml(link.url)}" target="_blank" style="color:var(--accent);">${escapeHtml(link.url)}</a></p>
+        <div style="margin-top: 8px;"><strong>⭐ ${avg} / 5 (${votes} votes)</strong></div>
+        <div><strong>👤 contributor:</strong> ${escapeHtml(link.ownerName || 'anonymous')} ${link.ownerCountry ? `(${escapeHtml(link.ownerCountry)})` : ''}</div>
+        <div class="sidebar-stars" id="sidebarStars">${starsHtml}</div>
+        <div><strong>💬 comments</strong></div>
+        <div class="sidebar-comment-list" id="sidebarComments">${commentsHtml || '<div style="color:gray;">no comments yet</div>'}</div>
+        <div class="sidebar-comment-input">
+          <input type="text" id="sidebarCommentInput" placeholder="write a comment...">
+          <button class="btn btn-primary" id="sidebarPostComment" style="padding:0.3rem 0.8rem;">post</button>
+        </div>
+      `;
+      if(window.Iconify) window.Iconify.scan(container);
+      
+      if (currentUser) {
+        document.querySelectorAll('.sidebar-star').forEach(star => {
+          star.removeEventListener('click', starClickHandler);
+          star.addEventListener('click', starClickHandler);
+        });
+      }
+      const postBtn = document.getElementById('sidebarPostComment');
+      if (postBtn) {
+        postBtn.removeEventListener('click', sidebarCommentHandler);
+        postBtn.addEventListener('click', sidebarCommentHandler);
+      }
+    }
+    
+    async function starClickHandler(e) {
+      const starSpan = e.currentTarget;
+      const starValue = parseInt(starSpan.dataset.star);
+      if (!currentUser) { showToast("sign in to rate", "error"); return; }
+      if (!currentSelectedLink) return;
+      await rateLink(currentSelectedLink.id, starValue);
+    }
+    
+    async function sidebarCommentHandler() {
+      const input = document.getElementById('sidebarCommentInput');
+      const text = input?.value.trim();
+      if (!text) return;
+      if (!currentUser) { showToast("sign in to comment", "error"); return; }
+      if (!currentSelectedLink) return;
+      await addCommentToLink(currentSelectedLink.id, text);
+      input.value = '';
+    }
+    
+    // ---------- Firestore Operations ----------
+    async function fetchLinks() {
+      const snapshot = await db.collection('links').orderBy('createdAt', 'desc').get();
+      allLinks = [];
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        allLinks.push({
+          id: doc.id,
+          ...data,
+          ratings: data.ratings || {},
+          avgRating: data.avgRating || 0,
+          comments: data.comments || []
+        });
+      });
+      renderTable();
+    }
+    
+    async function addNewLink(title, desc, url) {
+      if (!title || !url) { showToast("Title and URL required", "error"); return false; }
+      let finalUrl = url.startsWith('http') ? url : 'https://' + url;
+      if (allLinks.some(l => l.url === finalUrl)) { showToast("duplicate URL", "error"); return false; }
+      let ownerId = currentUser?.uid || "anonymous";
+      let ownerName = currentUser?.name || "anonymous";
+      let ownerCountry = currentUser?.country || "";
+      const newLink = {
+        title, description: desc, url: finalUrl,
+        ownerId, ownerName, ownerCountry,
+        createdAt: Date.now(), ratings: {}, avgRating: 0, comments: []
+      };
+      await db.collection('links').add(newLink);
+      showToast("link added", "success");
+      await fetchLinks();
+      return true;
+    }
+    
+    async function rateLink(linkId, stars) {
+      if (!currentUser) return;
+      const linkRef = db.collection('links').doc(linkId);
+      const doc = await linkRef.get();
+      if (!doc.exists) return;
+      const link = doc.data();
+      let ratings = link.ratings || {};
+      ratings[currentUser.uid] = stars;
+      const values = Object.values(ratings);
+      const newAvg = values.reduce((a,b)=>a+b,0)/values.length;
+      await linkRef.update({ ratings, avgRating: newAvg });
+      if (currentSelectedLink && currentSelectedLink.id === linkId) {
+        currentSelectedLink.ratings = ratings;
+        currentSelectedLink.avgRating = newAvg;
+        renderSidebar(currentSelectedLink);
+      }
+      await fetchLinks();
+    }
+    
+    async function addCommentToLink(linkId, text) {
+      if (!currentUser) return;
+      const linkRef = db.collection('links').doc(linkId);
+      const doc = await linkRef.get();
+      if (!doc.exists) return;
+      const link = doc.data();
+      const comments = link.comments || [];
+      comments.push({ author: currentUser.name, text: text, timestamp: Date.now() });
+      await linkRef.update({ comments });
+      if (currentSelectedLink && currentSelectedLink.id === linkId) {
+        currentSelectedLink.comments = comments;
+        renderSidebar(currentSelectedLink);
+      }
+      await fetchLinks();
+    }
+    
+    // ---------- Table Render ----------
     function renderTable() {
       let filtered = allLinks.filter(l => {
         if (!searchQuery) return true;
@@ -553,7 +734,6 @@
         }
         tbody.innerHTML = html;
       }
-      // pagination UI
       const container = document.getElementById('paginationContainer');
       if (totalPages <= 1) { container.innerHTML = ''; return; }
       container.innerHTML = `
@@ -566,146 +746,25 @@
       if (window.Iconify) window.Iconify.scan(container);
       attachTitleClickHandlers();
     }
-
+    
     function attachTitleClickHandlers() {
       document.querySelectorAll('.title-cell').forEach(el => {
         el.removeEventListener('click', titleClickHandler);
         el.addEventListener('click', titleClickHandler);
       });
     }
+    
     async function titleClickHandler(e) {
       const linkId = e.currentTarget.dataset.id;
       const link = allLinks.find(l => l.id === linkId);
-      if (link) openDetailModal(link);
-    }
-
-    // ---------- Detail Modal ----------
-    function openDetailModal(link) {
-      currentDetailLink = link;
-      document.getElementById('detailTitle').innerText = link.title;
-      document.getElementById('detailDesc').innerText = link.description || 'no description';
-      document.getElementById('detailUrl').innerHTML = link.url;
-      document.getElementById('detailUrl').href = link.url;
-      const avg = (link.avgRating || 0).toFixed(1);
-      const votes = Object.keys(link.ratings || {}).length;
-      document.getElementById('detailAvgRate').innerText = avg;
-      document.getElementById('detailVotes').innerText = votes;
-      document.getElementById('detailContributor').innerHTML = `<span class="iconify" data-icon="mdi:account" data-width="14"></span> ${escapeHtml(link.ownerName || 'anonymous')} ${link.ownerCountry ? `(${escapeHtml(link.ownerCountry)})` : ''}`;
-      
-      const starContainer = document.getElementById('detailStars');
-      const userRating = (currentUser && link.ratings && link.ratings[currentUser.uid]) ? link.ratings[currentUser.uid] : 0;
-      starContainer.innerHTML = '';
-      for (let i=1;i<=5;i++) {
-        const starSpan = document.createElement('span');
-        starSpan.className = 'star';
-        const iconName = i <= userRating ? 'mdi:star' : 'mdi:star-outline';
-        starSpan.setAttribute('data-icon', iconName);
-        starSpan.setAttribute('data-width', '28');
-        starSpan.style.cursor = currentUser ? 'pointer' : 'default';
-        starSpan.dataset.star = i;
-        if (currentUser) starSpan.addEventListener('click', () => rateLink(link.id, i));
-        starSpan.classList.add('iconify');
-        starContainer.appendChild(starSpan);
-      }
-      if (window.Iconify) window.Iconify.scan(starContainer);
-      
-      const commentsDiv = document.getElementById('detailComments');
-      const comments = link.comments || [];
-      commentsDiv.innerHTML = comments.map(c => `<div class="comment-item"><b>${escapeHtml(c.author)}</b> · ${new Date(c.timestamp).toLocaleString()}<br>${escapeHtml(c.text)}</div>`).join('');
-      if (!currentUser) commentsDiv.innerHTML += `<div style="margin-top:8px;">🔒 sign in to comment</div>`;
-      document.getElementById('newCommentText').value = '';
-      
-      const actionsDiv = document.getElementById('detailActions');
-      actionsDiv.innerHTML = '';
-      if (currentUser && link.ownerId === currentUser.uid) {
-        actionsDiv.innerHTML = `<span class="icon-btn" id="detailEditBtn" style="cursor:pointer;"><span class="iconify" data-icon="mdi:pencil" data-width="20"></span></span>
-                                <span class="icon-btn" id="detailDeleteBtn" style="cursor:pointer;"><span class="iconify" data-icon="mdi:trash-can-outline" data-width="20"></span></span>`;
-        if(window.Iconify) window.Iconify.scan(actionsDiv);
-      }
-      document.getElementById('detailModal').classList.add('active');
-    }
-
-    async function rateLink(linkId, stars) {
-      if (!currentUser) { showToast("sign in to rate", "error"); return; }
-      const linkRef = database.ref(`links/${linkId}`);
-      const snap = await linkRef.once('value');
-      const link = snap.val();
-      let ratings = link.ratings || {};
-      ratings[currentUser.uid] = stars;
-      const values = Object.values(ratings);
-      const newAvg = values.reduce((a,b)=>a+b,0)/values.length;
-      await linkRef.update({ ratings, avgRating: newAvg });
-      if (currentDetailLink && currentDetailLink.id === linkId) {
-        currentDetailLink.ratings = ratings;
-        currentDetailLink.avgRating = newAvg;
-        openDetailModal(currentDetailLink);
-      }
-      fetchLinks();
-    }
-
-    async function addCommentToLink(linkId, text) {
-      if (!currentUser) { showToast("sign in to comment", "error"); return; }
-      const linkRef = database.ref(`links/${linkId}`);
-      const snap = await linkRef.once('value');
-      const link = snap.val();
-      const comments = link.comments || [];
-      comments.push({ author: currentUser.name, text: text, timestamp: Date.now() });
-      await linkRef.update({ comments });
-      if (currentDetailLink && currentDetailLink.id === linkId) {
-        currentDetailLink.comments = comments;
-        openDetailModal(currentDetailLink);
-      }
-      fetchLinks();
-    }
-
-    // edit/delete
-    async function editLink(linkId) {
-      const link = allLinks.find(l => l.id === linkId);
-      if (!link || link.ownerId !== currentUser?.uid) return;
-      const newTitle = prompt("Edit title:", link.title);
-      if (newTitle !== null) {
-        const newDesc = prompt("Edit description:", link.description || "");
-        await database.ref(`links/${linkId}`).update({ title: newTitle, description: newDesc });
-        fetchLinks();
-        showToast("link updated", "success");
+      if (link) {
+        currentSelectedLink = link;
+        renderSidebar(link);
+        openSidebar();
       }
     }
-    async function deleteLink(linkId) {
-      if (confirm("delete this link?")) {
-        await database.ref(`links/${linkId}`).remove();
-        fetchLinks();
-        document.getElementById('detailModal').classList.remove('active');
-        showToast("deleted", "success");
-      }
-    }
-
-    // ---------- Add Link ----------
-    async function addNewLink(title, desc, url) {
-      if (!title || !url) { showToast("Title and URL required", "error"); return false; }
-      let finalUrl = url.startsWith('http') ? url : 'https://' + url;
-      if (allLinks.some(l => l.url === finalUrl)) { showToast("duplicate URL", "error"); return false; }
-      let ownerId = currentUser?.uid || "anonymous";
-      let ownerName = currentUser?.name || "anonymous";
-      let ownerCountry = currentUser?.country || "";
-      const newLink = {
-        title, description: desc, url: finalUrl,
-        ownerId, ownerName, ownerCountry,
-        createdAt: Date.now(), ratings: {}, avgRating: 0, comments: []
-      };
-      await database.ref('links').push(newLink);
-      showToast("link added", "success");
-      return true;
-    }
-
-    function fetchLinks() {
-      database.ref('links').once('value', (snapshot) => {
-        const data = snapshot.val();
-        allLinks = data ? Object.entries(data).map(([id,val]) => ({ id, ...val, ratings: val.ratings || {}, avgRating: val.avgRating || 0, comments: val.comments || [] })) : [];
-        renderTable();
-      });
-    }
-
-    // ---------- Auth with Persistence ----------
+    
+    // ---------- Auth ----------
     async function setPersistence(remember) {
       const persistence = remember ? firebase.auth.Auth.Persistence.LOCAL : firebase.auth.Auth.Persistence.SESSION;
       await auth.setPersistence(persistence);
@@ -721,9 +780,11 @@
         await setPersistence(remember);
         const cred = await auth.signInWithEmailAndPassword(email, password);
         const uid = cred.user.uid;
-        const snap = await database.ref(`users/${uid}`).once('value');
-        if (snap.exists()) {
-          currentUser = { uid, name: snap.val().name, email: snap.val().email, country: snap.val().country };
+        const userDoc = await db.collection('users').doc(uid).get();
+        if (userDoc.exists) {
+          currentUser = { uid, ...userDoc.data() };
+        } else {
+          currentUser = { uid, name: email.split('@')[0], email: email, country: '' };
         }
         renderUserUI(); fetchLinks(); closeAuthModal();
         showToast(`welcome back!`, "success");
@@ -741,7 +802,7 @@
       try {
         const cred = await auth.createUserWithEmailAndPassword(email, password);
         const uid = cred.user.uid;
-        await database.ref(`users/${uid}`).set({ uid, name, email, country: country || "", createdAt: Date.now() });
+        await db.collection('users').doc(uid).set({ uid, name, email, country: country || "", createdAt: Date.now() });
         currentUser = { uid, name, email, country };
         renderUserUI(); fetchLinks(); closeAuthModal();
         showToast(`account created! welcome ${name}`, "success");
@@ -749,47 +810,38 @@
       } catch(e) { showToast(e.message, "error"); return false; }
       finally { btn.innerHTML = orig; btn.disabled = false; }
     }
-
+    
     function renderUserUI() {
       const area = document.getElementById('userArea');
       if (currentUser) {
         area.innerHTML = `<div class="user-badge"><span class="iconify" data-icon="mdi:account-circle" data-width="16"></span> ${escapeHtml(currentUser.name)}</div>
                           <button class="btn btn-ghost" id="logoutBtn"><span class="iconify" data-icon="mdi:logout" data-width="16"></span></button>`;
-        document.getElementById('logoutBtn')?.addEventListener('click', () => { auth.signOut(); currentUser = null; renderUserUI(); fetchLinks(); showToast("logged out", "success"); });
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { auth.signOut(); currentUser = null; currentSelectedLink = null; closeSidebar(); renderUserUI(); fetchLinks(); showToast("logged out", "success"); });
       } else {
         area.innerHTML = `<button class="btn btn-ghost" id="showAuthBtn"><span class="iconify" data-icon="mdi:login" data-width="16"></span> sign in</button>`;
         document.getElementById('showAuthBtn')?.addEventListener('click', () => openAuthModal());
       }
       if(window.Iconify) window.Iconify.scan(area);
     }
-
-    // Modal toggles
+    
     function openAuthModal() { document.getElementById('authModal').classList.add('active'); }
     function closeAuthModal() { document.getElementById('authModal').classList.remove('active'); }
     function openAddLinkModal() { document.getElementById('addLinkModal').classList.add('active'); }
     function closeAddLinkModal() { document.getElementById('addLinkModal').classList.remove('active'); }
-
-    // ---------- Event Listeners (no conflicts, single bind) ----------
+    
+    // ---------- Event Listeners ----------
     document.getElementById('headerAddBtn')?.addEventListener('click', openAddLinkModal);
     document.getElementById('confirmAddBtn')?.addEventListener('click', async () => {
       const title = document.getElementById('addTitle').value.trim();
       const desc = document.getElementById('addDesc').value.trim();
       const url = document.getElementById('addUrl').value.trim();
       await addNewLink(title, desc, url);
-      fetchLinks();
       closeAddLinkModal();
       document.getElementById('addTitle').value = '';
       document.getElementById('addDesc').value = '';
       document.getElementById('addUrl').value = '';
     });
     document.getElementById('addLinkModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('addLinkModal')) closeAddLinkModal(); });
-    document.getElementById('addCommentBtn')?.addEventListener('click', () => {
-      if (!currentDetailLink) return;
-      const text = document.getElementById('newCommentText').value.trim();
-      if (!text) return;
-      addCommentToLink(currentDetailLink.id, text);
-    });
-    document.getElementById('detailModal')?.addEventListener('click', (e) => { if (e.target === document.getElementById('detailModal')) document.getElementById('detailModal').classList.remove('active'); });
     document.getElementById('searchInput')?.addEventListener('input', (e) => { searchQuery = e.target.value; currentPage = 1; renderTable(); });
     document.getElementById('paginationContainer')?.addEventListener('click', (e) => {
       const btn = e.target.closest('.page-btn');
@@ -801,13 +853,7 @@
       else if (btn.id === 'nextPage' && currentPage < total) { currentPage++; renderTable(); }
       else if (btn.id === 'lastPage' && currentPage !== total) { currentPage = total; renderTable(); }
     });
-    document.getElementById('detailActions')?.addEventListener('click', (e) => {
-      const btn = e.target.closest('.icon-btn');
-      if (!btn) return;
-      if (btn.id === 'detailEditBtn' && currentDetailLink) editLink(currentDetailLink.id);
-      else if (btn.id === 'detailDeleteBtn' && currentDetailLink) deleteLink(currentDetailLink.id);
-    });
-
+    
     // Auth Tabs
     const signinDiv = document.getElementById('signinForm');
     const signupDiv = document.getElementById('signupForm');
@@ -835,14 +881,14 @@
       handleSignUp(name, email, pwd, country);
     });
     document.getElementById('authModal')?.addEventListener('click', (e) => { if(e.target === document.getElementById('authModal')) closeAuthModal(); });
-
-    // Firebase state listener (restores session on refresh)
+    
+    // Firebase auth state listener
     auth.onAuthStateChanged(async (user) => {
       if (user) {
         const uid = user.uid;
-        const snap = await database.ref(`users/${uid}`).once('value');
-        if (snap.exists()) {
-          currentUser = { uid, name: snap.val().name, email: snap.val().email, country: snap.val().country };
+        const userDoc = await db.collection('users').doc(uid).get();
+        if (userDoc.exists) {
+          currentUser = { uid, ...userDoc.data() };
         } else {
           currentUser = { uid, name: user.email?.split('@')[0] || 'user', email: user.email, country: '' };
         }
@@ -850,12 +896,13 @@
         fetchLinks();
       } else {
         currentUser = null;
+        currentSelectedLink = null;
+        closeSidebar();
         renderUserUI();
         fetchLinks();
       }
     });
-
-    // Initial call
+    
     renderUserUI();
   })();
 </script>
