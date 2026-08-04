@@ -2,24 +2,67 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Vault · Dashboard</title>
 
+    <!-- ===== FONTS ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
 
+    <!-- ===== ICONIFY ===== -->
     <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
 
     <style>
-        /* ---------- AUTH CHECK OVERLAY ---------- */
+        /* ---------- RESET & BASE ---------- */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-input: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --accent-light: #eff6ff;
+            --success: #22c55e;
+            --error: #ef4444;
+            --warning: #f59e0b;
+            --border-light: #e2e8f0;
+            --radius: 16px;
+            --radius-sm: 10px;
+            --radius-xs: 6px;
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
+            --transition: 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, system-ui, sans-serif;
+            background: var(--bg-primary);
+            min-height: 100vh;
+            padding: 1.5rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ---------- AUTH GUARD OVERLAY ---------- */
         #authGuard {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: #f1f5f9;
+            background: var(--bg-primary);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -37,46 +80,43 @@
         #authGuard .spinner-ring {
             width: 48px;
             height: 48px;
-            border: 3px solid #e2e8f0;
-            border-top-color: #3b82f6;
+            border: 3px solid var(--border-light);
+            border-top-color: var(--accent);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
 
         #authGuard p {
-            font-family: 'Poppins', sans-serif;
             font-size: 0.9rem;
-            color: #475569;
+            color: var(--text-secondary);
             font-weight: 300;
             letter-spacing: 0.3px;
         }
 
         #authGuard .error-icon {
             font-size: 3rem;
-            color: #ef4444;
+            color: var(--error);
         }
 
         #authGuard .error-text {
-            font-family: 'Poppins', sans-serif;
             font-size: 1rem;
-            color: #0f172a;
+            color: var(--text-primary);
             font-weight: 500;
         }
 
         #authGuard .error-sub {
-            font-family: 'Poppins', sans-serif;
             font-size: 0.85rem;
-            color: #64748b;
+            color: var(--text-secondary);
             font-weight: 300;
         }
 
         #authGuard .redirect-btn {
             margin-top: 0.5rem;
             padding: 0.7rem 2rem;
-            background: #3b82f6;
+            background: var(--accent);
             color: #fff;
             border: none;
-            border-radius: 8px;
+            border-radius: var(--radius-sm);
             font-family: 'Poppins', sans-serif;
             font-size: 0.9rem;
             font-weight: 500;
@@ -86,7 +126,7 @@
         }
 
         #authGuard .redirect-btn:hover {
-            background: #2563eb;
+            background: var(--accent-hover);
         }
 
         @keyframes spin {
@@ -95,11 +135,13 @@
             }
         }
 
-        /* ---------- VAULT CONTENT (hidden initially) ---------- */
+        /* ---------- VAULT CONTENT ---------- */
         #vaultContent {
             display: none;
             opacity: 0;
             transition: opacity 0.5s ease;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         #vaultContent.visible {
@@ -107,84 +149,622 @@
             opacity: 1;
         }
 
-        /* ---------- VAULT STYLES (placeholder for now) ---------- */
-        body {
-            font-family: 'Poppins', sans-serif;
-            background: #f1f5f9;
-            min-height: 100vh;
-            padding: 2rem;
-            color: #0f172a;
-        }
-
+        /* ---------- HEADER ---------- */
         .vault-header {
-            max-width: 1000px;
-            margin: 0 auto 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
             gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-light);
         }
 
-        .vault-header h1 {
-            font-size: 1.5rem;
+        .vault-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .vault-header .brand h1 {
+            font-size: 1.3rem;
             font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .vault-header .brand .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.7rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            background: var(--bg-primary);
+            padding: 0.1rem 0.6rem;
+            border-radius: 20px;
+        }
+
+        .vault-header .actions {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .vault-header .actions .btn {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.2s ease, transform 0.15s ease;
+        }
+
+        .vault-header .actions .btn:active {
+            transform: scale(0.97);
+        }
+
+        .vault-header .actions .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .vault-header .actions .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .vault-header .actions .btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        .vault-header .actions .btn-outline:hover {
+            background: var(--bg-primary);
+        }
+
+        .vault-header .actions .btn-danger {
+            background: transparent;
+            color: var(--error);
+            border: 1px solid #fecaca;
+        }
+
+        .vault-header .actions .btn-danger:hover {
+            background: #fef2f2;
+        }
+
+        /* ---------- STATS BAR ---------- */
+        .stats-bar {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stats-bar .stat {
+            background: var(--bg-card);
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius-sm);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stats-bar .stat .number {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .stats-bar .stat .label {
+            font-size: 0.65rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        /* ---------- SEARCH + FILTERS ---------- */
+        .search-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-section .search-wrapper {
+            flex: 1;
+            min-width: 200px;
+            display: flex;
+            align-items: center;
+            background: var(--bg-card);
+            border-radius: var(--radius-sm);
+            padding: 0 0.8rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-section .search-wrapper iconify-icon {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+        }
+
+        .search-section .search-wrapper input {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border: none;
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .search-section .search-wrapper input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .search-section .filter-tabs {
+            display: flex;
+            gap: 0.3rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-section .filter-tabs .tab {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 20px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.75rem;
+            font-weight: 400;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-section .filter-tabs .tab:hover {
+            background: var(--accent-light);
+            color: var(--accent);
+        }
+
+        .search-section .filter-tabs .tab.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .search-section .filter-tabs .tab.trash-tab.active {
+            background: var(--error);
+            color: #fff;
+        }
+
+        /* ---------- ITEM LIST ---------- */
+        .item-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .item-card {
+            background: var(--bg-card);
+            padding: 0.8rem 1rem;
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s ease, box-shadow 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .item-card:hover {
+            background: var(--accent-light);
+            box-shadow: var(--shadow-md);
+        }
+
+        .item-card .item-icon {
+            font-size: 1.3rem;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .item-card .item-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .item-card .item-info .title {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             gap: 0.5rem;
+            flex-wrap: wrap;
         }
 
-        .vault-header .logout-btn {
-            padding: 0.5rem 1.2rem;
-            background: #e2e8f0;
+        .item-card .item-info .title .badge {
+            font-size: 0.6rem;
+            font-weight: 400;
+            color: var(--text-muted);
+            background: var(--bg-primary);
+            padding: 0.05rem 0.5rem;
+            border-radius: 20px;
+        }
+
+        .item-card .item-info .sub {
+            font-size: 0.75rem;
+            font-weight: 300;
+            color: var(--text-muted);
+        }
+
+        .item-card .item-actions {
+            display: flex;
+            gap: 0.3rem;
+            flex-shrink: 0;
+        }
+
+        .item-card .item-actions button {
+            background: none;
             border: none;
-            border-radius: 8px;
-            font-family: 'Poppins', sans-serif;
-            font-size: 0.85rem;
-            font-weight: 500;
-            color: #475569;
             cursor: pointer;
+            color: var(--text-muted);
+            padding: 0.2rem;
+            border-radius: 4px;
+            transition: color 0.2s ease, background 0.2s ease;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            transition: background 0.2s ease;
         }
 
-        .vault-header .logout-btn:hover {
-            background: #cbd5e1;
+        .item-card .item-actions button:hover {
+            color: var(--accent);
+            background: var(--accent-light);
         }
 
-        .vault-content {
-            max-width: 1000px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 16px;
-            padding: 2rem;
-            min-height: 400px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #94a3b8;
+        .item-card .item-actions .delete-btn:hover {
+            color: var(--error);
+            background: #fef2f2;
+        }
+
+        .item-card .item-actions .fav-btn.active {
+            color: #f59e0b;
+        }
+
+        /* ---------- EMPTY STATE ---------- */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state iconify-icon {
+            font-size: 3rem;
+            color: var(--border-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
             font-weight: 300;
         }
 
-        @media (max-width: 600px) {
+        /* ---------- MODAL / PANEL ---------- */
+        .panel-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .panel-overlay.active {
+            display: flex;
+        }
+
+        .panel-overlay .panel {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .panel-overlay .panel .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-overlay .panel .panel-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .panel-overlay .panel .panel-header .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: color 0.2s ease;
+        }
+
+        .panel-overlay .panel .panel-header .close-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .panel-overlay .panel .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .panel-overlay .panel .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.2rem;
+        }
+
+        .panel-overlay .panel .form-group input,
+        .panel-overlay .panel .form-group textarea,
+        .panel-overlay .panel .form-group select {
+            width: 100%;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-xs);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--text-primary);
+            background: var(--bg-input);
+            transition: border-color 0.2s ease;
+            outline: none;
+        }
+
+        .panel-overlay .panel .form-group input:focus,
+        .panel-overlay .panel .form-group textarea:focus,
+        .panel-overlay .panel .form-group select:focus {
+            border-color: var(--accent);
+        }
+
+        .panel-overlay .panel .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .panel-overlay .panel .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+
+        .panel-overlay .panel .btn-group {
+            display: flex;
+            gap: 0.8rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .panel-overlay .panel .btn-group .btn {
+            padding: 0.7rem 1.5rem;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            flex: 1;
+            min-width: 100px;
+        }
+
+        .panel-overlay .panel .btn-group .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .panel-overlay .panel .btn-group .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+        .panel-overlay .panel .btn-group .btn-danger {
+            background: var(--error);
+            color: #fff;
+        }
+
+        .panel-overlay .panel .btn-group .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .panel-overlay .panel .btn-group .btn-outline {
+            background: transparent;
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+
+        .panel-overlay .panel .btn-group .btn-outline:hover {
+            background: var(--bg-primary);
+        }
+
+        /* ---------- TOAST ---------- */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            max-width: 360px;
+            width: 100%;
+        }
+
+        .toast {
+            background: var(--bg-card);
+            padding: 0.8rem 1.2rem;
+            border-radius: var(--radius-sm);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            animation: slideIn 0.3s ease;
+            border-left: 4px solid var(--accent);
+        }
+
+        .toast.success {
+            border-left-color: var(--success);
+        }
+
+        .toast.error {
+            border-left-color: var(--error);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning);
+        }
+
+        .toast iconify-icon {
+            font-size: 1.3rem;
+        }
+
+        .toast .toast-text {
+            font-size: 0.85rem;
+            font-weight: 400;
+            color: var(--text-primary);
+            flex: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(40px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 768px) {
             body {
                 padding: 1rem;
             }
-            .vault-header h1 {
-                font-size: 1.2rem;
+
+            .vault-header {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.8rem;
             }
-            .vault-content {
+
+            .vault-header .actions {
+                justify-content: stretch;
+            }
+
+            .vault-header .actions .btn {
+                flex: 1;
+                justify-content: center;
+            }
+
+            .search-section {
+                flex-direction: column;
+            }
+
+            .search-section .filter-tabs {
+                justify-content: center;
+            }
+
+            .stats-bar {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .panel-overlay .panel {
                 padding: 1.5rem;
-                min-height: 300px;
+                margin: 0.5rem;
+            }
+
+            .panel-overlay .panel .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .panel-overlay .panel .btn-group .btn {
+                flex: 1 1 100%;
+            }
+
+            .toast-container {
+                bottom: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .stats-bar {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+
+            .stats-bar .stat {
+                padding: 0.6rem 0.5rem;
+            }
+
+            .stats-bar .stat .number {
+                font-size: 1.1rem;
+            }
+
+            .item-card {
+                flex-wrap: wrap;
+                padding: 0.6rem 0.8rem;
+            }
+
+            .item-card .item-actions {
+                width: 100%;
+                justify-content: flex-end;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== AUTH GUARD (overlay) ===== -->
+    <!-- ===== AUTH GUARD ===== -->
     <div id="authGuard">
         <div class="spinner-ring" id="authSpinner"></div>
         <p id="authStatus">Verifying session ...</p>
@@ -192,48 +772,161 @@
 
     <!-- ===== VAULT CONTENT ===== -->
     <div id="vaultContent">
-        <div class="vault-header">
-            <h1>
-                <iconify-icon icon="mdi:lock-open" style="color:#3b82f6;"></iconify-icon>
-                MK Bertrand · Vault
-            </h1>
-            <button class="logout-btn" id="logoutBtn">
-                <iconify-icon icon="mdi:logout"></iconify-icon>
-                Logout
-            </button>
-        </div>
-        <div class="vault-content">
-            <p style="display:flex;flex-direction:column;align-items:center;gap:0.5rem;">
-                <iconify-icon icon="mdi:database-check" style="font-size:2.5rem;color:#3b82f6;"></iconify-icon>
-                <span>Vault content will appear here.</span>
-                <span style="font-size:0.85rem;color:#94a3b8;">(Full vault UI coming next.)</span>
-            </p>
+
+        <!-- HEADER -->
+        <header class="vault-header">
+            <div class="brand">
+                <iconify-icon icon="mdi:lock-open" style="font-size:1.8rem;color:var(--accent);"></iconify-icon>
+                <h1>MK Bertrand <span class="mono">· vault</span></h1>
+            </div>
+            <div class="actions">
+                <button class="btn btn-primary" id="newItemBtn">
+                    <iconify-icon icon="mdi:plus"></iconify-icon> New
+                </button>
+                <button class="btn btn-outline" id="refreshBtn">
+                    <iconify-icon icon="mdi:refresh"></iconify-icon>
+                </button>
+                <button class="btn btn-danger" id="logoutBtn">
+                    <iconify-icon icon="mdi:logout"></iconify-icon> Logout
+                </button>
+            </div>
+        </header>
+
+        <!-- STATS -->
+        <section class="stats-bar" id="statsBar">
+            <div class="stat">
+                <div class="number" id="totalCount">0</div>
+                <div class="label">Total Items</div>
+            </div>
+            <div class="stat">
+                <div class="number" id="favCount">0</div>
+                <div class="label">Favorites</div>
+            </div>
+            <div class="stat">
+                <div class="number" id="loginCount">0</div>
+                <div class="label">Logins</div>
+            </div>
+            <div class="stat">
+                <div class="number" id="noteCount">0</div>
+                <div class="label">Notes</div>
+            </div>
+        </section>
+
+        <!-- SEARCH + FILTERS -->
+        <section class="search-section">
+            <div class="search-wrapper">
+                <iconify-icon icon="mdi:search"></iconify-icon>
+                <input type="text" id="searchInput" placeholder="Search vault ..." />
+            </div>
+            <div class="filter-tabs" id="filterTabs">
+                <button class="tab active" data-filter="all">All</button>
+                <button class="tab" data-filter="login">Logins</button>
+                <button class="tab" data-filter="note">Notes</button>
+                <button class="tab" data-filter="folder">Folders</button>
+                <button class="tab trash-tab" data-filter="trash">Trash</button>
+            </div>
+        </section>
+
+        <!-- ITEM LIST -->
+        <section class="item-list" id="itemList">
+            <!-- Items rendered dynamically -->
+        </section>
+
+        <!-- FOOTER -->
+        <footer style="margin-top:2rem;padding-top:1rem;border-top:1px solid var(--border-light);display:flex;justify-content:space-between;flex-wrap:wrap;gap:0.5rem;font-size:0.7rem;color:var(--text-muted);font-weight:300;">
+            <span>&copy; <span id="footerYear"></span> · PIReactive · MK Bertrand</span>
+            <span>Encrypted · Secure · Private</span>
+        </footer>
+    </div>
+
+    <!-- ===== MODAL PANEL ===== -->
+    <div class="panel-overlay" id="panelOverlay">
+        <div class="panel" id="panelContent">
+            <!-- Dynamic content rendered by JS -->
         </div>
     </div>
 
+    <!-- ===== TOAST CONTAINER ===== -->
+    <div class="toast-container" id="toastContainer"></div>
+
     <!-- ============================================================ -->
-    <!-- ===== AUTH VALIDATION LOGIC ===== -->
+    <!-- ===== FIREBASE + VAULT LOGIC ===== -->
     <!-- ============================================================ -->
 
-    <script>
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js",
+                "firebase/database": "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
+            }
+        }
+    </script>
+
+    <script type="module">
         // =============================================================
-        // 1. DOM REFS
+        // 1. IMPORTS
+        // =============================================================
+        import { initializeApp } from 'firebase/app';
+        import { getDatabase, ref, onValue, push, set, update, remove } from 'firebase/database';
+
+        // =============================================================
+        // 2. FIREBASE CONFIG
+        // =============================================================
+        const firebaseConfig = {
+            apiKey: 'AIzaSyBbrRHlakmOdKwuDGwYAx5qf-e6DOHW7s0',
+            authDomain: 'joefootball-15e7a.firebaseapp.com',
+            databaseURL: 'https://joefootball-15e7a-default-rtdb.firebaseio.com',
+            projectId: 'joefootball-15e7a',
+            storageBucket: 'joefootball-15e7a.firebasestorage.app',
+            messagingSenderId: '976347287101',
+            appId: '1:976347287101:web:93a93c519fff7e60986454',
+            measurementId: 'G-3Q10KV3HE3'
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+        const itemsRef = ref(database, 'vault-items');
+
+        // =============================================================
+        // 3. CONSTANTS
+        // =============================================================
+        const SESSION_KEY = 'vault_authenticated';
+        const SESSION_TIME_KEY = 'vault_login_time';
+        const SESSION_DURATION_MS = 24 * 60 * 60 * 1000;
+
+        // =============================================================
+        // 4. DOM REFS
         // =============================================================
         const authGuard = document.getElementById('authGuard');
         const authStatus = document.getElementById('authStatus');
         const authSpinner = document.getElementById('authSpinner');
         const vaultContent = document.getElementById('vaultContent');
         const logoutBtn = document.getElementById('logoutBtn');
+        const itemList = document.getElementById('itemList');
+        const searchInput = document.getElementById('searchInput');
+        const filterTabs = document.getElementById('filterTabs');
+        const newItemBtn = document.getElementById('newItemBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const panelOverlay = document.getElementById('panelOverlay');
+        const panelContent = document.getElementById('panelContent');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Stats elements
+        const totalCount = document.getElementById('totalCount');
+        const favCount = document.getElementById('favCount');
+        const loginCount = document.getElementById('loginCount');
+        const noteCount = document.getElementById('noteCount');
 
         // =============================================================
-        // 2. CONSTANTS
+        // 5. STATE
         // =============================================================
-        const SESSION_KEY = 'vault_authenticated';
-        const SESSION_TIME_KEY = 'vault_login_time';
-        const SESSION_DURATION_MS = 24 * 60 * 60 * 1000; // 24 hours
+        let items = [];
+        let currentFilter = 'all';
+        let searchTerm = '';
+        let editingItemId = null;
 
         // =============================================================
-        // 3. AUTH CHECK
+        // 6. AUTH CHECK
         // =============================================================
 
         function checkAuthentication() {
@@ -241,21 +934,12 @@
             const loginTime = parseInt(sessionStorage.getItem(SESSION_TIME_KEY) || '0');
             const now = Date.now();
 
-            // Case 1: No session → not authenticated
-            if (isAuth !== 'true') {
-                showAuthError('No active session found.');
-                return false;
-            }
-
-            // Case 2: Session expired
-            if (now - loginTime > SESSION_DURATION_MS) {
+            if (isAuth !== 'true' || now - loginTime > SESSION_DURATION_MS) {
                 sessionStorage.removeItem(SESSION_KEY);
                 sessionStorage.removeItem(SESSION_TIME_KEY);
-                showAuthError('Your session has expired. Please log in again.');
+                showAuthError('Your session has expired or is invalid.');
                 return false;
             }
-
-            // Case 3: Valid session
             return true;
         }
 
@@ -272,29 +956,25 @@
         }
 
         function grantAccess() {
-            // Hide auth guard, show vault
             authGuard.classList.add('hidden');
             vaultContent.classList.add('visible');
-
-            // Update session timestamp (keep alive)
             sessionStorage.setItem(SESSION_TIME_KEY, Date.now().toString());
+            // Start listening to Firebase
+            listenToItems();
         }
 
         // =============================================================
-        // 4. RUN AUTH CHECK
+        // 7. RUN AUTH
         // =============================================================
 
         setTimeout(() => {
-            const isValid = checkAuthentication();
-
-            if (isValid) {
+            if (checkAuthentication()) {
                 grantAccess();
             }
-            // If invalid, auth guard shows error (already handled)
-        }, 400); // Small delay for smooth transition
+        }, 400);
 
         // =============================================================
-        // 5. LOGOUT
+        // 8. LOGOUT
         // =============================================================
 
         logoutBtn.addEventListener('click', () => {
@@ -304,22 +984,583 @@
         });
 
         // =============================================================
-        // 6. PREVENT BACK/FORWARD NAVIGATION ISSUES
+        // 9. TOAST SYSTEM
         // =============================================================
 
-        // If user navigates back here from vault, re-check
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const iconMap = {
+                info: 'mdi:information',
+                success: 'mdi:check-circle',
+                error: 'mdi:alert-circle',
+                warning: 'mdi:alert'
+            };
+
+            toast.innerHTML = `
+                <iconify-icon icon="${iconMap[type] || 'mdi:information'}"></iconify-icon>
+                <span class="toast-text">${message}</span>
+            `;
+
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(40px)';
+                toast.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        // =============================================================
+        // 10. FIREBASE — READ
+        // =============================================================
+
+        function listenToItems() {
+            onValue(itemsRef, (snapshot) => {
+                const data = snapshot.val();
+                items = data ? Object.entries(data).map(([id, value]) => ({
+                    id,
+                    ...value,
+                    createdAt: value.createdAt || Date.now()
+                })) : [];
+                render();
+            }, (error) => {
+                console.error('Firebase read error:', error);
+                showToast('Error loading vault data.', 'error');
+            });
+        }
+
+        // =============================================================
+        // 11. RENDER
+        // =============================================================
+
+        function render() {
+            updateStats();
+            const filtered = getFilteredItems();
+            renderItems(filtered);
+        }
+
+        function updateStats() {
+            const active = items.filter(i => !i.trash);
+            const favorites = active.filter(i => i.favorite);
+            const logins = active.filter(i => i.type === 'login');
+            const notes = active.filter(i => i.type === 'note');
+
+            totalCount.textContent = active.length;
+            favCount.textContent = favorites.length;
+            loginCount.textContent = logins.length;
+            noteCount.textContent = notes.length;
+        }
+
+        function getFilteredItems() {
+            let filtered = items;
+
+            // Filter by trash/view
+            if (currentFilter === 'trash') {
+                filtered = filtered.filter(i => i.trash === true);
+            } else {
+                filtered = filtered.filter(i => !i.trash);
+            }
+
+            // Filter by type
+            if (currentFilter !== 'all' && currentFilter !== 'trash') {
+                filtered = filtered.filter(i => i.type === currentFilter);
+            }
+
+            // Search
+            if (searchTerm.trim()) {
+                const term = searchTerm.toLowerCase().trim();
+                filtered = filtered.filter(i =>
+                    (i.title && i.title.toLowerCase().includes(term)) ||
+                    (i.username && i.username.toLowerCase().includes(term)) ||
+                    (i.content && i.content.toLowerCase().includes(term)) ||
+                    (i.url && i.url.toLowerCase().includes(term))
+                );
+            }
+
+            // Sort: newest first
+            return filtered.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+        }
+
+        function renderItems(filtered) {
+            if (filtered.length === 0) {
+                itemList.innerHTML = `
+                    <div class="empty-state">
+                        <iconify-icon icon="mdi:inbox-outline"></iconify-icon>
+                        <h3>Nothing here yet</h3>
+                        <p>${currentFilter === 'trash' ? 'Trash is empty.' : 'Create your first item with the "New" button.'}</p>
+                    </div>
+                `;
+                return;
+            }
+
+            itemList.innerHTML = filtered.map(item => `
+                <div class="item-card" data-id="${item.id}">
+                    <span class="item-icon">${getIcon(item)}</span>
+                    <div class="item-info">
+                        <div class="title">
+                            ${item.title || 'Untitled'}
+                            ${item.archived ? '<span class="badge">archived</span>' : ''}
+                            ${item.trash ? '<span class="badge" style="background:#fef2f2;color:#ef4444;">deleted</span>' : ''}
+                        </div>
+                        <div class="sub">${getSubtitle(item)}</div>
+                    </div>
+                    <div class="item-actions">
+                        <button class="fav-btn ${item.favorite ? 'active' : ''}" data-action="fav" title="Toggle favorite">
+                            <iconify-icon icon="${item.favorite ? 'mdi:star' : 'mdi:star-outline'}"></iconify-icon>
+                        </button>
+                        ${!item.trash ? `
+                            <button data-action="edit" title="Edit">
+                                <iconify-icon icon="mdi:pencil"></iconify-icon>
+                            </button>
+                            <button class="delete-btn" data-action="trash" title="Move to trash">
+                                <iconify-icon icon="mdi:delete-outline"></iconify-icon>
+                            </button>
+                        ` : `
+                            <button data-action="restore" title="Restore">
+                                <iconify-icon icon="mdi:restore"></iconify-icon>
+                            </button>
+                            <button class="delete-btn" data-action="delete" title="Delete permanently">
+                                <iconify-icon icon="mdi:delete"></iconify-icon>
+                            </button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+
+            // Attach event listeners to cards
+            document.querySelectorAll('.item-card').forEach(card => {
+                const id = card.dataset.id;
+
+                // Click on card → open edit
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.item-actions')) return;
+                    openEditPanel(id);
+                });
+
+                // Action buttons
+                card.querySelectorAll('[data-action]').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const action = btn.dataset.action;
+                        handleItemAction(id, action);
+                    });
+                });
+            });
+        }
+
+        function getIcon(item) {
+            const map = {
+                login: 'mdi:key',
+                note: 'mdi:note-text',
+                folder: 'mdi:folder',
+                project: 'mdi:folder-open'
+            };
+            return map[item.type] || 'mdi:file';
+        }
+
+        function getSubtitle(item) {
+            const parts = [];
+            if (item.type) parts.push(item.type);
+            if (item.username) parts.push(item.username);
+            if (item.url) parts.push(item.url.replace(/^https?:\/\//, ''));
+            if (item.folder) parts.push(`📁 ${item.folder}`);
+            if (item.content) {
+                const preview = item.content.length > 30 ? item.content.slice(0, 30) + '…' : item.content;
+                parts.push(preview);
+            }
+            return parts.join(' · ') || 'No details';
+        }
+
+        // =============================================================
+        // 12. ITEM ACTIONS
+        // =============================================================
+
+        function handleItemAction(id, action) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            switch (action) {
+                case 'fav':
+                    toggleFavorite(id, item);
+                    break;
+                case 'edit':
+                    openEditPanel(id);
+                    break;
+                case 'trash':
+                    moveToTrash(id);
+                    break;
+                case 'restore':
+                    restoreItem(id);
+                    break;
+                case 'delete':
+                    deletePermanently(id);
+                    break;
+            }
+        }
+
+        function toggleFavorite(id, item) {
+            const newVal = !item.favorite;
+            update(ref(database, `vault-items/${id}`), { favorite: newVal });
+            showToast(newVal ? 'Added to favorites' : 'Removed from favorites', 'success');
+        }
+
+        function moveToTrash(id) {
+            if (confirm('Move this item to trash?')) {
+                update(ref(database, `vault-items/${id}`), { trash: true, trashedAt: Date.now() });
+                showToast('Moved to trash', 'warning');
+            }
+        }
+
+        function restoreItem(id) {
+            update(ref(database, `vault-items/${id}`), { trash: false, trashedAt: null });
+            showToast('Restored from trash', 'success');
+        }
+
+        function deletePermanently(id) {
+            if (confirm('Permanently delete this item? This cannot be undone.')) {
+                remove(ref(database, `vault-items/${id}`));
+                showToast('Permanently deleted', 'error');
+            }
+        }
+
+        // =============================================================
+        // 13. PANEL: CREATE / EDIT
+        // =============================================================
+
+        function openCreatePanel() {
+            editingItemId = null;
+            panelContent.innerHTML = `
+                <div class="panel-header">
+                    <h2>Create New Item</h2>
+                    <button class="close-btn" id="closePanelBtn">✕</button>
+                </div>
+                <form id="itemForm">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="itemType" required>
+                            <option value="login">Login</option>
+                            <option value="note">Note</option>
+                            <option value="folder">Folder</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="itemTitle" placeholder="Enter title" required />
+                    </div>
+                    <div class="form-group" id="loginFields">
+                        <label>Username</label>
+                        <input type="text" id="itemUsername" placeholder="Username" />
+                        <label style="margin-top:0.5rem;">Password</label>
+                        <input type="password" id="itemPassword" placeholder="Password" />
+                        <label style="margin-top:0.5rem;">URL</label>
+                        <input type="url" id="itemUrl" placeholder="https://example.com" />
+                    </div>
+                    <div class="form-group" id="noteFields" style="display:none;">
+                        <label>Content</label>
+                        <textarea id="itemContent" placeholder="Write your note ..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Folder (optional)</label>
+                        <input type="text" id="itemFolder" placeholder="Folder name" />
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Create</button>
+                        <button type="button" class="btn btn-outline" id="cancelPanelBtn">Cancel</button>
+                    </div>
+                </form>
+            `;
+
+            panelOverlay.classList.add('active');
+
+            // Toggle fields based on type
+            const typeSelect = document.getElementById('itemType');
+            const loginFields = document.getElementById('loginFields');
+            const noteFields = document.getElementById('noteFields');
+
+            typeSelect.addEventListener('change', () => {
+                if (typeSelect.value === 'login') {
+                    loginFields.style.display = 'block';
+                    noteFields.style.display = 'none';
+                } else if (typeSelect.value === 'note') {
+                    loginFields.style.display = 'none';
+                    noteFields.style.display = 'block';
+                } else {
+                    loginFields.style.display = 'none';
+                    noteFields.style.display = 'none';
+                }
+            });
+
+            // Form submit
+            document.getElementById('itemForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                createItem();
+            });
+
+            // Close
+            document.getElementById('closePanelBtn').addEventListener('click', closePanel);
+            document.getElementById('cancelPanelBtn').addEventListener('click', closePanel);
+        }
+
+        function openEditPanel(id) {
+            const item = items.find(i => i.id === id);
+            if (!item) return;
+
+            editingItemId = id;
+            panelContent.innerHTML = `
+                <div class="panel-header">
+                    <h2>Edit Item</h2>
+                    <button class="close-btn" id="closePanelBtn">✕</button>
+                </div>
+                <form id="itemForm">
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="itemType" required>
+                            <option value="login" ${item.type === 'login' ? 'selected' : ''}>Login</option>
+                            <option value="note" ${item.type === 'note' ? 'selected' : ''}>Note</option>
+                            <option value="folder" ${item.type === 'folder' ? 'selected' : ''}>Folder</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Title</label>
+                        <input type="text" id="itemTitle" value="${item.title || ''}" required />
+                    </div>
+                    <div class="form-group" id="loginFields" style="${item.type === 'login' ? 'display:block;' : 'display:none;'}">
+                        <label>Username</label>
+                        <input type="text" id="itemUsername" value="${item.username || ''}" />
+                        <label style="margin-top:0.5rem;">Password</label>
+                        <input type="password" id="itemPassword" value="${item.password || ''}" />
+                        <label style="margin-top:0.5rem;">URL</label>
+                        <input type="url" id="itemUrl" value="${item.url || ''}" />
+                    </div>
+                    <div class="form-group" id="noteFields" style="${item.type === 'note' ? 'display:block;' : 'display:none;'}">
+                        <label>Content</label>
+                        <textarea id="itemContent">${item.content || ''}</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Folder (optional)</label>
+                        <input type="text" id="itemFolder" value="${item.folder || ''}" />
+                    </div>
+                    <div class="btn-group">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                        <button type="button" class="btn btn-danger" id="deleteFromPanelBtn">Delete</button>
+                        <button type="button" class="btn btn-outline" id="cancelPanelBtn">Cancel</button>
+                    </div>
+                </form>
+            `;
+
+            panelOverlay.classList.add('active');
+
+            const typeSelect = document.getElementById('itemType');
+            const loginFields = document.getElementById('loginFields');
+            const noteFields = document.getElementById('noteFields');
+
+            typeSelect.addEventListener('change', () => {
+                if (typeSelect.value === 'login') {
+                    loginFields.style.display = 'block';
+                    noteFields.style.display = 'none';
+                } else if (typeSelect.value === 'note') {
+                    loginFields.style.display = 'none';
+                    noteFields.style.display = 'block';
+                } else {
+                    loginFields.style.display = 'none';
+                    noteFields.style.display = 'none';
+                }
+            });
+
+            document.getElementById('itemForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                updateItem(id);
+            });
+
+            document.getElementById('deleteFromPanelBtn').addEventListener('click', () => {
+                if (confirm('Delete this item?')) {
+                    moveToTrash(id);
+                    closePanel();
+                }
+            });
+
+            document.getElementById('closePanelBtn').addEventListener('click', closePanel);
+            document.getElementById('cancelPanelBtn').addEventListener('click', closePanel);
+        }
+
+        function closePanel() {
+            panelOverlay.classList.remove('active');
+            editingItemId = null;
+        }
+
+        // =============================================================
+        // 14. CREATE / UPDATE ITEMS
+        // =============================================================
+
+        function createItem() {
+            const type = document.getElementById('itemType').value;
+            const title = document.getElementById('itemTitle').value.trim();
+            const folder = document.getElementById('itemFolder').value.trim() || null;
+
+            if (!title) {
+                showToast('Title is required.', 'warning');
+                return;
+            }
+
+            const newItem = {
+                type,
+                title,
+                folder,
+                favorite: false,
+                trash: false,
+                createdAt: Date.now()
+            };
+
+            if (type === 'login') {
+                newItem.username = document.getElementById('itemUsername').value.trim() || '';
+                newItem.password = document.getElementById('itemPassword').value.trim() || '';
+                newItem.url = document.getElementById('itemUrl').value.trim() || '';
+            } else if (type === 'note') {
+                newItem.content = document.getElementById('itemContent').value.trim() || '';
+            }
+
+            const newRef = push(itemsRef);
+            set(newRef, newItem);
+            showToast('Item created successfully!', 'success');
+            closePanel();
+        }
+
+        function updateItem(id) {
+            const type = document.getElementById('itemType').value;
+            const title = document.getElementById('itemTitle').value.trim();
+            const folder = document.getElementById('itemFolder').value.trim() || null;
+
+            if (!title) {
+                showToast('Title is required.', 'warning');
+                return;
+            }
+
+            const updates = {
+                type,
+                title,
+                folder
+            };
+
+            if (type === 'login') {
+                updates.username = document.getElementById('itemUsername').value.trim() || '';
+                updates.password = document.getElementById('itemPassword').value.trim() || '';
+                updates.url = document.getElementById('itemUrl').value.trim() || '';
+                // Remove content if switching from note
+                updates.content = null;
+            } else if (type === 'note') {
+                updates.content = document.getElementById('itemContent').value.trim() || '';
+                // Remove login fields if switching
+                updates.username = null;
+                updates.password = null;
+                updates.url = null;
+            } else {
+                updates.username = null;
+                updates.password = null;
+                updates.url = null;
+                updates.content = null;
+            }
+
+            update(ref(database, `vault-items/${id}`), updates);
+            showToast('Item updated successfully!', 'success');
+            closePanel();
+        }
+
+        // =============================================================
+        // 15. SEARCH + FILTERS
+        // =============================================================
+
+        searchInput.addEventListener('input', (e) => {
+            searchTerm = e.target.value;
+            render();
+        });
+
+        filterTabs.addEventListener('click', (e) => {
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            currentFilter = tab.dataset.filter;
+            render();
+        });
+
+        // =============================================================
+        // 16. NEW ITEM BUTTON
+        // =============================================================
+
+        newItemBtn.addEventListener('click', openCreatePanel);
+
+        // =============================================================
+        // 17. REFRESH
+        // =============================================================
+
+        refreshBtn.addEventListener('click', () => {
+            showToast('Refreshing ...', 'info');
+            // Firebase will trigger re-render via onValue
+        });
+
+        // =============================================================
+        // 18. FOOTER YEAR
+        // =============================================================
+
+        document.getElementById('footerYear').textContent = new Date().getFullYear();
+
+        // =============================================================
+        // 19. KEYBOARD SHORTCUTS
+        // =============================================================
+
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+N or Cmd+N → New item
+            if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+                e.preventDefault();
+                openCreatePanel();
+            }
+            // Escape → Close panel
+            if (e.key === 'Escape' && panelOverlay.classList.contains('active')) {
+                closePanel();
+            }
+            // Ctrl+F or / → Focus search
+            if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+            if (e.key === '/' && !e.ctrlKey && !e.metaKey && !e.target.closest('input, textarea')) {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+
+        // =============================================================
+        // 20. CONSOLE
+        // =============================================================
+
+        console.log('🔐 Vault dashboard fully loaded.');
+        console.log(`📦 ${items.length} items loaded.`);
+
+        // Prevent back navigation from breaking session
         window.addEventListener('pageshow', (event) => {
             if (event.persisted) {
-                // Page was loaded from cache (back button)
-                const isValid = checkAuthentication();
-                if (isValid) {
-                    grantAccess();
+                if (!checkAuthentication()) {
+                    window.location.href = 'index.html';
                 }
             }
         });
 
-        console.log('🔐 Vault dashboard loaded — auth check complete.');
-    </script>
+        // Click outside panel to close
+        panelOverlay.addEventListener('click', (e) => {
+            if (e.target === panelOverlay) {
+                closePanel();
+            }
+        });
 
+        // =============================================================
+        // 21. EXPOSE TO GLOBAL (for debugging)
+        // =============================================================
+        window.__VAULT = { items, database, itemsRef, showToast };
+    </script>
 </body>
 </html>
