@@ -5,12 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
     <title>Vault · Dashboard</title>
 
-    <!-- ===== FONTS ===== -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
 
-    <!-- ===== ICONIFY ===== -->
     <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
 
     <style>
@@ -45,8 +43,6 @@
             --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.10);
             --transition: 0.2s ease;
             --header-bg: #2395ed;
-            --header-bg-scrolled: #1180d6;
-            --yellow-light: #fff9e6;
             --yellow-box: #fef3c7;
             --sidebar-width: 30%;
         }
@@ -92,16 +88,29 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
         #authGuard p {
             font-size: 0.9rem;
             color: var(--text-secondary);
             font-weight: 300;
         }
-        #authGuard .error-icon { font-size: 3rem; color: var(--error); }
-        #authGuard .error-text { font-size: 1rem; color: var(--text-primary); font-weight: 500; }
-        #authGuard .error-sub { font-size: 0.85rem; color: var(--text-secondary); font-weight: 300; }
+        #authGuard .error-icon {
+            font-size: 3rem;
+            color: var(--error);
+        }
+        #authGuard .error-text {
+            font-size: 1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        #authGuard .error-sub {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
         #authGuard .redirect-btn {
             margin-top: 0.5rem;
             padding: 0.7rem 2rem;
@@ -135,7 +144,7 @@
         }
 
         /* ============================================================ */
-        /* ===== HERO SECTION ===== */
+        /* ===== HERO ===== */
         /* ============================================================ */
         .hero {
             position: relative;
@@ -169,17 +178,17 @@
             font-weight: 700;
             letter-spacing: -0.02em;
             margin-bottom: 0.25rem;
-            text-shadow: 0 2px 8px rgba(0,0,0,0.3);
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         .hero-content p {
             font-size: 0.95rem;
             font-weight: 300;
             opacity: 0.9;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.3);
+            text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
         }
 
         /* ============================================================ */
-        /* ===== HEADER (Start.me style) ===== */
+        /* ===== HEADER ===== */
         /* ============================================================ */
         .vault-header {
             position: sticky;
@@ -197,7 +206,6 @@
             color: #fff;
             box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
         }
-
         .vault-header .brand {
             display: flex;
             align-items: center;
@@ -231,7 +239,6 @@
             border-radius: 20px;
             margin-left: 4px;
         }
-
         .vault-header .actions {
             display: flex;
             align-items: center;
@@ -270,7 +277,7 @@
         }
 
         /* ============================================================ */
-        /* ===== MAIN LAYOUT (sidebar + right area) ===== */
+        /* ===== LAYOUT ===== */
         /* ============================================================ */
         .dashboard-layout {
             display: flex;
@@ -278,15 +285,11 @@
             margin-top: 16px;
             min-height: 600px;
         }
-
-        /* ---------- SIDEBAR (Credential Widget) ---------- */
         .sidebar {
             flex: 0 0 var(--sidebar-width);
             min-width: 260px;
             max-width: 380px;
         }
-
-        /* ---------- RIGHT AREA ---------- */
         .main-area {
             flex: 1;
             display: flex;
@@ -295,7 +298,9 @@
             min-width: 0;
         }
 
-        /* ---------- WIDGET COMMON ---------- */
+        /* ============================================================ */
+        /* ===== WIDGET COMMON ===== */
+        /* ============================================================ */
         .widget {
             background: var(--bg-card);
             border-radius: var(--radius-sm);
@@ -305,7 +310,6 @@
             display: flex;
             flex-direction: column;
         }
-
         .widget-header {
             padding: 10px 14px;
             background: var(--bg-primary);
@@ -394,8 +398,15 @@
             color: var(--text-muted);
             margin-left: 2px;
         }
+        .widget-header .widget-controls label {
+            font-size: 0.8rem;
+            font-weight: 400;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
 
-        /* Recents below header */
         .widget-recents {
             padding: 4px 12px 6px;
             background: var(--bg-primary);
@@ -446,7 +457,9 @@
             border-radius: 10px;
         }
 
-        /* ---------- CREDENTIALS WIDGET (sidebar) ---------- */
+        /* ============================================================ */
+        /* ===== CREDENTIALS ===== */
+        /* ============================================================ */
         .credential-groups {
             display: flex;
             flex-direction: column;
@@ -584,47 +597,63 @@
             background: var(--accent-light);
         }
 
-        /* ---------- BOOKMARK WIDGET (full width) ---------- */
-        .bookmark-grid {
+        /* ============================================================ */
+        /* ===== BOOKMARKS ===== */
+        /* ============================================================ */
+        .bookmark-carousel {
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        .bookmark-track {
+            display: flex;
+            transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            will-change: transform;
+        }
+        .bookmark-page {
+            flex: 0 0 100%;
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 6px;
             padding: 4px 0;
         }
         .bookmark-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 6px;
+            padding: 6px 4px;
             border-radius: var(--radius-sm);
             border: 1px solid var(--border-light);
             background: var(--bg-card);
-            transition: border-color 0.2s, background 0.2s;
+            transition: border-color 0.2s, background 0.2s, transform 0.15s;
             cursor: pointer;
             position: relative;
             text-align: center;
+            min-height: 60px;
+            justify-content: center;
         }
         .bookmark-item:hover {
             border-color: var(--accent-light);
             background: var(--accent-light);
+            transform: scale(1.02);
         }
         .bookmark-item .bookmark-checkbox {
             position: absolute;
-            top: 4px;
-            left: 4px;
+            top: 2px;
+            left: 2px;
             display: none;
         }
         .bookmark-item .bookmark-checkbox.show {
             display: block;
         }
         .bookmark-item .favicon {
-            width: 32px;
-            height: 32px;
+            width: 24px;
+            height: 24px;
             object-fit: contain;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
         }
         .bookmark-item .b-title {
-            font-size: 0.7rem;
+            font-size: 0.6rem;
             font-weight: 500;
             max-width: 60px;
             overflow: hidden;
@@ -636,33 +665,43 @@
             padding: 0 2px;
             border-radius: 2px;
         }
-        .bookmark-pagination {
+
+        .bookmark-nav {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
+            gap: 16px;
             padding: 8px 0 4px;
             font-size: 0.8rem;
             color: var(--text-secondary);
         }
-        .bookmark-pagination button {
-            background: none;
+        .bookmark-nav button {
+            background: var(--bg-card);
             border: 1px solid var(--border-light);
             border-radius: var(--radius-sm);
-            padding: 2px 10px;
+            padding: 4px 14px;
             cursor: pointer;
-            font-size: 0.8rem;
-            transition: background 0.2s;
+            font-size: 0.9rem;
+            transition: background 0.2s, box-shadow 0.2s;
+            color: var(--text-primary);
         }
-        .bookmark-pagination button:hover {
-            background: var(--bg-primary);
+        .bookmark-nav button:hover:not(:disabled) {
+            background: var(--accent-light);
+            box-shadow: var(--shadow-sm);
         }
-        .bookmark-pagination button:disabled {
-            opacity: 0.4;
-            pointer-events: none;
+        .bookmark-nav button:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+        .bookmark-nav .page-info {
+            font-weight: 500;
+            min-width: 50px;
+            text-align: center;
         }
 
-        /* ---------- NOTES WIDGET (grid) ---------- */
+        /* ============================================================ */
+        /* ===== NOTES ===== */
+        /* ============================================================ */
         .notes-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
@@ -677,7 +716,7 @@
             color: #1a1a1a;
             cursor: pointer;
             transition: transform 0.15s, box-shadow 0.15s;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             min-height: 60px;
             display: flex;
             align-items: center;
@@ -690,7 +729,9 @@
             box-shadow: var(--shadow-sm);
         }
 
-        /* ---------- PROJECTS WIDGET (list) ---------- */
+        /* ============================================================ */
+        /* ===== PROJECTS ===== */
+        /* ============================================================ */
         .project-list {
             display: flex;
             flex-direction: column;
@@ -710,14 +751,110 @@
             border-bottom: none;
         }
 
-        /* ---------- CUSTOM MODAL / POPUP ---------- */
+        /* ============================================================ */
+        /* ===== BOOKMARK FORM (inside widget) ===== */
+        /* ============================================================ */
+        .bookmark-form {
+            padding: 12px 14px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-light);
+            display: none;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .bookmark-form.show {
+            display: flex;
+        }
+        .bookmark-form .form-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .bookmark-form .form-row label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            min-width: 60px;
+        }
+        .bookmark-form .form-row input,
+        .bookmark-form .form-row select {
+            flex: 1;
+            padding: 5px 8px;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            background: var(--bg-card);
+            outline: none;
+            transition: border-color 0.2s;
+            min-width: 120px;
+        }
+        .bookmark-form .form-row input:focus,
+        .bookmark-form .form-row select:focus {
+            border-color: var(--accent);
+        }
+        .bookmark-form .form-row .status-text {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .bookmark-form .form-row .status-text .spinner-small {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border-light);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+        .bookmark-form .form-row .status-text .spinner-small.active {
+            display: inline-block;
+        }
+        .bookmark-form .form-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            padding-top: 4px;
+        }
+        .bookmark-form .form-actions .btn {
+            padding: 5px 14px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .bookmark-form .form-actions .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .bookmark-form .form-actions .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+        .bookmark-form .form-actions .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-light);
+        }
+        .bookmark-form .form-actions .btn-secondary:hover {
+            background: var(--bg-primary);
+        }
+
+        /* ============================================================ */
+        /* ===== MODAL ===== */
+        /* ============================================================ */
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.4);
+            background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(4px);
             z-index: 10000;
             display: none;
@@ -738,8 +875,14 @@
             animation: modalSlide 0.25s ease;
         }
         @keyframes modalSlide {
-            from { transform: scale(0.95) translateY(10px); opacity: 0; }
-            to { transform: scale(1) translateY(0); opacity: 1; }
+            from {
+                transform: scale(0.95) translateY(10px);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1) translateY(0);
+                opacity: 1;
+            }
         }
         .modal-box .modal-title {
             font-size: 1.1rem;
@@ -812,7 +955,9 @@
             background: #b91c1c;
         }
 
-        /* ---------- RESPONSIVE ---------- */
+        /* ============================================================ */
+        /* ===== RESPONSIVE ===== */
+        /* ============================================================ */
         @media (max-width: 992px) {
             .dashboard-layout {
                 flex-direction: column;
@@ -822,24 +967,33 @@
                 max-width: none;
                 width: 100%;
             }
-            .bookmark-grid {
-                grid-template-columns: repeat(4, 1fr);
+            .bookmark-page {
+                grid-template-columns: repeat(6, 1fr);
             }
         }
         @media (max-width: 768px) {
-            /* Redirect to mobile version, but we'll handle with JS */
-            .hero { height: 100px; }
-            .hero-content h1 { font-size: 1.2rem; }
-            .hero-content p { font-size: 0.8rem; }
+            .hero {
+                height: 100px;
+            }
+            .hero-content h1 {
+                font-size: 1.2rem;
+            }
+            .hero-content p {
+                font-size: 0.8rem;
+            }
             .vault-header {
                 flex-wrap: wrap;
                 height: auto;
                 padding: 8px 12px;
             }
-            .vault-header .brand { flex: 0 0 auto; }
-            .vault-header .actions { flex: 0 0 auto; }
-            .bookmark-grid {
-                grid-template-columns: repeat(3, 1fr);
+            .vault-header .brand {
+                flex: 0 0 auto;
+            }
+            .vault-header .actions {
+                flex: 0 0 auto;
+            }
+            .bookmark-page {
+                grid-template-columns: repeat(4, 1fr);
             }
             .notes-grid {
                 grid-template-columns: repeat(2, 1fr);
@@ -852,11 +1006,18 @@
             }
         }
         @media (max-width: 480px) {
-            .bookmark-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .bookmark-page {
+                grid-template-columns: repeat(3, 1fr);
             }
             .notes-grid {
                 grid-template-columns: 1fr;
+            }
+            .widget-header .widget-controls {
+                gap: 4px;
+            }
+            .widget-header .widget-controls .search-box input {
+                width: 50px;
+                font-size: 0.7rem;
             }
         }
     </style>
@@ -872,7 +1033,7 @@
     <!-- ===== VAULT CONTENT ===== -->
     <div id="vaultContent">
 
-        <!-- ===== HERO SECTION ===== -->
+        <!-- ===== HERO ===== -->
         <section class="hero" style="background-image: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&h=300&fit=crop&crop=center');">
             <div class="hero-content">
                 <h1>Welcome back, Bertrand</h1>
@@ -898,7 +1059,7 @@
         <!-- ===== DASHBOARD LAYOUT ===== -->
         <div class="dashboard-layout">
 
-            <!-- ===== SIDEBAR: CREDENTIALS WIDGET ===== -->
+            <!-- ===== SIDEBAR: CREDENTIALS ===== -->
             <aside class="sidebar">
                 <div class="widget" id="credentialWidget">
                     <div class="widget-header">
@@ -907,7 +1068,7 @@
                             Credentials
                         </div>
                         <div class="widget-controls">
-                            <label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;font-weight:400;cursor:pointer;">
+                            <label>
                                 <input type="checkbox" id="credSelectToggle" /> Select
                             </label>
                             <div class="search-box">
@@ -936,7 +1097,7 @@
             <!-- ===== MAIN AREA ===== -->
             <div class="main-area">
 
-                <!-- ===== BOOKMARK WIDGET (top row) ===== -->
+                <!-- ===== BOOKMARK WIDGET ===== -->
                 <div class="widget" id="bookmarkWidget">
                     <div class="widget-header">
                         <div class="widget-title">
@@ -944,7 +1105,7 @@
                             Bookmarks
                         </div>
                         <div class="widget-controls">
-                            <label style="display:flex;align-items:center;gap:4px;font-size:0.8rem;font-weight:400;cursor:pointer;">
+                            <label>
                                 <input type="checkbox" id="bookSelectToggle" /> Select
                             </label>
                             <div class="search-box">
@@ -955,15 +1116,48 @@
                             <button class="btn-icon primary" id="bookAddLink">+Link</button>
                         </div>
                     </div>
+
+                    <!-- Bookmark Form -->
+                    <div class="bookmark-form" id="bookmarkForm">
+                        <div class="form-row">
+                            <label>URL</label>
+                            <input type="url" id="bookUrlInput" placeholder="https://example.com" />
+                            <span class="status-text" id="bookFetchStatus">
+                                <span class="spinner-small" id="bookFetchSpinner"></span>
+                                <span id="bookFetchMsg">Ready</span>
+                            </span>
+                        </div>
+                        <div class="form-row">
+                            <label>Title</label>
+                            <input type="text" id="bookTitleInput" placeholder="Page title" />
+                        </div>
+                        <div class="form-row">
+                            <label>Description</label>
+                            <input type="text" id="bookDescInput" placeholder="Short description" />
+                        </div>
+                        <div class="form-row">
+                            <label>Category</label>
+                            <select id="bookCategorySelect"></select>
+                            <button class="btn-icon primary" id="bookAddCategoryBtn">+</button>
+                        </div>
+                        <div class="form-actions">
+                            <button class="btn btn-secondary" id="bookFormCancel">Cancel</button>
+                            <button class="btn btn-primary" id="bookFormSave">Save</button>
+                        </div>
+                    </div>
+
                     <div class="widget-recents" id="bookRecent">
                         <span class="recent-label">Recent</span>
                         <span id="bookRecentItems"></span>
                     </div>
+
                     <div class="widget-body" id="bookBody">
-                        <div class="bookmark-grid" id="bookGrid"></div>
-                        <div class="bookmark-pagination" id="bookPagination">
+                        <div class="bookmark-carousel" id="bookCarousel">
+                            <div class="bookmark-track" id="bookTrack"></div>
+                        </div>
+                        <div class="bookmark-nav" id="bookNav">
                             <button id="bookPrev"><</button>
-                            <span id="bookPageInfo">1 / 1</span>
+                            <span class="page-info" id="bookPageInfo">1 / 1</span>
                             <button id="bookNext">></button>
                         </div>
                         <div class="multi-select-actions" id="bookMultiActions">
@@ -973,10 +1167,10 @@
                     </div>
                 </div>
 
-                <!-- ===== BOTTOM ROW: NOTES + PROJECTS ===== -->
+                <!-- ===== BOTTOM ROW ===== -->
                 <div style="display:flex; gap:20px; flex:1; min-height:0;">
 
-                    <!-- NOTES WIDGET (70%) -->
+                    <!-- NOTES (70%) -->
                     <div class="widget" id="noteWidget" style="flex: 7;">
                         <div class="widget-header">
                             <div class="widget-title">
@@ -984,6 +1178,14 @@
                                 Notes
                             </div>
                             <div class="widget-controls">
+                                <label>
+                                    <input type="checkbox" id="noteSelectToggle" /> Select
+                                </label>
+                                <div class="search-box">
+                                    <iconify-icon icon="mdi:search"></iconify-icon>
+                                    <input type="text" id="noteSearch" placeholder="Search..." />
+                                    <span class="match-count" id="noteMatchCount"></span>
+                                </div>
                                 <button class="btn-icon primary" id="noteAdd">+Note</button>
                             </div>
                         </div>
@@ -996,7 +1198,7 @@
                         </div>
                     </div>
 
-                    <!-- PROJECTS WIDGET (30%) -->
+                    <!-- PROJECTS (30%) -->
                     <div class="widget" id="projectWidget" style="flex: 3;">
                         <div class="widget-header">
                             <div class="widget-title">
@@ -1004,6 +1206,11 @@
                                 Projects
                             </div>
                             <div class="widget-controls">
+                                <div class="search-box">
+                                    <iconify-icon icon="mdi:search"></iconify-icon>
+                                    <input type="text" id="projectSearch" placeholder="Search..." />
+                                    <span class="match-count" id="projectMatchCount"></span>
+                                </div>
                                 <button class="btn-icon primary" id="projectAdd">+Project</button>
                             </div>
                         </div>
@@ -1030,7 +1237,7 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- ===== CUSTOM MODAL (popup) ===== -->
+    <!-- ===== MODAL ===== -->
     <!-- ============================================================ -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box" id="modalBox">
@@ -1088,11 +1295,8 @@
         const vaultContent = document.getElementById('vaultContent');
 
         // Mobile redirect
-        const isMobile = window.innerWidth < 768;
-        if (isMobile) {
-            // Redirect to vaultp.html
+        if (window.innerWidth < 768) {
             window.location.replace('vaultp.html');
-            // Stop execution
             throw new Error('Redirecting to mobile version.');
         }
 
@@ -1141,9 +1345,8 @@
         document.getElementById('footerYear').textContent = new Date().getFullYear();
 
         // =============================================================
-        // 3. MODAL / POPUP SYSTEM
+        // 3. MODAL SYSTEM
         // =============================================================
-
         const modalOverlay = document.getElementById('modalOverlay');
         const modalTitle = document.getElementById('modalTitle');
         const modalBody = document.getElementById('modalBody');
@@ -1160,17 +1363,14 @@
             modalOverlay.classList.remove('active');
         }
 
-        // Close on overlay click
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) closeModal();
         });
 
-        // Simple prompt replacement
         function customPrompt(title, label, defaultValue = '', inputType = 'text', options = null) {
             return new Promise((resolve) => {
                 let bodyHTML = `<label>${label}</label>`;
                 if (options) {
-                    // Select dropdown
                     bodyHTML += `<select id="modalSelect">${options.map(opt => `<option value="${opt}">${opt}</option>`).join('')}</select>`;
                 } else {
                     bodyHTML += `<input type="${inputType}" id="modalInput" value="${defaultValue}" />`;
@@ -1182,10 +1382,8 @@
                 showModal(title, bodyHTML, actionsHTML);
                 const input = document.getElementById('modalInput');
                 const select = document.getElementById('modalSelect');
-                if (input) {
-                    input.focus();
-                    input.select();
-                }
+                if (input) { input.focus();
+                    input.select(); }
                 const confirmBtn = modalActions.querySelector('[data-action="confirm"]');
                 const cancelBtn = modalActions.querySelector('[data-action="cancel"]');
                 const handleConfirm = () => {
@@ -1199,18 +1397,14 @@
                 };
                 confirmBtn.addEventListener('click', handleConfirm);
                 cancelBtn.addEventListener('click', handleCancel);
-                // Enter key
-                const onKey = (e) => {
+                document.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter') handleConfirm();
                     if (e.key === 'Escape') handleCancel();
-                };
-                document.addEventListener('keydown', onKey, { once: true });
-                // Also handle if input exists
+                }, { once: true });
                 if (input) input.addEventListener('keydown', (e) => { if (e.key === 'Enter') handleConfirm(); });
             });
         }
 
-        // Confirm dialog
         function customConfirm(message) {
             return new Promise((resolve) => {
                 const bodyHTML = `<p>${message}</p>`;
@@ -1221,12 +1415,10 @@
                 showModal('Confirm', bodyHTML, actionsHTML);
                 const confirmBtn = modalActions.querySelector('[data-action="confirm"]');
                 const cancelBtn = modalActions.querySelector('[data-action="cancel"]');
-                const handle = (result) => {
-                    closeModal();
-                    resolve(result);
-                };
-                confirmBtn.addEventListener('click', () => handle(true));
-                cancelBtn.addEventListener('click', () => handle(false));
+                confirmBtn.addEventListener('click', () => { closeModal();
+                    resolve(true); });
+                cancelBtn.addEventListener('click', () => { closeModal();
+                    resolve(false); });
             });
         }
 
@@ -1234,23 +1426,60 @@
         // 4. STATE
         // =============================================================
         let allItems = [];
-        let credentialGroups = {}; // { groupName: [itemIds] }
-        let bookmarkCategories = {}; // { categoryName: [itemIds] }
+        let credentialGroups = {};
+        let bookmarkCategories = {};
         let credentialSelectMode = false;
         let bookmarkSelectMode = false;
+        let noteSelectMode = false;
         let selectedCredIds = new Set();
         let selectedBookIds = new Set();
+        let selectedNoteIds = new Set();
 
-        // Bookmark pagination
         let bookPage = 0;
-        const BOOKS_PER_PAGE = 10;
+        const BOOKS_PER_PAGE = 36; // 12 columns × 3 rows
+        const BOOKS_PER_ROW = 12;
+        const BOOK_ROWS_VISIBLE = 3;
 
-        // Search state
         let credSearchTerm = '';
         let bookSearchTerm = '';
+        let noteSearchTerm = '';
+        let projectSearchTerm = '';
 
         // =============================================================
-        // 5. FIREBASE READ
+        // 5. NAVIGATION HELPERS (local files → same tab)
+        // =============================================================
+        function navigateTo(page, params = {}) {
+            const qs = new URLSearchParams(params).toString();
+            const url = qs ? `${page}?${qs}` : page;
+            window.location.href = url;
+        }
+
+        function openCredential(id) {
+            if (id === 'new') {
+                navigateTo('credential.html', { action: 'add' });
+            } else {
+                navigateTo('credential.html', { id });
+            }
+        }
+
+        function openNote(id) {
+            if (id === 'new') {
+                navigateTo('note.html', { action: 'add' });
+            } else {
+                navigateTo('note.html', { id });
+            }
+        }
+
+        function openProject(id) {
+            if (id === 'new') {
+                navigateTo('project.html', { action: 'add' });
+            } else {
+                navigateTo('project.html', { id });
+            }
+        }
+
+        // =============================================================
+        // 6. FIREBASE READ
         // =============================================================
 
         function initVault() {
@@ -1270,7 +1499,6 @@
         }
 
         function buildIndexes() {
-            // Credential groups
             credentialGroups = {};
             const creds = allItems.filter(i => i.type === 'credential' && !i.trash);
             creds.forEach(item => {
@@ -1280,7 +1508,6 @@
             });
             if (!credentialGroups['General']) credentialGroups['General'] = [];
 
-            // Bookmark categories (not used for grouping in UI but for future)
             bookmarkCategories = {};
             const books = allItems.filter(i => i.type === 'bookmark' && !i.trash);
             books.forEach(item => {
@@ -1288,10 +1515,11 @@
                 if (!bookmarkCategories[cat]) bookmarkCategories[cat] = [];
                 bookmarkCategories[cat].push(item.id);
             });
+            if (!bookmarkCategories['Uncategorized']) bookmarkCategories['Uncategorized'] = [];
         }
 
         // =============================================================
-        // 6. RENDER ALL WIDGETS
+        // 7. RENDER ALL
         // =============================================================
 
         function renderAll() {
@@ -1300,10 +1528,11 @@
             renderNotes();
             renderProjects();
             renderRecents();
+            renderBookmarkCategories();
         }
 
         // =============================================================
-        // 7. CREDENTIALS WIDGET
+        // 8. CREDENTIALS
         // =============================================================
 
         function renderCredentials() {
@@ -1343,8 +1572,6 @@
 
             groupNames.forEach(group => {
                 const items = filteredGroups[group];
-                const isExpanded = true;
-
                 html += `<div class="credential-group" data-group="${group}">
                     <div class="group-header" data-toggle="group">
                         <iconify-icon icon="mdi:chevron-down"></iconify-icon>
@@ -1378,7 +1605,6 @@
 
             container.innerHTML = html;
 
-            // Toggle group expansion
             container.querySelectorAll('[data-toggle="group"]').forEach(el => {
                 el.addEventListener('click', (e) => {
                     if (e.target.closest('.group-actions')) return;
@@ -1391,14 +1617,12 @@
                 });
             });
 
-            // Item actions
             container.querySelectorAll('[data-action="openCred"]').forEach(el => {
                 el.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const itemEl = el.closest('.credential-item');
                     if (!itemEl) return;
-                    const id = itemEl.dataset.id;
-                    openCredential(id);
+                    openCredential(itemEl.dataset.id);
                 });
             });
 
@@ -1407,15 +1631,11 @@
                     e.stopPropagation();
                     const itemEl = el.closest('.credential-item');
                     if (!itemEl) return;
-                    const id = itemEl.dataset.id;
                     const confirmed = await customConfirm('Move this credential to trash?');
-                    if (confirmed) {
-                        moveToTrash(id);
-                    }
+                    if (confirmed) moveToTrash(itemEl.dataset.id);
                 });
             });
 
-            // Select checkboxes
             container.querySelectorAll('.cred-check').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     const id = cb.dataset.id;
@@ -1436,19 +1656,20 @@
             document.getElementById('credDeleteMulti').disabled = !show;
         }
 
-        // Toggle select mode
         document.getElementById('credSelectToggle').addEventListener('change', (e) => {
             credentialSelectMode = e.target.checked;
-            if (!credentialSelectMode) {
-                selectedCredIds.clear();
-            }
+            if (!credentialSelectMode) selectedCredIds.clear();
             renderCredentials();
         });
 
-        // Multi-select actions
         document.getElementById('credOpenMulti').addEventListener('click', () => {
             if (selectedCredIds.size === 0) return;
-            selectedCredIds.forEach(id => openCredential(id));
+            const ids = Array.from(selectedCredIds);
+            if (ids.length === 1) {
+                openCredential(ids[0]);
+            } else {
+                ids.forEach(id => openCredential(id));
+            }
         });
 
         document.getElementById('credDeleteMulti').addEventListener('click', async () => {
@@ -1462,7 +1683,6 @@
             }
         });
 
-        // Add group
         document.getElementById('credAddGroup').addEventListener('click', async () => {
             const name = await customPrompt('New Group', 'Enter group name:');
             if (name && name.trim() && !credentialGroups[name.trim()]) {
@@ -1474,34 +1694,10 @@
             }
         });
 
-        // Add credential
-        document.getElementById('credAddItem').addEventListener('click', async () => {
-            const title = await customPrompt('New Credential', 'Enter title:');
-            if (!title || !title.trim()) return;
-            const username = await customPrompt('Username/Email', 'Enter username or email:', '', 'text');
-            const password = await customPrompt('Password', 'Enter password:', '', 'password');
-            const url = await customPrompt('Website URL', 'Enter URL (optional):', '', 'url');
-            // Group selection
-            const groups = Object.keys(credentialGroups);
-            const group = await customPrompt('Select Group', 'Choose group:', 'General', 'select', groups);
-            const finalGroup = group || 'General';
-            const newItem = {
-                type: 'credential',
-                title: title.trim(),
-                username: username || '',
-                password: password || '',
-                url: url || '',
-                group: finalGroup,
-                favorite: false,
-                trash: false,
-                createdAt: Date.now()
-            };
-            const newRef = push(itemsRef);
-            set(newRef, newItem);
-            showToast('Credential added!', 'success');
+        document.getElementById('credAddItem').addEventListener('click', () => {
+            openCredential('new');
         });
 
-        // Group rename/delete via delegated events
         document.getElementById('credBody').addEventListener('click', async (e) => {
             const target = e.target.closest('[data-action]');
             if (!target) return;
@@ -1516,9 +1712,7 @@
                 if (newName && newName.trim() && newName.trim() !== groupName) {
                     const ids = credentialGroups[groupName] || [];
                     const updates = {};
-                    ids.forEach(id => {
-                        updates[`vault-items/${id}/group`] = newName.trim();
-                    });
+                    ids.forEach(id => { updates[`vault-items/${id}/group`] = newName.trim(); });
                     update(ref(database), updates);
                     showToast(`Group renamed to "${newName.trim()}"`, 'success');
                 }
@@ -1527,9 +1721,7 @@
                 if (confirmed) {
                     const ids = credentialGroups[groupName] || [];
                     const updates = {};
-                    ids.forEach(id => {
-                        updates[`vault-items/${id}/group`] = 'General';
-                    });
+                    ids.forEach(id => { updates[`vault-items/${id}/group`] = 'General'; });
                     update(ref(database), updates);
                     showToast(`Group "${groupName}" deleted, items moved to General`, 'warning');
                 }
@@ -1537,11 +1729,11 @@
         });
 
         // =============================================================
-        // 8. BOOKMARK WIDGET
+        // 9. BOOKMARKS
         // =============================================================
 
         function renderBookmarks() {
-            const grid = document.getElementById('bookGrid');
+            const track = document.getElementById('bookTrack');
             const searchTerm = bookSearchTerm.toLowerCase().trim();
             const matchCount = document.getElementById('bookMatchCount');
 
@@ -1558,36 +1750,56 @@
             const totalPages = Math.ceil(books.length / BOOKS_PER_PAGE) || 1;
             if (bookPage >= totalPages) bookPage = totalPages - 1;
             if (bookPage < 0) bookPage = 0;
+
             const start = bookPage * BOOKS_PER_PAGE;
             const pageBooks = books.slice(start, start + BOOKS_PER_PAGE);
 
-            let html = '';
-            pageBooks.forEach(item => {
-                const isSelected = selectedBookIds.has(item.id);
-                const titleDisplay = item.title ? item.title.slice(0, 5) : 'Link';
-                const titleHtml = item.title ? item.title.replace(new RegExp(searchTerm, 'gi'), match => `<span class="highlight">${match}</span>`) : 'Link';
-                html += `
-                    <div class="bookmark-item" data-id="${item.id}" title="${item.title || ''}">
-                        <span class="bookmark-checkbox ${bookmarkSelectMode ? 'show' : ''}">
-                            <input type="checkbox" ${isSelected ? 'checked' : ''} data-id="${item.id}" class="book-check" />
-                        </span>
-                        <img class="favicon" src="${item.favicon || 'https://www.google.com/s2/favicons?domain=' + (item.url || '')}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>'" />
-                        <span class="b-title">${titleHtml}</span>
-                    </div>
-                `;
-            });
-
-            if (pageBooks.length === 0) {
-                html = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);">No bookmarks found.</div>`;
+            // Build pages for carousel
+            const pages = [];
+            for (let i = 0; i < pageBooks.length; i += BOOKS_PER_PAGE) {
+                pages.push(pageBooks.slice(i, i + BOOKS_PER_PAGE));
             }
 
-            grid.innerHTML = html;
+            let html = '';
+            if (pages.length === 0) {
+                html = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);">No bookmarks found.</div>`;
+                track.innerHTML = `<div class="bookmark-page">${html}</div>`;
+            } else {
+                pages.forEach((pageItems, pageIdx) => {
+                    let pageHtml = '';
+                    pageItems.forEach(item => {
+                        const isSelected = selectedBookIds.has(item.id);
+                        const titleDisplay = item.title ? item.title.slice(0, 5) : 'Link';
+                        const titleHtml = item.title ? item.title.replace(new RegExp(searchTerm, 'gi'),
+                            match => `<span class="highlight">${match}</span>`) : 'Link';
+                        pageHtml += `
+                            <div class="bookmark-item" data-id="${item.id}" title="${item.title || ''}">
+                                <span class="bookmark-checkbox ${bookmarkSelectMode ? 'show' : ''}">
+                                    <input type="checkbox" ${isSelected ? 'checked' : ''} data-id="${item.id}" class="book-check" />
+                                </span>
+                                <img class="favicon" src="${item.favicon || 'https://www.google.com/s2/favicons?domain=' + (item.url || '')}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>'" />
+                                <span class="b-title">${titleHtml}</span>
+                            </div>
+                        `;
+                    });
+                    // Fill empty slots if needed (for grid alignment)
+                    const remaining = BOOKS_PER_PAGE - pageItems.length;
+                    for (let i = 0; i < remaining; i++) {
+                        pageHtml += `<div style="visibility:hidden;"></div>`;
+                    }
+                    html += `<div class="bookmark-page">${pageHtml}</div>`;
+                });
+                track.innerHTML = html;
+                // Slide to current page
+                track.style.transform = `translateX(-${bookPage * 100}%)`;
+            }
 
             document.getElementById('bookPageInfo').textContent = `${bookPage + 1} / ${totalPages}`;
             document.getElementById('bookPrev').disabled = bookPage === 0;
             document.getElementById('bookNext').disabled = bookPage >= totalPages - 1;
 
-            grid.querySelectorAll('.bookmark-item').forEach(el => {
+            // Events
+            track.querySelectorAll('.bookmark-item').forEach(el => {
                 el.addEventListener('click', (e) => {
                     if (e.target.closest('.book-check')) return;
                     const id = el.dataset.id;
@@ -1598,7 +1810,7 @@
                 });
             });
 
-            grid.querySelectorAll('.book-check').forEach(cb => {
+            track.querySelectorAll('.book-check').forEach(cb => {
                 cb.addEventListener('change', (e) => {
                     const id = cb.dataset.id;
                     if (cb.checked) selectedBookIds.add(id);
@@ -1620,9 +1832,7 @@
 
         document.getElementById('bookSelectToggle').addEventListener('change', (e) => {
             bookmarkSelectMode = e.target.checked;
-            if (!bookmarkSelectMode) {
-                selectedBookIds.clear();
-            }
+            if (!bookmarkSelectMode) selectedBookIds.clear();
             renderBookmarks();
         });
 
@@ -1646,27 +1856,114 @@
         });
 
         document.getElementById('bookPrev').addEventListener('click', () => {
-            if (bookPage > 0) { bookPage--; renderBookmarks(); }
+            if (bookPage > 0) { bookPage--;
+                renderBookmarks(); }
         });
         document.getElementById('bookNext').addEventListener('click', () => {
-            const total = Math.ceil(allItems.filter(i => i.type === 'bookmark' && !i.trash).length / BOOKS_PER_PAGE);
-            if (bookPage < total - 1) { bookPage++; renderBookmarks(); }
+            const total = Math.ceil(allItems.filter(i => i.type === 'bookmark' && !i.trash).length / BOOKS_PER_PAGE) || 1;
+            if (bookPage < total - 1) { bookPage++;
+                renderBookmarks(); }
         });
 
-        document.getElementById('bookAddLink').addEventListener('click', async () => {
-            const url = await customPrompt('Add Bookmark', 'Enter URL:', '', 'url');
-            if (!url || !url.trim()) return;
-            const trimmedUrl = url.trim();
-            // Simple fetch metadata (we'll just use the URL as title)
-            const title = await customPrompt('Title (optional)', 'Enter title (or leave blank to use URL):', trimmedUrl, 'text');
-            const category = await customPrompt('Category (optional)', 'Enter category:', 'Uncategorized', 'text');
+        // =============================================================
+        // 10. BOOKMARK FORM
+        // =============================================================
+
+        const bookmarkForm = document.getElementById('bookmarkForm');
+        const bookUrlInput = document.getElementById('bookUrlInput');
+        const bookTitleInput = document.getElementById('bookTitleInput');
+        const bookDescInput = document.getElementById('bookDescInput');
+        const bookCategorySelect = document.getElementById('bookCategorySelect');
+        const bookFetchSpinner = document.getElementById('bookFetchSpinner');
+        const bookFetchMsg = document.getElementById('bookFetchMsg');
+
+        let isFetching = false;
+        let fetchTimer = null;
+
+        function renderBookmarkCategories() {
+            const cats = Object.keys(bookmarkCategories).sort();
+            bookCategorySelect.innerHTML = cats.map(c => `<option value="${c}">${c}</option>`).join('');
+        }
+
+        bookUrlInput.addEventListener('input', debounce(async () => {
+            const url = bookUrlInput.value.trim();
+            if (!url || !url.startsWith('http')) {
+                bookFetchMsg.textContent = 'Enter a valid URL';
+                bookFetchSpinner.classList.remove('active');
+                return;
+            }
+            bookFetchMsg.textContent = 'Fetching...';
+            bookFetchSpinner.classList.add('active');
+            isFetching = true;
+
+            try {
+                // Try to fetch using a proxy
+                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(url)}`;
+                const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(8000) });
+                if (!response.ok) throw new Error('Fetch failed');
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                const title = doc.querySelector('title')?.textContent?.trim() || '';
+                const desc = doc.querySelector('meta[name="description"]')?.getAttribute('content')?.trim() || '';
+                const favicon = `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`;
+
+                if (title) bookTitleInput.value = title;
+                if (desc) bookDescInput.value = desc;
+                bookFetchMsg.textContent = '✅ Fetched successfully';
+                bookFetchSpinner.classList.remove('active');
+            } catch (e) {
+                bookFetchMsg.textContent = '⚠️ Could not fetch, enter manually';
+                bookFetchSpinner.classList.remove('active');
+            }
+            isFetching = false;
+        }, 500));
+
+        document.getElementById('bookAddCategoryBtn').addEventListener('click', async () => {
+            const name = await customPrompt('New Category', 'Enter category name:');
+            if (name && name.trim() && !bookmarkCategories[name.trim()]) {
+                bookmarkCategories[name.trim()] = [];
+                renderBookmarkCategories();
+                bookCategorySelect.value = name.trim();
+                showToast(`Category "${name.trim()}" created`, 'success');
+            } else if (name && name.trim()) {
+                showToast('Category already exists.', 'warning');
+            }
+        });
+
+        document.getElementById('bookAddLink').addEventListener('click', () => {
+            bookmarkForm.classList.toggle('show');
+            if (bookmarkForm.classList.contains('show')) {
+                bookUrlInput.focus();
+            }
+        });
+
+        document.getElementById('bookFormCancel').addEventListener('click', () => {
+            bookmarkForm.classList.remove('show');
+            bookUrlInput.value = '';
+            bookTitleInput.value = '';
+            bookDescInput.value = '';
+            bookFetchMsg.textContent = 'Ready';
+            bookFetchSpinner.classList.remove('active');
+        });
+
+        document.getElementById('bookFormSave').addEventListener('click', async () => {
+            const url = bookUrlInput.value.trim();
+            if (!url || !url.startsWith('http')) {
+                showToast('Please enter a valid URL.', 'warning');
+                return;
+            }
+            const title = bookTitleInput.value.trim() || url;
+            const description = bookDescInput.value.trim() || '';
+            const category = bookCategorySelect.value || 'Uncategorized';
+
             const newItem = {
                 type: 'bookmark',
-                title: title || trimmedUrl,
-                url: trimmedUrl,
-                favicon: `https://www.google.com/s2/favicons?domain=${trimmedUrl}`,
-                description: '',
-                category: category || 'Uncategorized',
+                title: title,
+                url: url,
+                favicon: `https://www.google.com/s2/favicons?domain=${new URL(url).hostname}`,
+                description: description,
+                category: category,
                 favorite: false,
                 trash: false,
                 createdAt: Date.now()
@@ -1674,19 +1971,40 @@
             const newRef = push(itemsRef);
             set(newRef, newItem);
             showToast('Bookmark added!', 'success');
+            bookmarkForm.classList.remove('show');
+            bookUrlInput.value = '';
+            bookTitleInput.value = '';
+            bookDescInput.value = '';
+            bookFetchMsg.textContent = 'Ready';
+            bookFetchSpinner.classList.remove('active');
         });
 
         // =============================================================
-        // 9. NOTES WIDGET
+        // 11. NOTES
         // =============================================================
 
         function renderNotes() {
             const grid = document.getElementById('noteGrid');
-            const notes = allItems.filter(i => i.type === 'note' && !i.trash)
-                .sort((a, b) => b.createdAt - a.createdAt);
+            const searchTerm = noteSearchTerm.toLowerCase().trim();
+            const matchCount = document.getElementById('noteMatchCount');
+
+            let notes = allItems.filter(i => i.type === 'note' && !i.trash);
+            if (searchTerm) {
+                notes = notes.filter(item =>
+                    (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                    (item.content && item.content.toLowerCase().includes(searchTerm))
+                );
+            }
+            matchCount.textContent = searchTerm ? `(${notes.length} matches)` : '';
+
+            notes.sort((a, b) => b.createdAt - a.createdAt);
             let html = '';
             notes.forEach(note => {
-                html += `<div class="note-box" data-id="${note.id}" title="${note.title || ''}">${note.title || 'Untitled'}</div>`;
+                const isSelected = selectedNoteIds.has(note.id);
+                html += `<div class="note-box" data-id="${note.id}" style="position:relative;" title="${note.title || ''}">
+                    ${noteSelectMode ? `<input type="checkbox" ${isSelected ? 'checked' : ''} data-id="${note.id}" class="note-check" style="position:absolute;top:4px;left:4px;" />` : ''}
+                    ${note.title || 'Untitled'}
+                </div>`;
             });
             if (notes.length === 0) {
                 html = `<div style="grid-column:1/-1;text-align:center;padding:20px;color:var(--text-muted);">No notes yet.</div>`;
@@ -1694,38 +2012,57 @@
             grid.innerHTML = html;
 
             grid.querySelectorAll('.note-box').forEach(el => {
-                el.addEventListener('click', () => {
+                el.addEventListener('click', (e) => {
+                    if (e.target.closest('.note-check')) return;
                     const id = el.dataset.id;
+                    if (noteSelectMode) {
+                        const cb = el.querySelector('.note-check');
+                        if (cb) { cb.checked = !cb.checked;
+                            cb.dispatchEvent(new Event('change')); }
+                        return;
+                    }
                     openNote(id);
+                });
+            });
+
+            grid.querySelectorAll('.note-check').forEach(cb => {
+                cb.addEventListener('change', (e) => {
+                    const id = cb.dataset.id;
+                    if (cb.checked) selectedNoteIds.add(id);
+                    else selectedNoteIds.delete(id);
                 });
             });
         }
 
-        document.getElementById('noteAdd').addEventListener('click', async () => {
-            const title = await customPrompt('New Note', 'Enter note title:');
-            if (!title || !title.trim()) return;
-            const content = await customPrompt('Content (optional)', 'Enter note content:', '', 'text');
-            const newItem = {
-                type: 'note',
-                title: title.trim(),
-                content: content || '',
-                favorite: false,
-                trash: false,
-                createdAt: Date.now()
-            };
-            const newRef = push(itemsRef);
-            set(newRef, newItem);
-            showToast('Note created!', 'success');
+        document.getElementById('noteSelectToggle').addEventListener('change', (e) => {
+            noteSelectMode = e.target.checked;
+            if (!noteSelectMode) selectedNoteIds.clear();
+            renderNotes();
+        });
+
+        document.getElementById('noteAdd').addEventListener('click', () => {
+            openNote('new');
         });
 
         // =============================================================
-        // 10. PROJECTS WIDGET
+        // 12. PROJECTS
         // =============================================================
 
         function renderProjects() {
             const list = document.getElementById('projectList');
-            const projects = allItems.filter(i => i.type === 'project' && !i.trash)
-                .sort((a, b) => b.createdAt - a.createdAt);
+            const searchTerm = projectSearchTerm.toLowerCase().trim();
+            const matchCount = document.getElementById('projectMatchCount');
+
+            let projects = allItems.filter(i => i.type === 'project' && !i.trash);
+            if (searchTerm) {
+                projects = projects.filter(item =>
+                    (item.title && item.title.toLowerCase().includes(searchTerm)) ||
+                    (item.status && item.status.toLowerCase().includes(searchTerm))
+                );
+            }
+            matchCount.textContent = searchTerm ? `(${projects.length} matches)` : '';
+
+            projects.sort((a, b) => b.createdAt - a.createdAt);
             let html = '';
             projects.forEach(proj => {
                 html += `<div class="project-item" data-id="${proj.id}">${proj.title || 'Untitled'}</div>`;
@@ -1737,39 +2074,24 @@
 
             list.querySelectorAll('.project-item').forEach(el => {
                 el.addEventListener('click', () => {
-                    const id = el.dataset.id;
-                    openProject(id);
+                    openProject(el.dataset.id);
                 });
             });
         }
 
-        document.getElementById('projectAdd').addEventListener('click', async () => {
-            const title = await customPrompt('New Project', 'Enter project title:');
-            if (!title || !title.trim()) return;
-            const newItem = {
-                type: 'project',
-                title: title.trim(),
-                status: 'Active',
-                favorite: false,
-                trash: false,
-                createdAt: Date.now()
-            };
-            const newRef = push(itemsRef);
-            set(newRef, newItem);
-            showToast('Project created!', 'success');
+        document.getElementById('projectAdd').addEventListener('click', () => {
+            openProject('new');
         });
 
         // =============================================================
-        // 11. RECENTS (displayed under headers)
+        // 13. RECENTS
         // =============================================================
 
         function renderRecents() {
-            // Credentials recent (3 latest)
             const creds = allItems.filter(i => i.type === 'credential' && !i.trash)
                 .sort((a, b) => b.createdAt - a.createdAt).slice(0, 3);
-            renderRecentItems('credRecentItems', creds, openCredential);
+            renderRecentItems('credRecentItems', creds, (id) => openCredential(id));
 
-            // Bookmarks recent (3 latest)
             const books = allItems.filter(i => i.type === 'bookmark' && !i.trash)
                 .sort((a, b) => b.createdAt - a.createdAt).slice(0, 3);
             renderRecentItems('bookRecentItems', books, (id) => {
@@ -1777,15 +2099,13 @@
                 if (item && item.url) window.open(item.url, '_blank');
             });
 
-            // Notes recent (3 latest)
             const notes = allItems.filter(i => i.type === 'note' && !i.trash)
                 .sort((a, b) => b.createdAt - a.createdAt).slice(0, 3);
-            renderRecentItems('noteRecentItems', notes, openNote);
+            renderRecentItems('noteRecentItems', notes, (id) => openNote(id));
 
-            // Projects recent (3 latest)
             const projects = allItems.filter(i => i.type === 'project' && !i.trash)
                 .sort((a, b) => b.createdAt - a.createdAt).slice(0, 3);
-            renderRecentItems('projectRecentItems', projects, openProject);
+            renderRecentItems('projectRecentItems', projects, (id) => openProject(id));
         }
 
         function renderRecentItems(containerId, items, onClick) {
@@ -1799,30 +2119,12 @@
                 <span class="recent-item" data-id="${item.id}">${item.title || 'Untitled'}</span>
             `).join('');
             container.querySelectorAll('.recent-item').forEach(el => {
-                el.addEventListener('click', () => {
-                    onClick(el.dataset.id);
-                });
+                el.addEventListener('click', () => onClick(el.dataset.id));
             });
         }
 
         // =============================================================
-        // 12. OPEN FUNCTIONS (navigate to detail pages)
-        // =============================================================
-
-        function openCredential(id) {
-            window.open(`credential.html?id=${id}`, '_blank');
-        }
-
-        function openNote(id) {
-            window.open(`note.html?id=${id}`, '_blank');
-        }
-
-        function openProject(id) {
-            window.open(`project.html?id=${id}`, '_blank');
-        }
-
-        // =============================================================
-        // 13. DELETE / TRASH
+        // 14. DELETE / TRASH
         // =============================================================
 
         function moveToTrash(id) {
@@ -1830,8 +2132,16 @@
         }
 
         // =============================================================
-        // 14. SEARCH (per widget)
+        // 15. SEARCH (debounced)
         // =============================================================
+
+        function debounce(fn, delay) {
+            let timer;
+            return (...args) => {
+                clearTimeout(timer);
+                timer = setTimeout(() => fn(...args), delay);
+            };
+        }
 
         document.getElementById('credSearch').addEventListener('input', debounce((e) => {
             credSearchTerm = e.target.value.trim();
@@ -1843,20 +2153,18 @@
             renderBookmarks();
         }, 300));
 
-        // =============================================================
-        // 15. DEBOUNCE
-        // =============================================================
+        document.getElementById('noteSearch').addEventListener('input', debounce((e) => {
+            noteSearchTerm = e.target.value.trim();
+            renderNotes();
+        }, 300));
 
-        function debounce(fn, delay) {
-            let timer;
-            return (...args) => {
-                clearTimeout(timer);
-                timer = setTimeout(() => fn(...args), delay);
-            };
-        }
+        document.getElementById('projectSearch').addEventListener('input', debounce((e) => {
+            projectSearchTerm = e.target.value.trim();
+            renderProjects();
+        }, 300));
 
         // =============================================================
-        // 16. TOAST (simple)
+        // 16. TOAST
         // =============================================================
 
         function showToast(message, type = 'info') {
@@ -1879,16 +2187,10 @@
                 animation: slideIn 0.3s ease;
                 color: var(--text-primary);
             `;
-            const iconMap = {
-                info: 'mdi:information',
-                success: 'mdi:check-circle',
-                error: 'mdi:alert-circle',
-                warning: 'mdi:alert'
-            };
-            toast.innerHTML = `
-                <iconify-icon icon="${iconMap[type] || 'mdi:information'}"></iconify-icon>
-                <span>${message}</span>
-            `;
+            const iconMap = { info: 'mdi:information', success: 'mdi:check-circle', error: 'mdi:alert-circle',
+                warning: 'mdi:alert' };
+            toast.innerHTML =
+                `<iconify-icon icon="${iconMap[type] || 'mdi:information'}"></iconify-icon><span>${message}</span>`;
             document.body.appendChild(toast);
             setTimeout(() => {
                 toast.style.opacity = '0';
@@ -1899,11 +2201,23 @@
         }
 
         // =============================================================
-        // 17. INITIAL LOG
+        // 17. KEYBOARD SHORTCUTS
         // =============================================================
 
-        console.log('🔐 Vault dashboard loaded (desktop layout).');
-        console.log('📦 Items loaded:', allItems.length);
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (modalOverlay.classList.contains('active')) closeModal();
+                if (bookmarkForm.classList.contains('show')) {
+                    bookmarkForm.classList.remove('show');
+                }
+            }
+        });
+
+        // =============================================================
+        // 18. INIT
+        // =============================================================
+
+        console.log('🔐 Vault dashboard loaded (desktop).');
     </script>
 </body>
 </html>
