@@ -702,7 +702,7 @@
         {
             "imports": {
                 "firebase/app": "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js",
-                "firebase/database": "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
+                "firebase/firestore": "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js"
             }
         }
     </script>
@@ -712,7 +712,12 @@
         // 1. IMPORTS
         // =============================================================
         import { initializeApp } from 'firebase/app';
-        import { getDatabase, ref, get, set } from 'firebase/database';
+        import {
+            getFirestore,
+            doc,
+            getDoc,
+            setDoc
+        } from 'firebase/firestore';
 
         // =============================================================
         // 2. FIREBASE CONFIG
@@ -729,13 +734,14 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+        const db = getFirestore(app);
 
         // =============================================================
         // 3. CONSTANTS
         // =============================================================
-        const PASSWORD_PATH = 'auth-password';
-        const MASTER_PASSWORD = 'admin@123'; // <- Your chosen master password
+        // Path: password/master-key
+        const PASSWORD_COLLECTION = 'password';
+        const PASSWORD_DOCUMENT = 'master-key';
 
         // =============================================================
         // 4. DOM REFS
@@ -807,31 +813,7 @@
         }
 
         // =============================================================
-        // 8. ENSURE PASSWORD EXISTS IN FIREBASE (ON FIRST LOAD)
-        // =============================================================
-
-        async function ensurePasswordExists() {
-            try {
-                const passwordRef = ref(database, PASSWORD_PATH);
-                const snapshot = await get(passwordRef);
-                const storedHash = snapshot.val();
-
-                if (storedHash === null) {
-                    // No password set → hash the master password and store it
-                    const hashed = await hashPassword(MASTER_PASSWORD);
-                    await set(passwordRef, hashed);
-                    console.log('✅ Master password has been securely stored in Firebase.');
-                }
-            } catch (error) {
-                console.error('Error ensuring password exists:', error);
-            }
-        }
-
-        // Run this on page load
-        ensurePasswordExists();
-
-        // =============================================================
-        // 9. TOGGLE PASSWORD VISIBILITY
+        // 8. TOGGLE PASSWORD VISIBILITY
         // =============================================================
         let isPasswordVisible = false;
 
@@ -843,7 +825,7 @@
         });
 
         // =============================================================
-        // 10. CORE LOGIN LOGIC
+        // 9. CORE LOGIN LOGIC (Firestore)
         // =============================================================
 
         async function handleLogin(event) {
@@ -862,21 +844,38 @@
             showFeedback('Verifying credentials ...', 'warning');
 
             try {
-                const passwordRef = ref(database, PASSWORD_PATH);
-                const snapshot = await get(passwordRef);
-                const storedHash = snapshot.val();
+                // 9a. Fetch stored password hash from Firestore
+                // Path: password/master-key
+                const docRef = doc(db, PASSWORD_COLLECTION, PASSWORD_DOCUMENT);
+                const docSnap = await getDoc(docRef);
 
-                if (storedHash === null) {
-                    // This should not happen if ensurePasswordExists ran
-                    showFeedback('System error. Please contact support.', 'error');
+                let storedHash = null;
+
+                if (docSnap.exists()) {
+                    // The document exists → get the hash from the 'value' field
+                    const data = docSnap.data();
+                    storedHash = data.value || null;
+                } else {
+                    // Document doesn't exist → create it with a default hash
+                    // This is the FIRST TIME setup
+                    const defaultPassword = 'admin@123'; // Set your desired master password here
+                    const defaultHash = await hashPassword(defaultPassword);
+                    await setDoc(docRef, { value: defaultHash });
+                    storedHash = defaultHash;
+                    showFeedback('Master password initialized. Please log in.', 'success');
                     setLoading(false);
+                    passwordInput.value = '';
+                    passwordInput.focus();
                     return;
                 }
 
+                // 9b. Hash the entered password
                 const enteredHash = await hashPassword(enteredPassword);
 
+                // 9c. Compare
                 if (enteredHash === storedHash) {
                     showFeedback('Access granted! Redirecting ...', 'success');
+                    // SESSION STORAGE: session-only (cleared when browser closes)
                     sessionStorage.setItem('vault_authenticated', 'true');
                     sessionStorage.setItem('vault_login_time', Date.now().toString());
                     setLoading(false);
@@ -898,7 +897,7 @@
         }
 
         // =============================================================
-        // 11. EVENT LISTENERS
+        // 10. EVENT LISTENERS
         // =============================================================
 
         form.addEventListener('submit', handleLogin);
@@ -917,28 +916,32 @@
         });
 
         // =============================================================
-        // 12. AUTO-FOCUS
+        // 11. AUTO-FOCUS
         // =============================================================
         setTimeout(() => {
             passwordInput.focus();
         }, 800);
 
         // =============================================================
-        // 13. SESSION CHECK
+        // 12. SESSION CHECK (sessionStorage only — cleared on browser close)
         // =============================================================
         const isAuth = sessionStorage.getItem('vault_authenticated');
         if (isAuth === 'true') {
             const loginTime = parseInt(sessionStorage.getItem('vault_login_time') || '0');
             const now = Date.now();
+            // Session expires after 24 hours even if browser is open
             if (now - loginTime < 24 * 60 * 60 * 1000) {
                 redirectToVault();
             } else {
+                // Session expired → clear it
                 sessionStorage.removeItem('vault_authenticated');
                 sessionStorage.removeItem('vault_login_time');
             }
         }
 
-        console.log('🔐 Vault login ready — secure, no default fallback.');
+        console.log('🔐 Vault login ready — Firestore authentication active.');
+        console.log(`📁 Path: ${PASSWORD_COLLECTION}/${PASSWORD_DOCUMENT}`);
+        console.log('🗑️ Session storage is cleared when browser is closed.');
     </script>
 </body>
 </html>
