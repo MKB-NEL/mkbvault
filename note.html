@@ -138,6 +138,7 @@
             padding: 16px 20px 20px;
             gap: 20px;
             height: calc(100vh - 52px);
+            max-height: calc(100vh - 52px);
         }
 
         /* Left Panel: Folders */
@@ -151,6 +152,8 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            height: 100%;
+            max-height: 100%;
         }
         .left-panel .panel-header {
             padding: 12px 14px;
@@ -158,6 +161,7 @@
             border-bottom: 1px solid var(--border-light);
             font-size: 0.9rem;
             background: var(--bg-primary);
+            flex-shrink: 0;
         }
         .left-panel .folder-list {
             flex: 1;
@@ -253,6 +257,8 @@
             flex-direction: column;
             overflow: hidden;
             min-width: 0;
+            height: 100%;
+            max-height: 100%;
         }
         .main-content .toolbar {
             padding: 12px 20px;
@@ -313,7 +319,7 @@
             gap: 20px;
         }
 
-        /* Right Panel: Search & List */
+        /* Right Panel: Search & List (all notes, not folders) */
         .right-panel {
             width: 260px;
             flex-shrink: 0;
@@ -324,10 +330,13 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            height: 100%;
+            max-height: 100%;
         }
         .right-panel .search-box {
             padding: 12px 14px;
             border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
         }
         .right-panel .search-box input {
             width: 100%;
@@ -401,7 +410,7 @@
             font-size: 0.9rem;
         }
 
-        /* ---- Note Card ---- */
+        /* ---- Note Card (view mode) ---- */
         .note-card {
             background: var(--bg-card);
             border: 1px solid var(--border-light);
@@ -409,6 +418,7 @@
             padding: 16px 20px;
             box-shadow: var(--shadow-sm);
             transition: box-shadow 0.2s;
+            flex-shrink: 0;
         }
         .note-card:hover { box-shadow: var(--shadow-md); }
         .note-card .card-header {
@@ -457,6 +467,7 @@
             color: var(--text-primary);
         }
         .note-card .card-header .card-actions .delete:hover { color: var(--error); }
+        .note-card .card-header .card-actions .close-card:hover { color: var(--error); }
 
         .note-card .field {
             display: flex;
@@ -767,6 +778,7 @@
                 flex-direction: column;
                 padding: 12px;
                 height: auto;
+                max-height: none;
                 overflow-y: auto;
             }
             .left-panel, .right-panel {
@@ -871,7 +883,7 @@
             </div>
         </main>
 
-        <!-- Right Panel: Search & List -->
+        <!-- Right Panel: Search & List (all notes) -->
         <aside class="right-panel" id="rightPanel">
             <div class="search-box">
                 <input type="text" id="sidebarSearch" placeholder="Search notes..." />
@@ -985,8 +997,8 @@
         // =============================================================
         let allNotes = [];
         let filteredNotes = [];
-        let currentViewIds = [];
-        let selectedId = null;
+        let currentViewIds = []; // IDs of notes currently displayed in the center canvas (accumulated)
+        let selectedId = null; // currently highlighted note in lists
         let currentFolderFilter = null; // null = all, or folder name string
 
         // =============================================================
@@ -1111,28 +1123,29 @@
 
                 let initialIds = [];
                 if (action === 'add') {
+                    // Show add form, but we'll handle it separately; we set a flag
                     currentViewIds = ['new'];
                 } else if (idParam) {
                     initialIds = [idParam];
                 } else if (idsParam) {
                     initialIds = idsParam.split(',').map(s => s.trim()).filter(Boolean);
                 } else {
-                    if (allNotes.length > 0) {
-                        initialIds = [allNotes[0].id];
-                    } else {
-                        currentViewIds = ['empty'];
-                    }
+                    // Default: show nothing (empty state)
+                    currentViewIds = [];
                 }
 
                 if (initialIds.length > 0) {
-                    currentViewIds = initialIds.filter(id => allNotes.some(c => c.id === id));
-                    if (currentViewIds.length === 0 && allNotes.length > 0) {
-                        currentViewIds = [allNotes[0].id];
+                    // Validate IDs exist
+                    const validIds = initialIds.filter(id => allNotes.some(c => c.id === id));
+                    if (validIds.length > 0) {
+                        currentViewIds = validIds;
+                    } else {
+                        currentViewIds = [];
                     }
                 }
 
-                // Reset folder filter if we have a single note selected
-                if (currentViewIds.length === 1 && currentViewIds[0] !== 'new' && currentViewIds[0] !== 'empty') {
+                // Set selectedId to the first displayed note if any
+                if (currentViewIds.length > 0 && currentViewIds[0] !== 'new') {
                     selectedId = currentViewIds[0];
                     const note = allNotes.find(c => c.id === selectedId);
                     if (note && note.folder) {
@@ -1149,13 +1162,13 @@
                 renderMainContent();
                 highlightSidebarItem();
 
-                if (currentViewIds.length === 1 && currentViewIds[0] !== 'new' && currentViewIds[0] !== 'empty') {
+                if (currentViewIds.length === 1 && currentViewIds[0] !== 'new') {
                     const note = allNotes.find(c => c.id === currentViewIds[0]);
                     mainTitle.textContent = note ? (note.title || 'Untitled') : 'Note';
                 } else if (currentViewIds.length === 1 && currentViewIds[0] === 'new') {
                     mainTitle.textContent = 'Add New Note';
                 } else if (currentViewIds.length > 1) {
-                    mainTitle.textContent = `Multiple Notes (${currentViewIds.length})`;
+                    mainTitle.textContent = `${currentViewIds.length} notes displayed`;
                 } else {
                     mainTitle.textContent = 'Notes';
                 }
@@ -1169,13 +1182,11 @@
         // 9. FOLDERS PANEL RENDER
         // =============================================================
         function renderFolders() {
-            // Get unique folders from notes
             const folderSet = new Set();
             allNotes.forEach(n => { if (n.folder) folderSet.add(n.folder); });
             const folders = Array.from(folderSet).sort();
 
             let html = '';
-            // "All Notes" option
             const allActive = currentFolderFilter === null ? 'active' : '';
             html += `<div class="all-notes-item ${allActive}" data-folder="all">📋 All Notes</div>`;
 
@@ -1208,26 +1219,11 @@
             if (allNotesItem) {
                 allNotesItem.addEventListener('click', () => {
                     currentFolderFilter = null;
-                    // Reset currentViewIds to show all (or first)
-                    if (allNotes.length > 0) {
-                        currentViewIds = [allNotes[0].id];
-                        selectedId = allNotes[0].id;
-                    } else {
-                        currentViewIds = ['empty'];
-                        selectedId = null;
-                    }
-                    // Update URL
-                    const url = new URL(window.location);
-                    url.searchParams.delete('id');
-                    url.searchParams.delete('ids');
-                    url.searchParams.delete('action');
-                    window.history.pushState({}, '', url);
+                    // Clear current view (we'll keep existing displayed notes, but we can also clear? Better to keep)
+                    // Actually, we might want to keep displayed notes, but we'll update filter for lists
                     renderFolders();
                     renderSidebar();
-                    renderMainContent();
-                    highlightSidebarItem();
-                    const note = allNotes.find(c => c.id === currentViewIds[0]);
-                    mainTitle.textContent = note ? (note.title || 'Untitled') : 'Notes';
+                    // We don't change displayed notes, only highlight changes
                 });
             }
 
@@ -1250,30 +1246,13 @@
             folderListEl.querySelectorAll('.note-link').forEach(link => {
                 link.addEventListener('click', () => {
                     const id = link.dataset.id;
-                    selectedId = id;
-                    currentViewIds = [id];
-                    const note = allNotes.find(c => c.id === id);
-                    if (note && note.folder) {
-                        currentFolderFilter = note.folder;
-                    } else {
-                        currentFolderFilter = null;
-                    }
-                    const url = new URL(window.location);
-                    url.searchParams.set('id', id);
-                    url.searchParams.delete('ids');
-                    url.searchParams.delete('action');
-                    window.history.pushState({}, '', url);
-                    renderFolders();
-                    renderSidebar();
-                    renderMainContent();
-                    highlightSidebarItem();
-                    mainTitle.textContent = note ? (note.title || 'Untitled') : 'Note';
+                    toggleNoteDisplay(id);
                 });
             });
         }
 
         // =============================================================
-        // 10. SIDEBAR RENDER (right panel)
+        // 10. SIDEBAR RENDER (right panel - all notes, searchable)
         // =============================================================
         function renderSidebar() {
             const searchTerm = sidebarSearch.value.toLowerCase().trim();
@@ -1321,24 +1300,7 @@
                 el.addEventListener('click', (e) => {
                     if (e.target.closest('.fav-btn')) return;
                     const id = el.dataset.id;
-                    selectedId = id;
-                    currentViewIds = [id];
-                    const note = allNotes.find(c => c.id === id);
-                    if (note && note.folder) {
-                        currentFolderFilter = note.folder;
-                    } else {
-                        currentFolderFilter = null;
-                    }
-                    const url = new URL(window.location);
-                    url.searchParams.set('id', id);
-                    url.searchParams.delete('ids');
-                    url.searchParams.delete('action');
-                    window.history.pushState({}, '', url);
-                    renderFolders();
-                    renderSidebar();
-                    renderMainContent();
-                    highlightSidebarItem();
-                    mainTitle.textContent = note ? (note.title || 'Untitled') : 'Note';
+                    toggleNoteDisplay(id);
                 });
             });
 
@@ -1356,25 +1318,88 @@
             noteListEl.querySelectorAll('.note-item').forEach(el => {
                 el.classList.toggle('active', el.dataset.id === selectedId);
             });
+            // Also highlight in folder list
+            folderListEl.querySelectorAll('.note-link').forEach(el => {
+                el.classList.toggle('active', el.dataset.id === selectedId);
+            });
         }
 
         // =============================================================
-        // 11. MAIN CONTENT RENDER
+        // 11. TOGGLE NOTE DISPLAY (add/remove from center canvas)
+        // =============================================================
+        function toggleNoteDisplay(id) {
+            // If the note is already displayed, remove it; otherwise add it
+            const index = currentViewIds.indexOf(id);
+            if (index !== -1) {
+                currentViewIds.splice(index, 1);
+                if (currentViewIds.length === 0) {
+                    selectedId = null;
+                } else {
+                    // Keep selectedId as the first in the list
+                    selectedId = currentViewIds[0];
+                }
+            } else {
+                // Add it (if not already there)
+                currentViewIds.push(id);
+                selectedId = id;
+            }
+            // Update URL (optional, but we'll keep it)
+            const url = new URL(window.location);
+            if (currentViewIds.length > 0) {
+                url.searchParams.set('ids', currentViewIds.join(','));
+            } else {
+                url.searchParams.delete('ids');
+            }
+            url.searchParams.delete('id');
+            url.searchParams.delete('action');
+            window.history.pushState({}, '', url);
+
+            // Update folder filter based on first displayed note
+            if (currentViewIds.length > 0) {
+                const note = allNotes.find(c => c.id === currentViewIds[0]);
+                if (note && note.folder) {
+                    currentFolderFilter = note.folder;
+                } else {
+                    currentFolderFilter = null;
+                }
+            } else {
+                currentFolderFilter = null;
+            }
+
+            renderFolders();
+            renderSidebar();
+            renderMainContent();
+            highlightSidebarItem();
+            // Update title
+            if (currentViewIds.length === 1) {
+                const note = allNotes.find(c => c.id === currentViewIds[0]);
+                mainTitle.textContent = note ? (note.title || 'Untitled') : 'Note';
+            } else if (currentViewIds.length > 1) {
+                mainTitle.textContent = `${currentViewIds.length} notes displayed`;
+            } else {
+                mainTitle.textContent = 'Notes';
+            }
+        }
+
+        // =============================================================
+        // 12. MAIN CONTENT RENDER
         // =============================================================
         function renderMainContent() {
             const container = noteCardsEl;
             let ids = currentViewIds;
 
-            if (ids.includes('new')) {
+            if (ids.length === 1 && ids[0] === 'new') {
+                // Show add form
                 container.innerHTML = renderAddForm();
                 return;
             }
 
-            if (ids.length === 0 || ids[0] === 'empty') {
+            if (ids.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align:center;padding:40px;color:var(--text-muted);">
-                        <iconify-icon icon="mdi:note-off" style="font-size:3rem;"></iconify-icon>
-                        <p style="margin-top:10px;">No notes available. Click "Add New" to create one.</p>
+                    <div style="text-align:center;padding:40px;color:var(--text-muted);display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;">
+                        <iconify-icon icon="mdi:note-plus-outline" style="font-size:4rem;margin-bottom:10px;"></iconify-icon>
+                        <p style="font-size:1.1rem;">Click notes to display here</p>
+                        <p style="font-size:0.85rem;">Select a note from the right panel or folder list.</p>
                     </div>
                 `;
                 return;
@@ -1382,8 +1407,12 @@
 
             const notes = ids.map(id => allNotes.find(c => c.id === id)).filter(Boolean);
             if (notes.length === 0) {
-                container.innerHTML =
-                `<div style="text-align:center;padding:20px;color:var(--text-muted);">Note not found.</div>`;
+                container.innerHTML = `
+                    <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                        <iconify-icon icon="mdi:note-off" style="font-size:3rem;"></iconify-icon>
+                        <p style="margin-top:10px;">Selected notes not found.</p>
+                    </div>
+                `;
                 return;
             }
 
@@ -1415,14 +1444,27 @@
                         if (confirmed) {
                             moveToTrash(id);
                             showToast('Note moved to trash', 'warning');
-                            currentViewIds = currentViewIds.filter(i => i !== id);
-                            if (currentViewIds.length === 0 && allNotes.length > 0) {
-                                currentViewIds = [allNotes[0].id];
-                            }
+                            // Remove from current view
+                            const idx = currentViewIds.indexOf(id);
+                            if (idx !== -1) currentViewIds.splice(idx, 1);
+                            if (currentViewIds.length === 0) selectedId = null;
                             renderMainContent();
                             renderSidebar();
                             renderFolders();
                         }
+                    });
+                }
+
+                // Close this note card
+                const closeBtn = card.querySelector('.close-card');
+                if (closeBtn) {
+                    closeBtn.addEventListener('click', () => {
+                        const idx = currentViewIds.indexOf(id);
+                        if (idx !== -1) currentViewIds.splice(idx, 1);
+                        if (currentViewIds.length === 0) selectedId = null;
+                        renderMainContent();
+                        renderSidebar();
+                        renderFolders();
                     });
                 }
 
@@ -1466,6 +1508,7 @@
                 const cancelBtn = card.querySelector('.cancel-edit');
                 if (cancelBtn) {
                     cancelBtn.addEventListener('click', () => {
+                        // Exit edit mode by re-rendering this card as view mode
                         renderMainContent();
                     });
                 }
@@ -1481,7 +1524,7 @@
         }
 
         // =============================================================
-        // 12. RENDER NOTE CARD (view mode)
+        // 13. RENDER NOTE CARD (view mode)
         // =============================================================
         function renderNoteCard(note) {
             const fields = note.fields || {};
@@ -1520,6 +1563,7 @@
                         </span>
                         <div class="card-actions">
                             <button class="edit-btn" title="Edit"><iconify-icon icon="mdi:pencil"></iconify-icon></button>
+                            <button class="close-card" title="Close this note"><iconify-icon icon="mdi:close"></iconify-icon></button>
                             <button class="delete-btn" title="Delete"><iconify-icon icon="mdi:delete"></iconify-icon></button>
                         </div>
                     </div>
@@ -1536,10 +1580,9 @@
         }
 
         // =============================================================
-        // 13. RENDER ADD FORM
+        // 14. RENDER ADD FORM
         // =============================================================
         function renderAddForm() {
-            // Get existing folders for dropdown
             const folderSet = new Set();
             allNotes.forEach(n => { if (n.folder) folderSet.add(n.folder); });
             const folders = Array.from(folderSet).sort();
@@ -1583,7 +1626,7 @@
         }
 
         // =============================================================
-        // 14. EDIT MODE
+        // 15. EDIT MODE
         // =============================================================
         function enterEditMode(card, note) {
             const fields = note.fields || {};
@@ -1600,7 +1643,6 @@
                 `).join('');
             }
 
-            // Build folder options
             const folderSet = new Set();
             allNotes.forEach(n => { if (n.folder) folderSet.add(n.folder); });
             const folders = Array.from(folderSet).sort();
@@ -1644,7 +1686,6 @@
             `;
             card.replaceWith(createElementFromHTML(newHtml));
 
-            // Re-bind add field button in edit mode
             const newCard = document.querySelector(`.note-card[data-id="${note.id}"]`);
             const addFieldBtn = newCard.querySelector('.edit-add-field');
             if (addFieldBtn) {
@@ -1653,7 +1694,6 @@
                 });
             }
 
-            // Add folder button
             const addFolderBtn = newCard.querySelector('.edit-add-folder-btn');
             if (addFolderBtn) {
                 addFolderBtn.addEventListener('click', async () => {
@@ -1672,7 +1712,6 @@
                 });
             }
 
-            // Remove field buttons
             newCard.querySelectorAll('.remove-field-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     const fieldDiv = btn.closest('.custom-field-edit');
@@ -1706,7 +1745,7 @@
         }
 
         // =============================================================
-        // 15. SAVE EDIT
+        // 16. SAVE EDIT
         // =============================================================
         function saveEdit(card, id) {
             const title = card.querySelector('.edit-title')?.value?.trim();
@@ -1717,7 +1756,6 @@
             const content = card.querySelector('.edit-content')?.value || '';
             const folder = card.querySelector('.edit-folder')?.value || '';
 
-            // Collect custom fields
             const fields = {};
             const fieldRows = card.querySelectorAll('.custom-field-edit');
             fieldRows.forEach((row, index) => {
@@ -1738,11 +1776,7 @@
                     showToast('Note updated.', 'success');
                     const note = allNotes.find(c => c.id === id);
                     if (note) Object.assign(note, updates);
-                    // Update folder filter if needed
-                    if (currentFolderFilter && currentFolderFilter !== folder) {
-                        // If we changed folder, maybe reset filter to new folder
-                        currentFolderFilter = folder || null;
-                    }
+                    // Exit edit mode by re-rendering main content
                     renderMainContent();
                     renderSidebar();
                     renderFolders();
@@ -1754,7 +1788,7 @@
         }
 
         // =============================================================
-        // 16. SAVE NEW
+        // 17. SAVE NEW
         // =============================================================
         function handleSaveNew() {
             const title = document.getElementById('addTitle')?.value?.trim();
@@ -1765,7 +1799,6 @@
             const content = document.getElementById('addContent')?.value || '';
             const folder = document.getElementById('addFolder')?.value || '';
 
-            // Collect custom fields from add form
             const fields = {};
             const fieldRows = document.querySelectorAll('#addFieldsContainer .custom-field-edit');
             fieldRows.forEach((row, index) => {
@@ -1794,9 +1827,21 @@
             set(newRef, newItem)
                 .then(() => {
                     showToast('Note created.', 'success');
+                    // After creation, close add form and show the new note in view
                     const newId = newRef.key;
                     if (newId) {
-                        window.location.href = `note.html?id=${newId}`;
+                        // Display this note in the center
+                        currentViewIds = [newId];
+                        selectedId = newId;
+                        const url = new URL(window.location);
+                        url.searchParams.set('ids', newId);
+                        url.searchParams.delete('action');
+                        window.history.pushState({}, '', url);
+                        renderMainContent();
+                        renderSidebar();
+                        renderFolders();
+                        highlightSidebarItem();
+                        mainTitle.textContent = title;
                     } else {
                         window.location.reload();
                     }
@@ -1808,7 +1853,7 @@
         }
 
         // =============================================================
-        // 17. FAVORITE TOGGLE
+        // 18. FAVORITE TOGGLE
         // =============================================================
         function toggleFavorite(id) {
             const note = allNotes.find(c => c.id === id);
@@ -1829,14 +1874,14 @@
         }
 
         // =============================================================
-        // 18. DELETE
+        // 19. DELETE
         // =============================================================
         function moveToTrash(id) {
             update(ref(database, `vault-items/${id}`), { trash: true, trashedAt: Date.now() });
         }
 
         // =============================================================
-        // 19. SEARCH
+        // 20. SEARCH
         // =============================================================
         let searchTimer = null;
         sidebarSearch.addEventListener('input', () => {
@@ -1847,21 +1892,40 @@
         });
 
         // =============================================================
-        // 20. ADD NEW BUTTON
+        // 21. ADD NEW BUTTON
         // =============================================================
         addNewBtn.addEventListener('click', () => {
-            window.location.href = 'note.html?action=add';
+            // Show add form in center
+            currentViewIds = ['new'];
+            renderMainContent();
+            // Update URL
+            const url = new URL(window.location);
+            url.searchParams.set('action', 'add');
+            url.searchParams.delete('ids');
+            url.searchParams.delete('id');
+            window.history.pushState({}, '', url);
+            mainTitle.textContent = 'Add New Note';
         });
 
         // =============================================================
-        // 21. HANDLE ADD FORM EVENTS
+        // 22. HANDLE ADD FORM EVENTS
         // =============================================================
         document.addEventListener('click', async (e) => {
             if (e.target.id === 'saveNewBtn') {
                 handleSaveNew();
             }
             if (e.target.id === 'cancelNewBtn') {
-                window.location.href = 'vault.html';
+                // Close add form and go back to empty state
+                currentViewIds = [];
+                selectedId = null;
+                const url = new URL(window.location);
+                url.searchParams.delete('action');
+                url.searchParams.delete('ids');
+                window.history.pushState({}, '', url);
+                renderMainContent();
+                renderSidebar();
+                renderFolders();
+                mainTitle.textContent = 'Notes';
             }
             // Add field in add form
             if (e.target.id === 'addFieldBtn' || e.target.closest('#addFieldBtn')) {
@@ -1898,26 +1962,31 @@
         });
 
         // =============================================================
-        // 22. KEYBOARD SHORTCUTS
+        // 23. KEYBOARD SHORTCUTS
         // =============================================================
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
                 if (modalOverlay.classList.contains('active')) closeModal();
+                // If in add form, cancel
+                if (currentViewIds.length === 1 && currentViewIds[0] === 'new') {
+                    // Simulate cancel click
+                    document.getElementById('cancelNewBtn')?.click();
+                }
             }
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'N') {
                 e.preventDefault();
-                window.location.href = 'note.html?action=add';
+                addNewBtn.click();
             }
         });
 
         // =============================================================
-        // 23. POPSTATE
+        // 24. POPSTATE
         // =============================================================
         window.addEventListener('popstate', () => {
             window.location.reload();
         });
 
-        console.log('🔐 Note page loaded with folders and favorites');
+        console.log('🔐 Note page loaded with folders, favorites, and multi-view');
     </script>
 </body>
 </html>
