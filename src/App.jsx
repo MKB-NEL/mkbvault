@@ -1,5 +1,5 @@
 // ============================================================
-// FILE: src/App.jsx
+// FILE: src/App.jsx (FULL WORKING VERSION)
 // ============================================================
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -7,6 +7,9 @@ import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, onValue } from 'firebase/database';
 import AuthGuard from './components/AuthGuard';
 import Login from './pages/Login';
+import Credential from './pages/Credential';
+import Note from './pages/Note';
+import Project from './pages/Project';
 import DesktopLayout from './layouts/DesktopLayout';
 import MobileLayout from './layouts/MobileLayout';
 import './styles/global.css';
@@ -63,19 +66,41 @@ const App = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Login route - no auth required */}
+        {/* Login - no auth required */}
         <Route path="/login" element={<Login />} />
+
+        {/* Detail pages - auth required */}
+        <Route
+          path="/credential/:id?"
+          element={
+            <AuthGuard>
+              <Credential />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/note/:id?"
+          element={
+            <AuthGuard>
+              <Note />
+            </AuthGuard>
+          }
+        />
+        <Route
+          path="/project/:id?"
+          element={
+            <AuthGuard>
+              <Project />
+            </AuthGuard>
+          }
+        />
 
         {/* Main dashboard - auth required */}
         <Route
           path="/"
           element={
             <AuthGuard>
-              {isMobile ? (
-                <MobileLayout items={items} />
-              ) : (
-                <DesktopLayout items={items} />
-              )}
+              {isMobile ? <MobileLayout items={items} /> : <DesktopLayout items={items} />}
             </AuthGuard>
           }
         />
