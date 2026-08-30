@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
+  <title>Create · Vault</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Iconify -->
+  <script src="https://code.iconify.design/iconify-icon/2.3.0/iconify-icon.min.js"></script>
+
+  <!-- Firebase -->
+  <script type="importmap">
+    {
+      "imports": {
+        "firebase/app": "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js",
+        "firebase/database": "https://www.gstatic.com/firebasejs/12.10.0/firebase-database.js"
+      }
+    }
+  </script>
+
+  <style>
+    /* ===== RESET ===== */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #f0f2f5;
+      --card: #ffffff;
+      --text: #1a1a2e;
+      --text2: #6b7280;
+      --border: #e5e7eb;
+      --blue: #4f46e5;
+      --blue-hover: #4338ca;
+      --blue-light: #eef2ff;
+      --green: #10b981;
+      --red: #ef4444;
+      --yellow: #f59e0b;
+      --shadow: 0 4px 24px rgba(0,0,0,0.06);
+      --radius: 16px;
+      --radius-sm: 10px;
+      --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      line-height: 1.6;
+    }
+
+    /* ===== CONTAINER ===== */
+    .create-container {
+      max-width: 560px;
+      width: 100%;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 40px 36px 36px;
+      position: relative;
+      overflow: hidden;
+      animation: slideUp 0.5s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .create-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--green), var(--blue));
+      background-size: 200% 100%;
+      animation: shimmer 3s ease-in-out infinite;
+    }
+
+    @keyframes shimmer {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .header .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border: none;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text2);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .header .back-btn:hover {
+      background: var(--blue-light);
+      color: var(--blue);
+    }
+
+    .header .type-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 16px 4px 12px;
+      background: var(--blue-light);
+      border-radius: 40px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--blue);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header .type-badge iconify-icon {
+      font-size: 1.2rem;
+    }
+
+    .header .title {
+      flex: 1;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    /* ===== SUBTYPE SELECTOR (for Keys) ===== */
+    .subtype-selector {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      padding: 4px;
+    }
+
+    .subtype-selector .subtype-btn {
+      flex: 1;
+      padding: 10px 8px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: var(--transition);
+      background: transparent;
+      color: var(--text2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .subtype-selector .subtype-btn:hover {
+      color: var(--text);
+    }
+
+    .subtype-selector .subtype-btn.active {
+      background: var(--card);
+      color: var(--blue);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+
+    /* ===== FORM ===== */
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text2);
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .form-group label .required {
+      color: var(--red);
+      margin-left: 2px;
+    }
+
+    .form-group .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      background: var(--bg);
+      border-radius: var(--radius-sm);
+      border: 2px solid transparent;
+      transition: var(--transition);
+    }
+
+    .form-group .input-wrap:focus-within {
+      border-color: var(--blue);
+      background: var(--card);
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.08);
+    }
+
+    .form-group .input-wrap .icon {
+      padding: 0 0 0 14px;
+      color: var(--text2);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+    }
+
+    .form-group .input-wrap input,
+    .form-group .input-wrap textarea,
+    .form-group .input-wrap select {
+      width: 100%;
+      padding: 12px 14px;
+      border: none;
+      background: transparent;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      color: var(--text);
+      outline: none;
+      font-weight: 400;
+    }
+
+    .form-group .input-wrap textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .form-group .input-wrap select {
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .form-group .input-wrap .toggle-pwd {
+      padding: 0 14px 0 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text2);
+      font-size: 1.1rem;
+    }
+
+    .form-group .input-wrap .toggle-pwd:hover {
+      color: var(--text);
+    }
+
+    /* ===== TAGS / CHIPS ===== */
+    .tag-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    .tag {
+      padding: 4px 14px;
+      background: var(--bg);
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text2);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .tag:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-light);
+    }
+
+    .tag.active {
+      background: var(--blue);
+      color: white;
+      border-color: var(--blue);
+    }
+
+    .tag .add-tag {
+      background: var(--blue-light);
+      color: var(--blue);
+      border: 1px dashed var(--blue);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .tag .add-tag:hover {
+      background: var(--blue);
+      color: white;
+    }
+
+    /* ===== CUSTOM FIELDS (for Notes) ===== */
+    .custom-fields {
+      margin-top: 8px;
+    }
+
+    .custom-field-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .custom-field-row input {
+      flex: 1;
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.85rem;
+      background: var(--bg);
+      outline: none;
+      transition: var(--transition);
+    }
+
+    .custom-field-row input:focus {
+      border-color: var(--blue);
+    }
+
+    .custom-field-row .remove-field {
+      background: none;
+      border: none;
+      color: var(--red);
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 4px;
+    }
+
+    .add-field-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 6px 14px;
+      border: 1px dashed var(--border);
+      border-radius: var(--radius-sm);
+      background: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      color: var(--text2);
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .add-field-btn:hover {
+      border-color: var(--blue);
+      color: var(--blue);
+      background: var(--blue-light);
+    }
+
+    /* ===== SUBMIT ===== */
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: var(--radius-sm);
+      background: var(--blue);
+      color: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .submit-btn:hover {
+      background: var(--blue-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 16px rgba(79, 70, 229, 0.3);
+    }
+
+    .submit-btn:active {
+      transform: scale(0.98);
+    }
+
+    .submit-btn .spinner {
+      display: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    .submit-btn.loading .spinner {
+      display: block;
+    }
+
+    .submit-btn.loading .btn-text {
+      display: none;
+    }
+
+    .submit-btn.loading .btn-icon {
+      display: none;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--text);
+      color: white;
+      padding: 12px 24px;
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      font-weight: 500;
+      opacity: 0;
+      transition: all 0.4s ease;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      z-index: 999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .toast.success { background: var(--green); }
+    .toast.error { background: var(--red); }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      body { padding: 12px; }
+      .create-container { padding: 24px 18px 20px; }
+      .header .title { font-size: 1.2rem; }
+      .subtype-selector .subtype-btn { font-size: 0.75rem; padding: 8px 4px; }
+      .form-group .input-wrap input,
+      .form-group .input-wrap textarea,
+      .form-group .input-wrap select { font-size: 0.9rem; padding: 10px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="create-container" id="app">
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+      <button class="back-btn" id="backBtn">
+        <iconify-icon icon="mdi:arrow-left"></iconify-icon>
+        Back
+      </button>
+      <div class="type-badge" id="typeBadge">
+        <iconify-icon icon="mdi:plus"></iconify-icon>
+        <span id="typeLabel">Create</span>
+      </div>
+      <span class="title" id="pageTitle">New Item</span>
+    </div>
+
+    <!-- ===== SUBTYPE SELECTOR (for Keys) ===== -->
+    <div class="subtype-selector" id="subtypeSelector" style="display:none;">
+      <button class="subtype-btn active" data-subtype="password">
+        <iconify-icon icon="mdi:key"></iconify-icon> Password
+      </button>
+      <button class="subtype-btn" data-subtype="card">
+        <iconify-icon icon="mdi:credit-card"></iconify-icon> Card
+      </button>
+    </div>
+
+    <!-- ===== FORM ===== -->
+    <form id="createForm" autocomplete="off">
+
+      <!-- Title -->
+      <div class="form-group" id="titleGroup">
+        <label>Title <span class="required">*</span></label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:format-title"></iconify-icon></span>
+          <input type="text" id="titleInput" placeholder="Enter a title..." required />
+        </div>
+      </div>
+
+      <!-- URL (Credentials) -->
+      <div class="form-group" id="urlGroup" style="display:none;">
+        <label>URL <span class="required">*</span></label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:link"></iconify-icon></span>
+          <input type="url" id="urlInput" placeholder="https://example.com" />
+        </div>
+      </div>
+
+      <!-- Username (Credentials) -->
+      <div class="form-group" id="usernameGroup" style="display:none;">
+        <label>Username / Email / Phone</label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:account"></iconify-icon></span>
+          <input type="text" id="usernameInput" placeholder="Enter username or email" />
+        </div>
+      </div>
+
+      <!-- Password (Credentials / Keys) -->
+      <div class="form-group" id="passwordGroup" style="display:none;">
+        <label>Password <span class="required">*</span></label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:lock"></iconify-icon></span>
+          <input type="password" id="passwordInput" placeholder="Enter password" />
+          <button class="toggle-pwd" type="button" id="togglePwd">
+            <iconify-icon icon="mdi:eye"></iconify-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Content (Notes) -->
+      <div class="form-group" id="contentGroup" style="display:none;">
+        <label>Description</label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:note-text"></iconify-icon></span>
+          <textarea id="contentInput" placeholder="Write your note..."></textarea>
+        </div>
+      </div>
+
+      <!-- Folder (Notes / Projects) -->
+      <div class="form-group" id="folderGroup" style="display:none;">
+        <label>Folder</label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:folder"></iconify-icon></span>
+          <input type="text" id="folderInput" placeholder="Optional folder name" />
+        </div>
+      </div>
+
+      <!-- Status (Projects) -->
+      <div class="form-group" id="statusGroup" style="display:none;">
+        <label>Status</label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:progress-check"></iconify-icon></span>
+          <select id="statusInput">
+            <option value="Active">Active</option>
+            <option value="In Progress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Archived">Archived</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Group (Credentials) -->
+      <div class="form-group" id="groupGroup" style="display:none;">
+        <label>Group</label>
+        <div class="input-wrap">
+          <span class="icon"><iconify-icon icon="mdi:folder-multiple"></iconify-icon></span>
+          <select id="groupInput">
+            <option value="General">General</option>
+          </select>
+        </div>
+        <div class="tag-group" id="groupTags">
+          <span class="tag active" data-group="General">General</span>
+          <span class="tag add-tag" id="addGroupTag">+ Add</span>
+        </div>
+      </div>
+
+      <!-- Custom Fields (Notes) -->
+      <div class="form-group" id="fieldsGroup" style="display:none;">
+        <label>Custom Fields</label>
+        <div class="custom-fields" id="customFields">
+          <div class="custom-field-row">
+            <input type="text" placeholder="Field name" class="field-name" />
+            <input type="text" placeholder="Value" class="field-value" />
+            <button class="remove-field" type="button" style="display:none;">✕</button>
+          </div>
+        </div>
+        <button class="add-field-btn" type="button" id="addFieldBtn">
+          <iconify-icon icon="mdi:plus"></iconify-icon> Add Field
+        </button>
+      </div>
+
+      <!-- ===== SUBMIT ===== -->
+      <button class="submit-btn" type="submit" id="submitBtn">
+        <span class="btn-icon"><iconify-icon icon="mdi:check"></iconify-icon></span>
+        <span class="btn-text" id="submitText">Create</span>
+        <span class="spinner"></span>
+      </button>
+
+    </form>
+
+  </div>
+
+  <!-- ===== TOAST ===== -->
+  <div class="toast" id="toast"></div>
+
+  <!-- ============================================================ -->
+  <!-- ===== FIREBASE + LOGIC ===== -->
+  <!-- ============================================================ -->
+  <script type="module">
+    import { initializeApp } from 'firebase/app';
+    import { getDatabase, ref, push, set, get, update, onValue } from 'firebase/database';
+
+    // ============================================================
+    // FIREBASE CONFIG
+    // ============================================================
+    const firebaseConfig = {
+      apiKey: 'AIzaSyBbrRHlakmOdKwuDGwYAx5qf-e6DOHW7s0',
+      authDomain: 'joefootball-15e7a.firebaseapp.com',
+      databaseURL: 'https://joefootball-15e7a-default-rtdb.firebaseio.com',
+      projectId: 'joefootball-15e7a',
+      storageBucket: 'joefootball-15e7a.firebasestorage.app',
+      messagingSenderId: '976347287101',
+      appId: '1:976347287101:web:93a93c519fff7e60986454',
+      measurementId: 'G-3Q10KV3HE3'
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
+    const itemsRef = ref(database, 'vault-items');
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type') || 'credential';
+    const subtype = params.get('subtype') || 'password';
+    const editId = params.get('id');
+
+    let groups = ['General'];
+    let isEditing = !!editId;
+    let existingData = null;
+
+    const typeMap = {
+      credential: { icon: 'mdi:key', label: 'Credential', title: 'New Credential' },
+      note: { icon: 'mdi:note-text', label: 'Note', title: 'New Note' },
+      project: { icon: 'mdi:folder-open', label: 'Project', title: 'New Project' },
+      key: { icon: 'mdi:key-variant', label: 'Key', title: 'New Key' }
+    };
+
+    // ============================================================
+    // DOM REFS
+    // ============================================================
+    const $ = id => document.getElementById(id);
+
+    const backBtn = $('backBtn');
+    const typeBadge = $('typeBadge');
+    const typeLabel = $('typeLabel');
+    const pageTitle = $('pageTitle');
+    const subtypeSelector = $('subtypeSelector');
+    const form = $('createForm');
+    const titleInput = $('titleInput');
+    const urlInput = $('urlInput');
+    const usernameInput = $('usernameInput');
+    const passwordInput = $('passwordInput');
+    const contentInput = $('contentInput');
+    const folderInput = $('folderInput');
+    const statusInput = $('statusInput');
+    const groupInput = $('groupInput');
+    const groupTags = $('groupTags');
+    const customFields = $('customFields');
+    const addFieldBtn = $('addFieldBtn');
+    const submitBtn = $('submitBtn');
+    const submitText = $('submitText');
+    const toast = $('toast');
+    const togglePwd = $('togglePwd');
+
+    const typeGroups = {
+      credential: ['titleGroup', 'urlGroup', 'usernameGroup', 'passwordGroup', 'groupGroup'],
+      note: ['titleGroup', 'contentGroup', 'folderGroup', 'fieldsGroup'],
+      project: ['titleGroup', 'folderGroup', 'statusGroup'],
+      key: ['titleGroup', 'passwordGroup']
+    };
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function showToast(message, type = 'success') {
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      requestAnimationFrame(() => toast.classList.add('show'));
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    function getSubtype() {
+      return document.querySelector('.subtype-btn.active')?.dataset.subtype || subtype;
+    }
+
+    function getCustomFields() {
+      const fields = {};
+      const rows = customFields.querySelectorAll('.custom-field-row');
+      rows.forEach(row => {
+        const name = row.querySelector('.field-name')?.value?.trim();
+        const value = row.querySelector('.field-value')?.value?.trim();
+        if (name) {
+          fields[`field_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`] = { title: name, value: value || '' };
+        }
+      });
+      return fields;
+    }
+
+    // ============================================================
+    // LOAD GROUPS & EXISTING DATA
+    // ============================================================
+    async function loadGroups() {
+      const snap = await get(itemsRef);
+      const data = snap.val();
+      if (data) {
+        const all = Object.values(data).filter(i => i.type === 'credential' && !i.trash);
+        const groupSet = new Set();
+        all.forEach(c => { if (c.group) groupSet.add(c.group); });
+        if (!groupSet.has('General')) groupSet.add('General');
+        groups = Array.from(groupSet).sort();
+        populateGroupSelect();
+        populateGroupTags();
+      }
+    }
+
+    function populateGroupSelect() {
+      groupInput.innerHTML = groups.map(g => `<option value="${g}">${g}</option>`).join('');
+    }
+
+    function populateGroupTags() {
+      const activeGroup = groupInput.value;
+      groupTags.innerHTML = groups.map(g => `
+        <span class="tag ${g === activeGroup ? 'active' : ''}" data-group="${g}">${g}</span>
+      `).join('');
+      // Add "+ Add" button
+      const addTag = document.createElement('span');
+      addTag.className = 'tag add-tag';
+      addTag.innerHTML = '+ Add';
+      addTag.id = 'addGroupTag';
+      groupTags.appendChild(addTag);
+      // Re-attach event listeners
+      groupTags.querySelectorAll('.tag:not(.add-tag)').forEach(el => {
+        el.addEventListener('click', () => {
+          groupInput.value = el.dataset.group;
+          groupTags.querySelectorAll('.tag:not(.add-tag)').forEach(t => t.classList.remove('active'));
+          el.classList.add('active');
+        });
+      });
+      document.getElementById('addGroupTag')?.addEventListener('click', addNewGroup);
+    }
+
+    async function addNewGroup() {
+      const name = prompt('Enter new group name:');
+      if (name && name.trim() && !groups.includes(name.trim())) {
+        groups.push(name.trim());
+        populateGroupSelect();
+        populateGroupTags();
+        groupInput.value = name.trim();
+        showToast(`Group "${name.trim()}" created!`, 'success');
+      } else if (name && name.trim()) {
+        showToast('Group already exists.', 'warning');
+      }
+    }
+
+    // ============================================================
+    // LOAD EXISTING DATA (for editing)
+    // ============================================================
+    async function loadExistingData() {
+      if (!editId) return;
+      const snap = await get(ref(database, `vault-items/${editId}`));
+      const data = snap.val();
+      if (!data) {
+        showToast('Item not found.', 'error');
+        return;
+      }
+      existingData = data;
+      titleInput.value = data.title || '';
+      if (data.url) urlInput.value = data.url;
+      if (data.username) usernameInput.value = data.username;
+      if (data.password) passwordInput.value = data.password;
+      if (data.content) contentInput.value = data.content;
+      if (data.folder) folderInput.value = data.folder;
+      if (data.status) statusInput.value = data.status;
+      if (data.group) groupInput.value = data.group;
+      if (data.fields) {
+        customFields.innerHTML = '';
+        Object.entries(data.fields).forEach(([key, field]) => {
+          const row = document.createElement('div');
+          row.className = 'custom-field-row';
+          row.innerHTML = `
+            <input type="text" placeholder="Field name" class="field-name" value="${field.title || ''}" />
+            <input type="text" placeholder="Value" class="field-value" value="${field.value || ''}" />
+            <button class="remove-field" type="button">✕</button>
+          `;
+          customFields.appendChild(row);
+          row.querySelector('.remove-field').addEventListener('click', () => {
+            row.remove();
+          });
+        });
+      }
+      // Set subtype for keys
+      if (type === 'key' && data.subtype) {
+        document.querySelectorAll('.subtype-btn').forEach(btn => {
+          btn.classList.toggle('active', btn.dataset.subtype === data.subtype);
+        });
+      }
+      submitText.textContent = 'Update';
+      pageTitle.textContent = `Edit ${typeMap[type]?.label || 'Item'}`;
+      isEditing = true;
+    }
+
+    // ============================================================
+    // SETUP UI BASED ON TYPE
+    // ============================================================
+    function setupUI() {
+      // Set header
+      const info = typeMap[type] || typeMap.credential;
+      typeBadge.querySelector('iconify-icon').setAttribute('icon', info.icon);
+      typeLabel.textContent = info.label;
+      pageTitle.textContent = isEditing ? `Edit ${info.label}` : `New ${info.label}`;
+
+      // Show/hide subtype selector for keys
+      subtypeSelector.style.display = type === 'key' ? 'flex' : 'none';
+
+      // Show/hide form groups
+      Object.keys(typeGroups).forEach(key => {
+        const show = key === type;
+        typeGroups[key].forEach(id => {
+          const el = document.getElementById(id);
+          if (el) el.style.display = show ? 'block' : 'none';
+        });
+      });
+
+      // Special: for key, password is required and label changes
+      if (type === 'key') {
+        const pwdGroup = document.getElementById('passwordGroup');
+        if (pwdGroup) {
+          const label = pwdGroup.querySelector('label');
+          const sub = getSubtype();
+          if (sub === 'card') {
+            label.innerHTML = 'Card Number <span class="required">*</span>';
+            passwordInput.placeholder = 'Enter card number';
+          } else {
+            label.innerHTML = 'Password <span class="required">*</span>';
+            passwordInput.placeholder = 'Enter password';
+          }
+        }
+      }
+
+      // Update submit text
+      submitText.textContent = isEditing ? 'Update' : 'Create';
+    }
+
+    // ============================================================
+    // SUBTYPE CHANGE (for keys)
+    // ============================================================
+    document.querySelectorAll('.subtype-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.subtype-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        // Update password label
+        const sub = btn.dataset.subtype;
+        const pwdGroup = document.getElementById('passwordGroup');
+        if (pwdGroup) {
+          const label = pwdGroup.querySelector('label');
+          if (sub === 'card') {
+            label.innerHTML = 'Card Number <span class="required">*</span>';
+            passwordInput.placeholder = 'Enter card number';
+          } else {
+            label.innerHTML = 'Password <span class="required">*</span>';
+            passwordInput.placeholder = 'Enter password';
+          }
+        }
+      });
+    });
+
+    // ============================================================
+    // TOGGLE PASSWORD VISIBILITY
+    // ============================================================
+    togglePwd.addEventListener('click', () => {
+      const isPwd = passwordInput.type === 'password';
+      passwordInput.type = isPwd ? 'text' : 'password';
+      togglePwd.querySelector('iconify-icon').setAttribute('icon', isPwd ? 'mdi:eye-off' : 'mdi:eye');
+    });
+
+    // ============================================================
+    // ADD CUSTOM FIELD
+    // ============================================================
+    addFieldBtn.addEventListener('click', () => {
+      const row = document.createElement('div');
+      row.className = 'custom-field-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Field name" class="field-name" />
+        <input type="text" placeholder="Value" class="field-value" />
+        <button class="remove-field" type="button">✕</button>
+      `;
+      customFields.appendChild(row);
+      row.querySelector('.remove-field').addEventListener('click', () => {
+        row.remove();
+      });
+    });
+
+    // ============================================================
+    // BACK BUTTON
+    // ============================================================
+    backBtn.addEventListener('click', () => {
+      window.location.href = 'vault.html';
+    });
+
+    // ============================================================
+    // SUBMIT HANDLER
+    // ============================================================
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      submitBtn.classList.add('loading');
+      submitBtn.disabled = true;
+
+      try {
+        const title = titleInput.value.trim();
+        if (!title) {
+          showToast('Title is required.', 'error');
+          submitBtn.classList.remove('loading');
+          submitBtn.disabled = false;
+          return;
+        }
+
+        const data = {
+          type: type,
+          title: title,
+          favorite: false,
+          trash: false,
+          createdAt: Date.now()
+        };
+
+        // Type-specific fields
+        switch (type) {
+          case 'credential': {
+            const url = urlInput.value.trim();
+            if (!url) { showToast('URL is required.', 'error'); submitBtn.classList.remove('loading'); submitBtn.disabled = false; return; }
+            data.url = url;
+            data.username = usernameInput.value.trim() || '';
+            const pwd = passwordInput.value.trim();
+            if (!pwd) { showToast('Password is required.', 'error'); submitBtn.classList.remove('loading'); submitBtn.disabled = false; return; }
+            data.password = pwd;
+            data.group = groupInput.value || 'General';
+            break;
+          }
+          case 'note': {
+            data.content = contentInput.value.trim() || '';
+            data.folder = folderInput.value.trim() || '';
+            data.fields = getCustomFields();
+            break;
+          }
+          case 'project': {
+            data.folder = folderInput.value.trim() || '';
+            data.status = statusInput.value || 'Active';
+            break;
+          }
+          case 'key': {
+            const sub = getSubtype();
+            data.subtype = sub;
+            const pwd = passwordInput.value.trim();
+            if (!pwd) { showToast(`${sub === 'card' ? 'Card number' : 'Password'} is required.`, 'error'); submitBtn.classList.remove('loading'); submitBtn.disabled = false; return; }
+            if (sub === 'card') {
+              data.number = pwd;
+              data.cvv = '';
+              data.content = '';
+            } else {
+              data.content = pwd;
+              data.number = '';
+              data.cvv = '';
+            }
+            data.note = '';
+            break;
+          }
+          default: {
+            showToast('Unknown type.', 'error');
+            submitBtn.classList.remove('loading');
+            submitBtn.disabled = false;
+            return;
+          }
+        }
+
+        // Save to Firebase
+        if (isEditing && editId) {
+          await update(ref(database, `vault-items/${editId}`), data);
+          showToast('Item updated successfully!', 'success');
+        } else {
+          const newRef = push(itemsRef);
+          await set(newRef, data);
+          showToast('Item created successfully!', 'success');
+        }
+
+        // Redirect after short delay
+        setTimeout(() => {
+          window.location.href = 'vault.html';
+        }, 1200);
+
+      } catch (error) {
+        console.error('Save error:', error);
+        showToast('Error saving item. Please try again.', 'error');
+      } finally {
+        submitBtn.classList.remove('loading');
+        submitBtn.disabled = false;
+      }
+    });
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    async function init() {
+      await loadGroups();
+      await loadExistingData();
+      setupUI();
+
+      // Re-attach group tag events after setup
+      document.getElementById('addGroupTag')?.addEventListener('click', addNewGroup);
+      groupTags.querySelectorAll('.tag:not(.add-tag)').forEach(el => {
+        el.addEventListener('click', () => {
+          groupInput.value = el.dataset.group;
+          groupTags.querySelectorAll('.tag:not(.add-tag)').forEach(t => t.classList.remove('active'));
+          el.classList.add('active');
+        });
+      });
+
+      console.log('🔐 Create page loaded:', { type, subtype, editId, isEditing });
+    }
+
+    init();
+  </script>
+</body>
+</html>
