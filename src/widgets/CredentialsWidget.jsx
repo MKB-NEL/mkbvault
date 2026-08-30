@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/widgets/CredentialsWidget.jsx
-// ============================================================
+ 
 import React, { useState, useMemo } from 'react';
 import { Icon } from '../components/Icon';
 import { useModal } from '../context/ModalContext';
