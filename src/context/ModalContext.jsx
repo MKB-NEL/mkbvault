@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/context/ModalContext.jsx
-// ============================================================
+
 import React, { createContext, useState, useCallback, useContext, useRef } from 'react';
 
 const ModalContext = createContext();
