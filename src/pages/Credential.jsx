@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/pages/Credential.jsx
-// ============================================================
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { Icon } from '../components/Icon';
