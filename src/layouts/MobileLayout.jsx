@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/layouts/MobileLayout.jsx
-// ============================================================
+
 import React, { useState } from 'react';
 import { Icon } from '../components/Icon';
 import { useToast } from '../context/ToastContext';
