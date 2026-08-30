@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/widgets/NotesWidget.jsx
-// ============================================================
+ 
 import React, { useState, useMemo } from 'react';
 import { Icon } from '../components/Icon';
 
