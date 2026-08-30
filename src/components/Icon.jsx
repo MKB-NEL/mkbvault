@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/components/Icon.jsx
-// ============================================================
+
 import React from 'react';
 
 export const Icon = ({ icon, className = '', style = {} }) => (
