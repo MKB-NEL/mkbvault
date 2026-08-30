@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/mobile/MobileBookmarks.jsx
-// ============================================================
+ 
 import React, { useState, useMemo } from 'react';
 import { Icon } from '../components/Icon';
 import { useToast } from '../context/ToastContext';
