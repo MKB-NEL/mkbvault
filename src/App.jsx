@@ -20,7 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const itemsRef = ref(database, 'vault-items');
-const categoriesRef = ref(database, 'categories'); // for bookmark categories
+const categoriesRef = ref(database, 'categories');
 
 // ============================================================
 // ICON
@@ -272,7 +272,7 @@ const CredentialsWidget = ({ items, navigate }) => {
 };
 
 // ============================================================
-// KEYS WIDGET (NEW)
+// KEYS WIDGET (FIXED)
 // ============================================================
 const KeysWidget = ({ items, navigate }) => {
   const { prompt, confirm } = useModal();
@@ -281,7 +281,6 @@ const KeysWidget = ({ items, navigate }) => {
   const [selected, setSelected] = useState(new Set());
   const [search, setSearch] = useState('');
 
-  // Group by subtype
   const groups = useMemo(() => {
     const g = {};
     items.filter(i => i.type === 'key' && !i.trash).forEach(item => {
@@ -324,11 +323,9 @@ const KeysWidget = ({ items, navigate }) => {
     else navigate(`/key/${id}`);
   };
 
-  // Add new key – opens modal with subtype selection
   const handleAddKey = async () => {
     const subtype = await prompt('Select Type', 'Choose key type:', 'password', 'select', ['password', 'card']);
     if (!subtype) return;
-    // Open the key detail page with action=add and subtype param
     navigate(`/key?action=add&subtype=${subtype}`);
   };
 
@@ -392,7 +389,7 @@ const KeysWidget = ({ items, navigate }) => {
 };
 
 // ============================================================
-// BOOKMARKS WIDGET (Fixed: categories saved to Firebase)
+// BOOKMARKS WIDGET (Fixed categories)
 // ============================================================
 const BookmarksWidget = ({ items }) => {
   const { prompt, confirm } = useModal();
@@ -450,10 +447,8 @@ const BookmarksWidget = ({ items }) => {
   const addCategory = async () => {
     const name = await prompt('New Category', 'Enter category name:');
     if (name && name.trim() && !categories.includes(name.trim())) {
-      // Save to Firebase
       const newCatRef = push(categoriesRef);
       await set(newCatRef, true);
-      // Update local state (will be updated by onValue)
       setCategories(prev => [...prev, name.trim()]);
       setForm(prev => ({ ...prev, category: name.trim() }));
       toast(`Category "${name.trim()}" created`, 'success');
@@ -500,7 +495,6 @@ const BookmarksWidget = ({ items }) => {
     set(newRef, newItem);
     toast('Bookmark added!', 'success');
     setShowForm(false);
-    // Reset form properly
     setForm({ url: '', title: '', description: '', category: 'Uncategorized' });
   };
 
@@ -832,19 +826,17 @@ const CredentialDetail = () => {
   const { confirm } = useModal();
   const isNew = searchParams.get('action') === 'add' || !id;
   const [credential, setCredential] = useState(null);
-  const [allCredentials, setAllCredentials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(isNew);
   const [showPassword, setShowPassword] = useState(false);
   const [groups, setGroups] = useState(['General']);
   const [formData, setFormData] = useState({ title: '', url: '', username: '', password: '', group: 'General' });
 
-  // Load all credentials for sidebar
+  // Load groups
   useEffect(() => {
     const unsubscribe = onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();
-      const all = data ? Object.entries(data).map(([id, value]) => ({ id, ...value })).filter(i => i.type === 'credential' && !i.trash).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0)) : [];
-      setAllCredentials(all);
+      const all = data ? Object.entries(data).map(([id, value]) => ({ id, ...value })).filter(i => i.type === 'credential' && !i.trash) : [];
       const groupSet = new Set();
       all.forEach(c => { if (c.group) groupSet.add(c.group); });
       if (!groupSet.has('General')) groupSet.add('General');
@@ -1261,7 +1253,7 @@ const ProjectDetail = () => {
   );
 };
 
-// ---- Key Detail (NEW) ----
+// ---- Key Detail ----
 const KeyDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -1269,7 +1261,7 @@ const KeyDetail = () => {
   const toast = useToast();
   const { confirm } = useModal();
   const isNew = searchParams.get('action') === 'add' || !id;
-  const subtype = searchParams.get('subtype') || 'password';
+  const subtypeParam = searchParams.get('subtype') || 'password';
   const [keyItem, setKeyItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(isNew);
@@ -1279,7 +1271,7 @@ const KeyDetail = () => {
     number: '',
     cvv: '',
     note: '',
-    subtype: subtype
+    subtype: subtypeParam
   });
 
   useEffect(() => {
@@ -1301,11 +1293,9 @@ const KeyDetail = () => {
         setLoading(false);
       }).catch(() => setLoading(false));
     } else {
-      // For new, set subtype from query param
-      setFormData(prev => ({ ...prev, subtype: subtype }));
       setLoading(false);
     }
-  }, [id, isNew, subtype]);
+  }, [id, isNew]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -1463,7 +1453,7 @@ const VaultDashboard = ({ items }) => {
       <div className="layout">
         <aside className="sidebar">
           <CredentialsWidget items={items} navigate={navigate} />
-          <KeysWidget items={items} navigate={navigate} />  {/* NEW: Keys widget below Credentials */}
+          <KeysWidget items={items} navigate={navigate} />
         </aside>
         <div className="main">
           <BookmarksWidget items={items} />
@@ -1523,7 +1513,7 @@ const MobileLayout = ({ items }) => {
 };
 
 // ============================================================
-// STYLES (complete)
+// STYLES
 // ============================================================
 const styles = `
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1684,7 +1674,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .modal-box .actions .btn-danger { background: var(--red); color: #fff; }
 .modal-box .actions .btn-danger:hover { background: #b91c1c; }
 
-/* Detail Pages */
 .detail-page { max-width: 900px; margin: 0 auto; padding: 20px; }
 .detail-header { display: flex; align-items: center; gap: 16px; padding: 12px 0; border-bottom: 1px solid var(--border); margin-bottom: 20px; flex-wrap: wrap; }
 .detail-header .back-btn { background: none; border: none; cursor: pointer; color: var(--text2); display: flex; align-items: center; gap: 4px; font-size: 0.9rem; }
@@ -1721,7 +1710,6 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .status-badge.on-hold { background: #fed7d7; color: #991b1b; }
 .status-badge.archived { background: #e5e7eb; color: #4b5563; }
 
-/* Mobile Layout */
 .mobile-container { display: flex; flex-direction: column; height: 100vh; max-height: 100vh; overflow: hidden; background: var(--bg); }
 .mobile-header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: var(--header); color: #fff; flex-shrink: 0; }
 .mobile-header .brand { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 1.1rem; }
@@ -1765,7 +1753,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 `;
 
 // ============================================================
-// MAIN APP (with Router)
+// MAIN APP
 // ============================================================
 function App() {
   const [items, setItems] = useState([]);
