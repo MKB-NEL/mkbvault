@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/App.jsx (FULL WORKING VERSION)
-// ============================================================
+
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { initializeApp } from 'firebase/app';
@@ -14,9 +12,7 @@ import DesktopLayout from './layouts/DesktopLayout';
 import MobileLayout from './layouts/MobileLayout';
 import './styles/global.css';
 
-// ============================================================
-// FIREBASE CONFIG
-// ============================================================
+
 const firebaseConfig = {
   apiKey: 'AIzaSyBbrRHlakmOdKwuDGwYAx5qf-e6DOHW7s0',
   authDomain: 'joefootball-15e7a.firebaseapp.com',
@@ -32,21 +28,17 @@ export const app = initializeApp(firebaseConfig);
 export const database = getDatabase(app);
 export const itemsRef = ref(database, 'vault-items');
 
-// ============================================================
-// MAIN APP
-// ============================================================
+
 const App = () => {
   const [items, setItems] = useState([]);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Handle window resize for mobile detection
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Listen to Firebase for real-time updates
   useEffect(() => {
     const unsubscribe = onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();
@@ -95,7 +87,7 @@ const App = () => {
           }
         />
 
-        {/* Main dashboard - auth required */}
+        {}
         <Route
           path="/"
           element={
@@ -105,7 +97,7 @@ const App = () => {
           }
         />
 
-        {/* Redirect any unknown routes to home */}
+        {}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
