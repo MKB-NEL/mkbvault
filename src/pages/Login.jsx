@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/pages/Login.jsx
-// ============================================================
+ 
 import React, { useState, useEffect, useRef } from 'react';
 import { Icon } from '../components/Icon';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
