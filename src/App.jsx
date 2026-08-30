@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { BrowserRouter, Routes, Route, Link, useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useParams, useNavigate, useSearchParams, Navigate } from 'react-router-dom';
 import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue, push, set, update } from 'firebase/database';
+import { getDatabase, ref, onValue, push, set, update, get } from 'firebase/database';
 
 // ============================================================
 // FIREBASE CONFIG
@@ -20,6 +20,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const itemsRef = ref(database, 'vault-items');
+const categoriesRef = ref(database, 'categories'); // for bookmark categories
 
 // ============================================================
 // ICON
@@ -124,7 +125,7 @@ const ModalProvider = ({ children }) => {
 };
 
 // ============================================================
-// CREDENTIALS WIDGET (Full)
+// CREDENTIALS WIDGET
 // ============================================================
 const CredentialsWidget = ({ items, navigate }) => {
   const { prompt, confirm } = useModal();
@@ -271,7 +272,127 @@ const CredentialsWidget = ({ items, navigate }) => {
 };
 
 // ============================================================
-// BOOKMARKS WIDGET
+// KEYS WIDGET (NEW)
+// ============================================================
+const KeysWidget = ({ items, navigate }) => {
+  const { prompt, confirm } = useModal();
+  const toast = useToast();
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState(new Set());
+  const [search, setSearch] = useState('');
+
+  // Group by subtype
+  const groups = useMemo(() => {
+    const g = {};
+    items.filter(i => i.type === 'key' && !i.trash).forEach(item => {
+      const subtype = item.subtype || 'password';
+      if (!g[subtype]) g[subtype] = [];
+      g[subtype].push(item);
+    });
+    return g;
+  }, [items]);
+
+  const filtered = useMemo(() => {
+    const term = search.toLowerCase().trim();
+    const result = {};
+    let total = 0;
+    Object.keys(groups).forEach(subtype => {
+      const items = groups[subtype].filter(item =>
+        !term || (item.title && item.title.toLowerCase().includes(term)) ||
+        (item.content && item.content.toLowerCase().includes(term)) ||
+        (item.number && item.number.toLowerCase().includes(term))
+      );
+      if (items.length > 0 || !term) { result[subtype] = items; total += items.length; }
+    });
+    return { groups: result, total };
+  }, [groups, search]);
+
+  const toggleSelect = (id) => {
+    const newSet = new Set(selected);
+    if (newSet.has(id)) newSet.delete(id);
+    else newSet.add(id);
+    setSelected(newSet);
+  };
+
+  const moveToTrash = (id) => {
+    update(ref(database, `vault-items/${id}`), { trash: true, trashedAt: Date.now() });
+    toast('Moved to trash', 'warning');
+  };
+
+  const openKey = (id) => {
+    if (id === 'new') navigate('/key?action=add');
+    else navigate(`/key/${id}`);
+  };
+
+  // Add new key – opens modal with subtype selection
+  const handleAddKey = async () => {
+    const subtype = await prompt('Select Type', 'Choose key type:', 'password', 'select', ['password', 'card']);
+    if (!subtype) return;
+    // Open the key detail page with action=add and subtype param
+    navigate(`/key?action=add&subtype=${subtype}`);
+  };
+
+  return (
+    <div className="widget">
+      <div className="widget-header">
+        <div className="title"><Icon icon="mdi:key-variant" /> Keys</div>
+        <div className="controls">
+          <label><input type="checkbox" checked={selectMode} onChange={() => { setSelectMode(prev => !prev); if (selectMode) setSelected(new Set()); }} /> Select</label>
+          <div className="search">
+            <Icon icon="mdi:search" />
+            <input type="text" placeholder="Search..." value={search} onChange={(e) => setSearch(e.target.value)} />
+            <span className="match">{search ? `(${filtered.total} matches)` : ''}</span>
+          </div>
+          <button className="btn-icon primary" onClick={handleAddKey}>+Key</button>
+        </div>
+      </div>
+      <div className="widget-recents">
+        <span className="label">Recent</span>
+        {items.filter(i => i.type === 'key' && !i.trash).slice(0, 3).map(i => (
+          <span key={i.id} className="item" onClick={() => openKey(i.id)}>{i.title || 'Untitled'}</span>
+        ))}
+      </div>
+      <div className="widget-body">
+        {Object.keys(filtered.groups).sort().map(subtype => (
+          <div key={subtype} className="cred-group">
+            <div className="group-header" onClick={() => {
+              const content = document.querySelector(`.keys-group[data-subtype="${subtype}"] .group-content`);
+              if (content) content.classList.toggle('open');
+            }}>
+              <Icon icon="mdi:chevron-down" />
+              <span className="name">{subtype === 'password' ? '🔑 Passwords' : '💳 Cards'}</span>
+              <span className="count">({filtered.groups[subtype].length})</span>
+            </div>
+            <div className="group-content open" data-subtype={subtype}>
+              {filtered.groups[subtype].map(item => {
+                const isSelected = selected.has(item.id);
+                return (
+                  <div key={item.id} className="cred-item">
+                    <span className={`checkbox ${selectMode ? 'show' : ''}`}>
+                      <input type="checkbox" checked={isSelected} onChange={() => toggleSelect(item.id)} />
+                    </span>
+                    <span className="title" onClick={() => openKey(item.id)}>{item.title || 'Untitled'}</span>
+                    <div className="actions">
+                      <button onClick={() => openKey(item.id)}>📂</button>
+                      <button className="delete" onClick={() => moveToTrash(item.id)}>🗑</button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+        <div className={`multi-actions ${selectMode && selected.size > 0 ? 'show' : ''}`}>
+          <button className="btn" onClick={() => { selected.forEach(id => openKey(id)); }}><Icon icon="mdi:open-in-new" /> Open</button>
+          <button className="btn" onClick={() => { selected.forEach(id => moveToTrash(id)); setSelected(new Set()); toast('Keys moved to trash', 'warning'); }}><Icon icon="mdi:delete" /> Delete</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ============================================================
+// BOOKMARKS WIDGET (Fixed: categories saved to Firebase)
 // ============================================================
 const BookmarksWidget = ({ items }) => {
   const { prompt, confirm } = useModal();
@@ -284,6 +405,21 @@ const BookmarksWidget = ({ items }) => {
   const [form, setForm] = useState({ url: '', title: '', description: '', category: 'Uncategorized' });
   const [fetching, setFetching] = useState(false);
   const [fetchMsg, setFetchMsg] = useState('Ready');
+  const [categories, setCategories] = useState(['Uncategorized']);
+
+  // Load categories from Firebase
+  useEffect(() => {
+    const unsubscribe = onValue(categoriesRef, (snapshot) => {
+      const data = snapshot.val();
+      if (data) {
+        const catList = Object.keys(data).filter(key => data[key] === true);
+        setCategories(catList.length ? catList : ['Uncategorized']);
+      } else {
+        setCategories(['Uncategorized']);
+      }
+    });
+    return () => unsubscribe();
+  }, []);
 
   const books = useMemo(() => {
     let b = items.filter(i => i.type === 'bookmark' && !i.trash);
@@ -298,13 +434,6 @@ const BookmarksWidget = ({ items }) => {
 
   const totalPages = Math.ceil(books.length / 36) || 1;
   const pageBooks = books.slice(page * 36, (page + 1) * 36);
-
-  const categories = useMemo(() => {
-    const cats = new Set();
-    items.filter(i => i.type === 'bookmark' && !i.trash).forEach(i => { if (i.category) cats.add(i.category); });
-    if (!cats.has('Uncategorized')) cats.add('Uncategorized');
-    return Array.from(cats).sort();
-  }, [items]);
 
   const toggleSelect = (id) => {
     const newSet = new Set(selected);
@@ -321,9 +450,15 @@ const BookmarksWidget = ({ items }) => {
   const addCategory = async () => {
     const name = await prompt('New Category', 'Enter category name:');
     if (name && name.trim() && !categories.includes(name.trim())) {
-      categories.push(name.trim());
+      // Save to Firebase
+      const newCatRef = push(categoriesRef);
+      await set(newCatRef, true);
+      // Update local state (will be updated by onValue)
+      setCategories(prev => [...prev, name.trim()]);
       setForm(prev => ({ ...prev, category: name.trim() }));
       toast(`Category "${name.trim()}" created`, 'success');
+    } else if (name && name.trim()) {
+      toast('Category already exists.', 'warning');
     }
   };
 
@@ -365,6 +500,7 @@ const BookmarksWidget = ({ items }) => {
     set(newRef, newItem);
     toast('Bookmark added!', 'success');
     setShowForm(false);
+    // Reset form properly
     setForm({ url: '', title: '', description: '', category: 'Uncategorized' });
   };
 
@@ -684,14 +820,16 @@ const LoginPage = () => {
 };
 
 // ============================================================
-// CREDENTIAL DETAIL
+// DETAIL PAGES (Credential, Note, Project, Key)
 // ============================================================
+
+// ---- Credential Detail ----
 const CredentialDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const toast = useToast();
-  const { confirm, prompt } = useModal();
+  const { confirm } = useModal();
   const isNew = searchParams.get('action') === 'add' || !id;
   const [credential, setCredential] = useState(null);
   const [allCredentials, setAllCredentials] = useState([]);
@@ -701,6 +839,7 @@ const CredentialDetail = () => {
   const [groups, setGroups] = useState(['General']);
   const [formData, setFormData] = useState({ title: '', url: '', username: '', password: '', group: 'General' });
 
+  // Load all credentials for sidebar
   useEffect(() => {
     const unsubscribe = onValue(itemsRef, (snapshot) => {
       const data = snapshot.val();
@@ -714,6 +853,7 @@ const CredentialDetail = () => {
     return () => unsubscribe();
   }, []);
 
+  // Load single credential
   useEffect(() => {
     if (!isNew && id) {
       const credRef = ref(database, `vault-items/${id}`);
@@ -830,11 +970,11 @@ const CredentialDetail = () => {
         )}
         {(isNew || isEditing) && (
           <div className="edit-mode">
-            <div className="field"><label>Title *</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Title" /></div>
-            <div className="field"><label>URL</label><input type="url" name="url" value={formData.url} onChange={handleChange} placeholder="https://example.com" /></div>
-            <div className="field"><label>Username</label><input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username / Email" /></div>
-            <div className="field"><label>Password</label><input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="Password" /> <button className="toggle-pwd" onClick={() => setShowPassword(!showPassword)} type="button">{showPassword ? 'Hide' : 'Show'}</button></div>
-            <div className="field"><label>Group</label><select name="group" value={formData.group} onChange={handleChange}>{groups.map(g => <option key={g} value={g}>{g}</option>)}</select></div>
+            <div className="field"><label>Title *</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Title" style={{ border: '2px solid #000' }} /></div>
+            <div className="field"><label>URL</label><input type="url" name="url" value={formData.url} onChange={handleChange} placeholder="https://example.com" style={{ border: '2px solid #000' }} /></div>
+            <div className="field"><label>Username</label><input type="text" name="username" value={formData.username} onChange={handleChange} placeholder="Username / Email" style={{ border: '2px solid #000' }} /></div>
+            <div className="field"><label>Password</label><input type={showPassword ? 'text' : 'password'} name="password" value={formData.password} onChange={handleChange} placeholder="Password" style={{ border: '2px solid #000' }} /> <button className="toggle-pwd" onClick={() => setShowPassword(!showPassword)} type="button">{showPassword ? 'Hide' : 'Show'}</button></div>
+            <div className="field"><label>Group</label><select name="group" value={formData.group} onChange={handleChange} style={{ border: '2px solid #000' }}>{groups.map(g => <option key={g} value={g}>{g}</option>)}</select></div>
           </div>
         )}
       </div>
@@ -842,9 +982,7 @@ const CredentialDetail = () => {
   );
 };
 
-// ============================================================
-// NOTE DETAIL (similar structure)
-// ============================================================
+// ---- Note Detail ----
 const NoteDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -989,14 +1127,14 @@ const NoteDetail = () => {
         )}
         {(isNew || isEditing) && (
           <div className="edit-mode">
-            <div className="field"><label>Title *</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Title" /></div>
-            <div className="field"><label>Folder</label><input type="text" name="folder" value={formData.folder} onChange={handleChange} placeholder="Folder" /></div>
-            <div className="field"><label>Description</label><textarea name="content" value={formData.content} onChange={handleChange} rows="4" placeholder="Write your note..." /></div>
+            <div className="field"><label>Title *</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Title" style={{ border: '2px solid #000' }} /></div>
+            <div className="field"><label>Folder</label><input type="text" name="folder" value={formData.folder} onChange={handleChange} placeholder="Folder" style={{ border: '2px solid #000' }} /></div>
+            <div className="field"><label>Description</label><textarea name="content" value={formData.content} onChange={handleChange} rows="4" placeholder="Write your note..." style={{ border: '2px solid #000' }} /></div>
             <div className="fields-section"><div className="fields-title">Custom Fields</div>
               {Object.entries(formData.fields).map(([key, field]) => (
                 <div key={key} className="custom-field-edit">
-                  <input className="f-label-input" placeholder="Field name" value={field.title || ''} onChange={(e) => handleFieldChange(key, 'title', e.target.value)} />
-                  <input className="f-value-input" placeholder="Value" value={field.value || ''} onChange={(e) => handleFieldChange(key, 'value', e.target.value)} />
+                  <input className="f-label-input" placeholder="Field name" value={field.title || ''} onChange={(e) => handleFieldChange(key, 'title', e.target.value)} style={{ border: '2px solid #000' }} />
+                  <input className="f-value-input" placeholder="Value" value={field.value || ''} onChange={(e) => handleFieldChange(key, 'value', e.target.value)} style={{ border: '2px solid #000' }} />
                   <button className="remove-field-btn" onClick={() => removeField(key)}><Icon icon="mdi:close" /></button>
                 </div>
               ))}
@@ -1009,9 +1147,7 @@ const NoteDetail = () => {
   );
 };
 
-// ============================================================
-// PROJECT DETAIL (simplified)
-// ============================================================
+// ---- Project Detail ----
 const ProjectDetail = () => {
   const { id } = useParams();
   const [searchParams] = useSearchParams();
@@ -1115,9 +1251,176 @@ const ProjectDetail = () => {
         )}
         {(isNew || isEditing) && (
           <div className="edit-mode">
-            <div className="field"><label>Title *</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Project title" /></div>
-            <div className="field"><label>Status</label><select name="status" value={formData.status} onChange={handleChange}><option value="Active">Active</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option><option value="On Hold">On Hold</option><option value="Archived">Archived</option></select></div>
-            <div className="field"><label>Description</label><textarea name="description" value={formData.description} onChange={handleChange} rows="4" placeholder="Project description..." /></div>
+            <div className="field"><label>Title *</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Project title" style={{ border: '2px solid #000' }} /></div>
+            <div className="field"><label>Status</label><select name="status" value={formData.status} onChange={handleChange} style={{ border: '2px solid #000' }}><option value="Active">Active</option><option value="In Progress">In Progress</option><option value="Completed">Completed</option><option value="On Hold">On Hold</option><option value="Archived">Archived</option></select></div>
+            <div className="field"><label>Description</label><textarea name="description" value={formData.description} onChange={handleChange} rows="4" placeholder="Project description..." style={{ border: '2px solid #000' }} /></div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ---- Key Detail (NEW) ----
+const KeyDetail = () => {
+  const { id } = useParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { confirm } = useModal();
+  const isNew = searchParams.get('action') === 'add' || !id;
+  const subtype = searchParams.get('subtype') || 'password';
+  const [keyItem, setKeyItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [isEditing, setIsEditing] = useState(isNew);
+  const [formData, setFormData] = useState({
+    title: '',
+    content: '',
+    number: '',
+    cvv: '',
+    note: '',
+    subtype: subtype
+  });
+
+  useEffect(() => {
+    if (!isNew && id) {
+      const keyRef = ref(database, `vault-items/${id}`);
+      get(keyRef).then((snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+          setKeyItem({ id, ...data });
+          setFormData({
+            title: data.title || '',
+            content: data.content || '',
+            number: data.number || '',
+            cvv: data.cvv || '',
+            note: data.note || '',
+            subtype: data.subtype || 'password'
+          });
+        }
+        setLoading(false);
+      }).catch(() => setLoading(false));
+    } else {
+      // For new, set subtype from query param
+      setFormData(prev => ({ ...prev, subtype: subtype }));
+      setLoading(false);
+    }
+  }, [id, isNew, subtype]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSave = async () => {
+    if (!formData.title.trim()) {
+      toast('Title is required.', 'warning');
+      return;
+    }
+    const data = {
+      type: 'key',
+      subtype: formData.subtype,
+      title: formData.title.trim(),
+      content: formData.content || '',
+      number: formData.number || '',
+      cvv: formData.cvv || '',
+      note: formData.note || '',
+      favorite: false,
+      trash: false,
+      createdAt: Date.now()
+    };
+    try {
+      if (isNew) {
+        const newRef = push(itemsRef);
+        await set(newRef, data);
+        toast('Key created!', 'success');
+        navigate(`/key/${newRef.key}`);
+      } else {
+        await update(ref(database, `vault-items/${id}`), data);
+        toast('Key updated!', 'success');
+        setIsEditing(false);
+        const keyRef = ref(database, `vault-items/${id}`);
+        const snapshot = await get(keyRef);
+        if (snapshot.exists()) setKeyItem({ id, ...snapshot.val() });
+      }
+    } catch (error) {
+      toast('Error saving key.', 'error');
+    }
+  };
+
+  const handleDelete = async () => {
+    if (await confirm(`Delete key "${keyItem?.title || 'Untitled'}"?`)) {
+      await update(ref(database, `vault-items/${id}`), { trash: true, trashedAt: Date.now() });
+      toast('Moved to trash', 'warning');
+      navigate('/');
+    }
+  };
+
+  const copyToClipboard = (text) => {
+    if (!text) return;
+    navigator.clipboard?.writeText(text).then(() => toast('Copied!', 'success')).catch(() => {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      toast('Copied!', 'success');
+    });
+  };
+
+  if (loading) return <div className="loader"><div className="spinner"></div></div>;
+
+  const isPassword = formData.subtype === 'password';
+  const isCard = formData.subtype === 'card';
+
+  return (
+    <div className="detail-page">
+      <header className="detail-header">
+        <button className="back-btn" onClick={() => navigate('/')}><Icon icon="mdi:arrow-left" /> Back</button>
+        <h2>{isNew ? `New ${isPassword ? 'Password' : 'Card'}` : keyItem?.title || 'Key'}</h2>
+        <div className="actions">
+          {!isNew && !isEditing && (
+            <>
+              <button className="btn btn-secondary" onClick={() => setIsEditing(true)}><Icon icon="mdi:pencil" /> Edit</button>
+              <button className="btn btn-danger" onClick={handleDelete}><Icon icon="mdi:delete" /> Delete</button>
+            </>
+          )}
+          {(isNew || isEditing) && (
+            <>
+              <button className="btn btn-primary" onClick={handleSave}><Icon icon="mdi:check" /> Save</button>
+              <button className="btn btn-secondary" onClick={() => { if (isNew) navigate('/'); else setIsEditing(false); }}>Cancel</button>
+            </>
+          )}
+        </div>
+      </header>
+      <div className="detail-content">
+        {!isNew && !isEditing && keyItem && (
+          <div className="view-mode">
+            <div className="field"><label>Title</label><div>{keyItem.title || 'Untitled'}</div></div>
+            {isPassword && <div className="field"><label>Password</label><div>{keyItem.content || '—'} {keyItem.content && <button className="copy-btn" onClick={() => copyToClipboard(keyItem.content)}><Icon icon="mdi:content-copy" /></button>}</div></div>}
+            {isCard && (
+              <>
+                <div className="field"><label>Number</label><div>{keyItem.number || '—'} {keyItem.number && <button className="copy-btn" onClick={() => copyToClipboard(keyItem.number)}><Icon icon="mdi:content-copy" /></button>}</div></div>
+                <div className="field"><label>CVV</label><div>{keyItem.cvv || '—'} {keyItem.cvv && <button className="copy-btn" onClick={() => copyToClipboard(keyItem.cvv)}><Icon icon="mdi:content-copy" /></button>}</div></div>
+              </>
+            )}
+            {keyItem.note && <div className="field"><label>Note</label><div>{keyItem.note}</div></div>}
+          </div>
+        )}
+        {(isNew || isEditing) && (
+          <div className="edit-mode">
+            <div className="field"><label>Title *</label><input type="text" name="title" value={formData.title} onChange={handleChange} placeholder="Title" style={{ border: '2px solid #000' }} /></div>
+            {isPassword && (
+              <div className="field"><label>Password</label><input type="text" name="content" value={formData.content} onChange={handleChange} placeholder="Password" style={{ border: '2px solid #000' }} /></div>
+            )}
+            {isCard && (
+              <>
+                <div className="field"><label>Number</label><input type="text" name="number" value={formData.number} onChange={handleChange} placeholder="Card number" style={{ border: '2px solid #000' }} /></div>
+                <div className="field"><label>CVV</label><input type="text" name="cvv" value={formData.cvv} onChange={handleChange} placeholder="CVV" style={{ border: '2px solid #000' }} /></div>
+              </>
+            )}
+            <div className="field"><label>Note</label><textarea name="note" value={formData.note} onChange={handleChange} rows="3" placeholder="Optional note..." style={{ border: '2px solid #000' }} /></div>
           </div>
         )}
       </div>
@@ -1160,6 +1463,7 @@ const VaultDashboard = ({ items }) => {
       <div className="layout">
         <aside className="sidebar">
           <CredentialsWidget items={items} navigate={navigate} />
+          <KeysWidget items={items} navigate={navigate} />  {/* NEW: Keys widget below Credentials */}
         </aside>
         <div className="main">
           <BookmarksWidget items={items} />
@@ -1202,12 +1506,14 @@ const MobileLayout = ({ items }) => {
       </header>
       <div className="mobile-content">
         {tab === 'credentials' && <CredentialsWidget items={items} navigate={navigate} />}
+        {tab === 'keys' && <KeysWidget items={items} navigate={navigate} />}
         {tab === 'bookmarks' && <BookmarksWidget items={items} />}
         {tab === 'notes' && <NotesWidget items={items} navigate={navigate} />}
         {tab === 'projects' && <ProjectsWidget items={items} navigate={navigate} />}
       </div>
       <nav className="bottom-nav">
         <button className={`nav-item ${tab === 'credentials' ? 'active' : ''}`} onClick={() => setTab('credentials')}><Icon icon="mdi:key" /><span>Credentials</span></button>
+        <button className={`nav-item ${tab === 'keys' ? 'active' : ''}`} onClick={() => setTab('keys')}><Icon icon="mdi:key-variant" /><span>Keys</span></button>
         <button className={`nav-item ${tab === 'bookmarks' ? 'active' : ''}`} onClick={() => setTab('bookmarks')}><Icon icon="mdi:bookmark" /><span>Bookmarks</span></button>
         <button className={`nav-item ${tab === 'notes' ? 'active' : ''}`} onClick={() => setTab('notes')}><Icon icon="mdi:note-text" /><span>Notes</span></button>
         <button className={`nav-item ${tab === 'projects' ? 'active' : ''}`} onClick={() => setTab('projects')}><Icon icon="mdi:folder-open" /><span>Projects</span></button>
@@ -1217,7 +1523,7 @@ const MobileLayout = ({ items }) => {
 };
 
 // ============================================================
-// STYLES (as a string constant)
+// STYLES (complete)
 // ============================================================
 const styles = `
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -1276,7 +1582,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .header .btn-danger { background: transparent; border: 1px solid rgba(255,255,255,0.3); }
 .header .btn-danger:hover { background: rgba(220,38,38,0.3); border-color: var(--red); }
 .layout { display: flex; gap: 20px; margin-top: 16px; }
-.sidebar { flex: 0 0 30%; min-width: 260px; max-width: 380px; }
+.sidebar { flex: 0 0 30%; min-width: 260px; max-width: 380px; display: flex; flex-direction: column; gap: 20px; }
 .main { flex: 1; display: flex; flex-direction: column; gap: 20px; }
 .widget { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
 .widget-header { padding: 10px 14px; background: var(--bg); border-bottom: 1px solid var(--border); display: flex; align-items: center; flex-wrap: wrap; gap: 6px 10px; font-weight: 600; font-size: 0.9rem; }
@@ -1388,7 +1694,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .detail-content .field { display: flex; padding: 8px 0; border-bottom: 1px solid var(--border); gap: 16px; align-items: flex-start; }
 .detail-content .field label { width: 120px; font-weight: 500; color: var(--text2); flex-shrink: 0; padding-top: 4px; }
 .detail-content .field .value { flex: 1; word-break: break-all; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-.detail-content .field input, .detail-content .field textarea, .detail-content .field select { flex: 1; padding: 6px 10px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.9rem; background: var(--bg); outline: none; font-family: 'Inter', sans-serif; }
+.detail-content .field input, .detail-content .field textarea, .detail-content .field select { flex: 1; padding: 6px 10px; border: 2px solid #000 !important; border-radius: var(--radius); font-size: 0.9rem; background: var(--bg); outline: none; font-family: 'Inter', sans-serif; }
 .detail-content .field input:focus, .detail-content .field textarea:focus, .detail-content .field select:focus { border-color: var(--blue); }
 .detail-content .field textarea { min-height: 80px; resize: vertical; }
 .copy-btn { background: none; border: none; cursor: pointer; color: var(--text-muted); padding: 0 4px; }
@@ -1403,7 +1709,7 @@ body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--tex
 .custom-field-edit { display: flex; gap: 8px; padding: 4px 0; align-items: center; flex-wrap: wrap; }
 .custom-field-edit .f-label-input { flex: 0 0 120px; }
 .custom-field-edit .f-value-input { flex: 1; min-width: 100px; }
-.custom-field-edit input { padding: 4px 8px; border: 1px solid var(--border); border-radius: var(--radius); font-size: 0.85rem; background: var(--bg); outline: none; }
+.custom-field-edit input { padding: 4px 8px; border: 2px solid #000 !important; border-radius: var(--radius); font-size: 0.85rem; background: var(--bg); outline: none; }
 .custom-field-edit input:focus { border-color: var(--blue); }
 .remove-field-btn { background: none; border: none; cursor: pointer; color: var(--red); font-size: 1rem; }
 .add-field-btn { background: none; border: 1px dashed var(--border); border-radius: var(--radius); padding: 6px 12px; color: var(--text2); font-size: 0.8rem; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; margin-top: 8px; }
@@ -1466,7 +1772,6 @@ function App() {
   const [auth, setAuth] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  // Resize listener
   useEffect(() => {
     const handleResize = () => setIsMobile(window.innerWidth < 768);
     window.addEventListener('resize', handleResize);
@@ -1524,6 +1829,8 @@ function App() {
             <Route path="/note" element={<NoteDetail />} />
             <Route path="/project/:id" element={<ProjectDetail />} />
             <Route path="/project" element={<ProjectDetail />} />
+            <Route path="/key/:id" element={<KeyDetail />} />
+            <Route path="/key" element={<KeyDetail />} />
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </BrowserRouter>
