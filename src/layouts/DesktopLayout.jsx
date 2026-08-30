@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/layouts/DesktopLayout.jsx
-// ============================================================
+
 import React from 'react';
 import CredentialsWidget from '../widgets/CredentialsWidget';
 import BookmarksWidget from '../widgets/BookmarksWidget';
