@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/widgets/BookmarksWidget.jsx
-// ============================================================
+ 
 import React, { useState, useMemo, useRef } from 'react';
 import { Icon } from '../components/Icon';
 import { useModal } from '../context/ModalContext';
