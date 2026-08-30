@@ -1,6 +1,4 @@
-// ============================================================
-// FILE: src/context/ToastContext.jsx
-// ============================================================
+
 import React, { createContext, useState, useCallback, useContext } from 'react';
 import { Icon } from '../components/Icon';
 
